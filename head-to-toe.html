@@ -1,0 +1,921 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Head to Toe</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&family=Fraunces:opsz,wght@9..144,600;9..144,800&display=swap" rel="stylesheet">
+
+<!--
+  ===================================================================
+  LESSON TEMPLATE
+  To make a new lesson: copy this file and edit ONLY the LESSON object
+  in the <script> at the bottom (title, theme colours, sections).
+  Everything else (design, checking, saving) stays the same.
+  ===================================================================
+-->
+
+<style>
+  :root{
+    /* default palette — overwritten by LESSON.theme */
+    --bg:#FBF6EC; --paper:#FFFFFF; --ink:#2B2235; --muted:#7A6F80;
+    --accent:#E2554F; --accent2:#F2B544; --soft:#F7E7CF;
+    --ok:#2E9E6A; --ok-bg:#E2F5EB; --bad:#D9483B; --bad-bg:#FCE5E2;
+    --close:#B07A06; --close-bg:#FFF2D2;
+    --radius:20px;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.6 "DM Sans",system-ui,-apple-system,"Segoe UI",sans-serif}
+  .wrap{max-width:800px;margin:0 auto;padding:0 18px}
+  button{font:inherit}
+
+  /* film strip */
+  .strip{height:16px;background:var(--ink);display:flex;align-items:center}
+  .strip::before{content:"";flex:1;height:6px;background:repeating-linear-gradient(90deg,var(--bg) 0 9px,transparent 9px 22px)}
+
+  /* hero */
+  .hero{position:relative;padding:40px 0 10px}
+  .kicker{display:inline-block;font-size:12.5px;letter-spacing:.09em;text-transform:uppercase;font-weight:700;background:var(--soft);padding:5px 12px;border-radius:99px}
+  .title-wrap{position:relative;display:inline-block;margin-top:14px;max-width:80%}
+  h1{font-family:"Fraunces",Georgia,serif;font-weight:800;font-size:clamp(36px,7.5vw,60px);line-height:1.02;margin:0;letter-spacing:-.015em}
+  .title-wrap svg{position:absolute;left:0;bottom:-16px;width:100%;height:16px;overflow:visible}
+  .kicker{max-width:calc(100% - 70px);line-height:1.5}
+  .sub{color:var(--muted);margin:26px 0 0;max-width:54ch}
+  .sticker{position:absolute;user-select:none;-webkit-user-select:none;filter:drop-shadow(3px 4px 0 rgba(0,0,0,.08));animation:bob 5s ease-in-out infinite}
+  .s1{right:0;top:34px;font-size:52px;rotate:12deg}
+  .s2{right:78px;top:104px;font-size:34px;rotate:-10deg;animation-delay:-2.5s}
+  @keyframes bob{0%,100%{translate:0 0}50%{translate:0 -7px}}
+
+  /* progress */
+  .progress{position:sticky;top:0;z-index:30;display:flex;align-items:center;gap:12px;padding:12px 0;font-weight:700;font-size:15px;background:color-mix(in srgb,var(--bg) 90%,transparent);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+  .bar{flex:1;height:10px;background:var(--soft);border-radius:99px;overflow:hidden}
+  .bar i{display:block;height:100%;width:0;background:var(--accent);border-radius:99px;transition:width .6s cubic-bezier(.3,1.4,.5,1)}
+
+  /* cards */
+  .card{position:relative;background:var(--paper);border:2px solid var(--ink);border-radius:var(--radius);padding:24px 22px 18px;margin:30px 0;box-shadow:7px 7px 0 var(--soft)}
+  .deco{position:absolute;right:18px;top:-22px;font-size:32px;rotate:10deg;user-select:none}
+  .card-head{display:flex;align-items:flex-start;gap:12px}
+  .ticket{flex:none;min-width:46px;height:38px;display:grid;place-items:center;padding:0 8px;background:var(--accent);color:#fff;font-family:"Fraunces",serif;font-weight:800;font-size:18px;border-radius:9px;rotate:-4deg;outline:2px dashed rgba(255,255,255,.55);outline-offset:-6px}
+  .ticket.alt{background:var(--accent2);color:var(--ink);outline-color:rgba(0,0,0,.18)}
+  h2{font-family:"Fraunces",serif;font-weight:800;font-size:23px;line-height:1.2;margin:4px 0 0}
+  .instr{color:var(--muted);margin:8px 0 18px;font-size:15.5px}
+  .instr b{color:var(--ink)}
+
+  .card-foot{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:18px;padding-top:14px;border-top:2px dashed color-mix(in srgb,var(--ink) 14%,transparent)}
+  .btn{font-weight:700;font-size:15px;border-radius:99px;padding:9px 20px;cursor:pointer;border:2px solid var(--ink);background:transparent;color:var(--ink);transition:transform .12s,background .15s}
+  .btn:hover{transform:translateY(-1px)}
+  .btn:active{transform:translateY(1px)}
+  .btn-check{background:var(--ink);color:var(--bg)}
+  .btn-soft{border-color:transparent;background:var(--soft)}
+  .score{margin-left:auto;font-family:"Fraunces",serif;font-weight:800;font-size:19px}
+  .score.perfect{color:var(--ok)}
+  .wiggle{animation:wiggle .5s}
+  @keyframes wiggle{25%{rotate:-4deg}50%{rotate:4deg}75%{rotate:-2deg}}
+
+  /* rule card */
+  .rule-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0}
+  .rule-box{border-radius:14px;padding:12px 14px;background:var(--soft)}
+  .rule-box.b2{background:color-mix(in srgb,var(--accent) 14%,#fff)}
+  .rule-box h3{margin:0 0 4px;font-size:15px;text-transform:uppercase;letter-spacing:.06em}
+  .rule-box p{margin:0;font-size:15.5px}
+  .timeline{width:100%;height:auto;margin:6px 0 4px}
+  .trap{margin-top:12px;font-size:15px;background:var(--close-bg);border-radius:12px;padding:10px 14px}
+  @media (max-width:560px){.rule-grid{grid-template-columns:1fr}}
+
+  /* gap fill */
+  .lines{margin:0;padding-left:1.5em}
+  .lines li::marker{color:var(--accent);font-weight:700}
+  .line{margin:0 0 4px;line-height:2.35}
+  .para .line{line-height:2.5}
+  .gapwrap{white-space:nowrap}
+  .gap{font:inherit;font-size:16.5px;color:var(--ink);border:0;border-bottom:2.5px solid var(--accent);background:var(--soft);border-radius:8px 8px 3px 3px;padding:1px 8px;min-width:5ch;max-width:100%;text-align:center;outline:none;transition:background .15s,box-shadow .15s}
+  .gap:focus{background:#fff;box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 25%,transparent)}
+  .hint{color:var(--muted);font-style:italic;font-size:.88em;margin-left:5px}
+  input.ok,textarea.ok{background:var(--ok-bg);border-color:var(--ok);color:#17603f}
+  input.bad{background:var(--bad-bg);border-color:var(--bad);text-decoration:underline wavy var(--bad);text-underline-offset:4px}
+  input.close{background:var(--close-bg);border-color:var(--close)}
+  .reveal{display:inline-block;margin-left:6px;font-size:.84em;font-weight:700;color:#17603f;background:var(--ok-bg);padding:0 9px;border-radius:99px;line-height:1.9;white-space:nowrap}
+
+  /* multiple choice */
+  .q{margin:0 0 18px}
+  .q-text{margin-bottom:8px}
+  .q-num{font-weight:800;color:var(--accent);margin-right:6px}
+  .blank{display:inline-block;width:64px;border-bottom:2px solid var(--muted);margin:0 3px;translate:0 -4px}
+  .opts{display:flex;flex-wrap:wrap;gap:8px}
+  .opt{font-size:15.5px;border:2px solid var(--ink);background:#fff;color:var(--ink);border-radius:99px;padding:6px 16px;cursor:pointer;transition:transform .12s,background .15s}
+  .opt:hover{transform:translateY(-1px)}
+  .opt.sel{background:var(--ink);color:var(--bg)}
+  .opt.ok{background:var(--ok);border-color:var(--ok);color:#fff}
+  .opt.bad{background:var(--bad);border-color:var(--bad);color:#fff}
+  .opt.answer{box-shadow:0 0 0 3px var(--ok)}
+
+  /* drag & drop */
+  .bank{display:flex;flex-wrap:wrap;gap:9px;padding:12px;min-height:60px;margin-bottom:18px;border:2px dashed color-mix(in srgb,var(--ink) 25%,transparent);border-radius:14px;background:color-mix(in srgb,var(--soft) 40%,#fff);transition:background .15s}
+  .bank:empty::before{content:"All placed ✨";color:var(--muted);font-size:14px;align-self:center}
+  .bank.over{background:var(--soft)}
+  .chip{font-size:15.5px;font-weight:700;line-height:1.35;background:var(--accent2);color:var(--ink);border:2px solid var(--ink);border-radius:10px;padding:5px 12px;box-shadow:2px 2px 0 var(--ink);cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;text-align:left}
+  .chip.selected{outline:3px solid var(--accent);outline-offset:2px;rotate:-2deg}
+  .chip.dragging{opacity:.28}
+  .chip.ghost{position:fixed;z-index:1000;pointer-events:none;margin:0;rotate:-4deg;scale:1.05;box-shadow:5px 6px 0 var(--ink)}
+  .chip.ok{background:var(--ok-bg);border-color:var(--ok);box-shadow:none}
+  .chip.bad{background:var(--bad-bg);border-color:var(--bad);box-shadow:none}
+  .slot{display:inline-flex;align-items:center;justify-content:center;min-width:100px;min-height:40px;padding:2px;margin:0 4px;vertical-align:middle;border:2px dashed color-mix(in srgb,var(--ink) 35%,transparent);border-radius:12px;cursor:pointer;transition:background .15s,border-color .15s}
+  .slot .chip{box-shadow:none}
+  .slot.over,.bucket-zone.over{background:var(--soft);border-color:var(--accent)}
+  .slot.ok{border-style:solid;border-color:var(--ok);background:var(--ok-bg)}
+  .slot.bad{border-style:solid;border-color:var(--bad);background:var(--bad-bg)}
+  .slot.ok .chip,.slot.bad .chip{background:transparent;border-color:transparent}
+
+  .match{display:grid;gap:10px}
+  .mrow{display:grid;grid-template-columns:1fr 1.15fr;gap:10px;align-items:center}
+  .mrow .left{font-weight:500}
+  .mrow .left::before{content:attr(data-n);font-weight:800;color:var(--accent);margin-right:8px}
+  .mrow .slot{display:flex;justify-content:flex-start;width:100%;min-height:46px;margin:0}
+  @media (max-width:560px){.mrow{grid-template-columns:1fr;gap:6px}.mrow+.mrow{margin-top:8px}}
+
+  .buckets{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+  .bucket{border:2px solid var(--ink);border-radius:14px;overflow:hidden;background:#fff}
+  .bucket h3{margin:0;padding:8px 12px;font-size:15px;background:var(--soft);border-bottom:2px solid var(--ink)}
+  .bucket-zone{min-height:118px;padding:10px;display:flex;flex-wrap:wrap;gap:8px;align-content:flex-start;transition:background .15s}
+
+  /* full-width inputs */
+  .row{margin:0 0 16px}
+  .row-label{font-size:14.5px;color:var(--muted);margin-bottom:5px}
+  .row-label s{text-decoration-color:var(--bad);text-decoration-thickness:2px}
+  .prompt{font-weight:500;margin-bottom:6px}
+  .flag{font-size:12.5px;font-weight:700;background:var(--soft);border-radius:6px;padding:1px 7px;margin-right:7px}
+  .full{display:block;width:100%;font:inherit;font-size:16.5px;color:var(--ink);padding:10px 14px;border:2px solid color-mix(in srgb,var(--ink) 22%,transparent);border-radius:12px;background:#fff;outline:none;transition:border-color .15s,background .15s}
+  .full:focus{border-color:var(--accent)}
+  textarea.full{resize:vertical;min-height:130px;line-height:1.55}
+  .model{margin-top:7px;font-size:15px;color:#17603f;background:var(--ok-bg);padding:7px 12px;border-radius:10px}
+  .model.close{color:#7a5300;background:var(--close-bg)}
+  .checks{list-style:none;padding:0;margin:12px 0 0;display:grid;gap:6px;font-size:15px}
+  .checks li::before{content:"○";display:inline-block;width:1.4em;font-weight:800;color:var(--muted)}
+  .checks li.done::before{content:"✓";color:var(--ok)}
+  .checks li.done{color:#17603f}
+
+  /* video */
+  .video{position:relative;aspect-ratio:16/9;border:2px solid var(--ink);border-radius:14px;overflow:hidden;background:#111}
+  .video iframe,.video img{position:absolute;inset:0;width:100%;height:100%;border:0;object-fit:cover}
+  .poster{position:absolute;inset:0;padding:0;border:0;cursor:pointer;background:#111}
+  .poster img{opacity:.85;transition:opacity .2s}
+  .poster:hover img{opacity:1}
+  .play{position:absolute;left:50%;top:50%;translate:-50% -50%;width:74px;height:74px;border-radius:50%;background:var(--accent);border:3px solid #fff;display:grid;place-items:center;box-shadow:0 6px 0 rgba(0,0,0,.25)}
+  .play::after{content:"";margin-left:6px;border-left:22px solid #fff;border-top:14px solid transparent;border-bottom:14px solid transparent}
+  .video-note{font-size:15px;color:var(--muted);margin:12px 0 0}
+
+  .page-foot{text-align:center;padding:14px 0 70px;color:var(--muted);font-size:14px}
+  .page-foot .btn{margin-bottom:12px}
+
+  .confetti{position:fixed;z-index:999;pointer-events:none;font-size:22px;left:0;top:0}
+
+  @media (max-width:560px){
+    body{font-size:16.5px}
+    .card{padding:20px 16px 16px;box-shadow:5px 5px 0 var(--soft)}
+    .s1{font-size:40px;top:26px}
+    .s2{display:none}
+    .title-wrap{max-width:100%}
+    .score{width:100%;margin-left:0;order:-1}
+  }
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="strip" aria-hidden="true"></div>
+
+<div class="wrap">
+  <header class="hero">
+    <div class="sticker s1" id="sticker1" aria-hidden="true"></div>
+    <div class="sticker s2" id="sticker2" aria-hidden="true"></div>
+    <span class="kicker" id="kicker"></span><br>
+    <span class="title-wrap">
+      <h1 id="title"></h1>
+      <svg viewBox="0 0 300 16" preserveAspectRatio="none" aria-hidden="true"><path d="M3 10 Q 21 2 39 10 T 75 10 T 111 10 T 147 10 T 183 10 T 219 10 T 255 10 T 297 10" fill="none" stroke="var(--accent)" stroke-width="4.5" stroke-linecap="round" vector-effect="non-scaling-stroke"/></svg>
+    </span>
+    <p class="sub" id="sub"></p>
+  </header>
+
+  <div class="progress" aria-live="polite">
+    <span id="pIcon">⭐</span><span><b id="pScore">0</b> / <b id="pTotal">0</b></span>
+    <div class="bar"><i id="pBar"></i></div>
+  </div>
+
+  <main id="lesson"></main>
+
+  <footer class="page-foot">
+    <button class="btn btn-soft" id="resetAll" type="button">↺ Reset all answers</button>
+    <div>Your answers are saved on this device.</div>
+  </footer>
+</div>
+
+<script>
+/* =====================================================================
+   LESSON CONTENT — edit this object to make a new lesson
+   ---------------------------------------------------------------------
+   Gaps:  [[answer]]  ·  several right answers: [[was not|wasn't]]
+          hint after " // ":  [[was walking // walk]]
+   Section types: rule, video (youtube: "ID"), mcq, gapfill, dragwords, match, sort,
+                  correct, translate, write
+   ===================================================================== */
+const LESSON = {
+  id: "nicole-body-health-looks-shopping-02",       // unique! answers are saved under this id
+  kicker: "Body · Health · Looks · Shopping · Past Simple vs Continuous",
+  title: "Head to Toe",
+  subtitle: "From a sore throat to new trainers — the words you need at the doctor’s and in the shop.",
+  stickers: ["🛍️", "🩹"],
+  confetti: ["🛍️", "⭐", "👟", "✨"],
+  theme: {                                          // change these to re-colour the whole lesson
+    bg: "#F2F7F4", paper: "#FFFFFF", ink: "#1F2A37", muted: "#667383",
+    accent: "#E8637A", accent2: "#8FD6C3", soft: "#E0F0EA"
+  },
+
+  sections: [
+    {
+      type: "rule", sticker: "🧠",
+      title: "Word box",
+      html: `
+        <p>Read the words. Which ones do you already know? Which are new?</p>
+        <div class="rule-grid">
+          <div class="rule-box"><h3>🦵 Body</h3><p>head, neck, shoulder, back, chest, stomach, arm, elbow, hand, finger, leg, knee, foot → <b>feet</b>, toe, tooth → <b>teeth</b></p></div>
+          <div class="rule-box b2"><h3>🤒 Health</h3><p>a headache, (a) toothache, a stomachache, a sore throat, a cold, a cough, a temperature, the flu · <i>I feel ill · my back hurts · take medicine · stay in bed</i></p></div>
+          <div class="rule-box b2"><h3>💇 Appearance</h3><p>tall / short, slim, good-looking, pretty · long / short, straight / curly / wavy, fair / dark <b>hair</b> · blue / brown <b>eyes</b> · a beard, glasses</p></div>
+          <div class="rule-box"><h3>🛍️ Shopping</h3><p>the chemist’s, the baker’s, the butcher’s, the newsagent’s, a shoe shop · size, changing room, receipt, cash / card · <i>Can I try it on? · How much is it? · It suits you.</i></p></div>
+        </div>
+        <div class="trap">⚠️ <b>Traps:</b> <i>hair</i> is uncountable → <i>She has long hair</i>, not <s>a long hair</s>. One <i>foot</i> → two <b>feet</b>, one <i>tooth</i> → two <b>teeth</b>. <i>Try it on</i>, not <s>try on it</s>.</div>`
+    },
+
+    {
+      type: "mcq", sticker: "🎯",
+      title: "Choose the right word",
+      instructions: "Tap the correct answer.",
+      items: [
+        { q: "I’ve got a ___ — my head really hurts.", options: ["toothache", "headache", "cold"], answer: 1 },
+        { q: "You can buy medicine at the ___.", options: ["baker’s", "butcher’s", "chemist’s"], answer: 2 },
+        { q: "Excuse me, can I ___ this jacket on?", options: ["try", "wear", "put"], answer: 0 },
+        { q: "Her hair isn’t straight — it’s ___.", options: ["slim", "curly", "tall"], answer: 1 },
+        { q: "I’ve got a sore ___, so I can’t talk much.", options: ["knee", "back", "throat"], answer: 2 },
+        { q: "These jeans are too small. Have you got a bigger ___?", options: ["size", "price", "receipt"], answer: 0 }
+      ]
+    },
+
+    {
+      type: "dragwords", sticker: "🏪",
+      title: "Where do you buy it?",
+      instructions: "Drag the shops into the gaps — or tap a word, then tap a gap. One word is extra!",
+      items: [
+        "You buy fresh bread at the [[baker’s]].",
+        "You buy meat at the [[butcher’s]].",
+        "You buy medicine and plasters at the [[chemist’s]].",
+        "You buy newspapers and magazines at the [[newsagent’s]].",
+        "You buy trainers at a [[shoe shop]]."
+      ],
+      extra: ["florist’s"]
+    },
+
+    {
+      type: "match", sticker: "🩺",
+      title: "Problem → advice",
+      instructions: "Drag each piece of advice to the right problem.",
+      pairs: [
+        ["I’ve got toothache.", "Go to the dentist."],
+        ["I’ve got a cold.", "Drink hot tea and stay warm."],
+        ["I’ve got a sore throat.", "Don’t talk too much."],
+        ["My back hurts.", "Don’t carry heavy bags."],
+        ["I’ve got a high temperature.", "Stay in bed and call the doctor."]
+      ]
+    },
+
+    {
+      type: "sort", sticker: "🧺",
+      title: "Sort the words",
+      instructions: "Put each word in the right basket.",
+      categories: [
+        { name: "🦵 Body", words: ["elbow", "knee", "shoulder", "toe"] },
+        { name: "💇 Appearance", words: ["curly", "slim", "fair", "a beard"] },
+        { name: "🛍️ Shopping", words: ["receipt", "changing room", "size", "cash"] }
+      ]
+    },
+
+    {
+      type: "gapfill", sticker: "🤧",
+      title: "My bad day",
+      instructions: "Put the verbs in the <b>Past Simple</b>. Tap a gap and type.",
+      items: [
+        "Yesterday I [[felt // feel]] ill.",
+        "My head [[hurt // hurt]] and I [[had // have]] a temperature.",
+        "Mum [[took // take]] me to the doctor.",
+        "The doctor [[looked // look]] at my throat and [[said // say]] it was a cold.",
+        "We [[bought // buy]] some medicine at the chemist’s.",
+        "I [[stayed // stay]] in bed all day and [[didn’t go|did not go // not go]] to school."
+      ]
+    },
+
+    {
+      type: "gapfill", sticker: "👖",
+      title: "In the shop",
+      instructions: "Write <b>one word</b> in each gap.",
+      text: "<b>Assistant:</b> Can I help you?<br><b>Nicole:</b> Yes, can I [[try]] on these jeans?<br><b>Assistant:</b> Of course. The changing [[room]] is over there.<br><b>Nicole:</b> Hmm, they’re too big. Have you got a smaller [[size]]?<br><b>Assistant:</b> Here you are. Oh, they really [[suit]] you!<br><b>Nicole:</b> Thanks! How [[much]] are they?<br><b>Assistant:</b> 650 hryvnias.<br><b>Nicole:</b> Can I pay by [[card]]?<br><b>Assistant:</b> Sure. Here’s your [[receipt]]."
+    },
+
+    {
+      type: "rule", sticker: "🎬",
+      title: "Background or event?",
+      html: `
+        <p>Every story is a little film. When the camera starts, something is <b>already happening</b> — that’s the <b>background</b>. Then something <b>happens</b> — that’s the <b>event</b>.</p>
+        <svg class="timeline" viewBox="0 0 560 130" role="img" aria-label="Timeline: I was shopping (long wavy line), I met Lisa (a cross in the middle)">
+          <line x1="14" y1="72" x2="540" y2="72" stroke="var(--ink)" stroke-width="2.5" stroke-linecap="round"/>
+          <path d="M532 64 L546 72 L532 80" fill="none" stroke="var(--ink)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M70 72 q 15 -14 30 0 t 30 0 t 30 0 t 30 0 t 30 0 t 30 0 t 30 0 t 30 0 t 30 0 t 30 0 t 30 0 t 30 0 t 30 0" fill="none" stroke="var(--accent2)" stroke-width="7" stroke-linecap="round"/>
+          <g stroke="var(--accent)" stroke-width="6" stroke-linecap="round"><line x1="254" y1="56" x2="286" y2="88"/><line x1="286" y1="56" x2="254" y2="88"/></g>
+          <text x="70" y="34" font-family="DM Sans, sans-serif" font-size="17" font-weight="700" fill="var(--ink)">🛍️ I was shopping… (background)</text>
+          <text x="200" y="118" font-family="DM Sans, sans-serif" font-size="17" font-weight="700" fill="var(--accent)">👋 …when I met Lisa. (event)</text>
+        </svg>
+        <div class="rule-grid">
+          <div class="rule-box"><h3>Background</h3><p><b>Past Continuous</b><br>was / were + verb-<b>ing</b><br><i>I was walking, they were playing</i></p></div>
+          <div class="rule-box b2"><h3>Event</h3><p><b>Past Simple</b><br>verb-<b>ed</b> / 2nd form<br><i>I fell, my knee hurt</i></p></div>
+        </div>
+        <p><b>while</b> + background: <i>While I was running, …</i> &nbsp;·&nbsp; <b>when</b> + event: <i>… when I fell.</i></p>
+        <div class="trap">⚠️ <b>Trap:</b> <i>know, like, want, have</i> (= own) don’t take -ing → <i>She had blue eyes</i>, not <s>was having blue eyes</s>. But <i>have a shower / have breakfast</i> can: <i>I was having a shower.</i></div>`
+    },
+
+    {
+      type: "mcq", sticker: "🎯",
+      title: "Background or event?",
+      instructions: "Tap the correct form.",
+      items: [
+        { q: "I ___ football when I hurt my knee.", options: ["played", "was playing", "play"], answer: 1 },
+        { q: "While I was trying on jeans, my phone ___.", options: ["rang", "was ringing", "rings"], answer: 0 },
+        { q: "At 8 pm yesterday I ___ in bed with a temperature.", options: ["lay", "lie", "was lying"], answer: 2 },
+        { q: "She ___ her finger while she was cutting bread.", options: ["cut", "was cutting", "cuts"], answer: 0 },
+        { q: "When we got to the chemist’s, it ___ — it was closed!", options: ["was closing", "was", "is"], answer: 1 },
+        { q: "What ___ you doing when you broke your arm?", options: ["did", "was", "were"], answer: 2 }
+      ]
+    },
+
+    {
+      type: "gapfill", sticker: "🩼",
+      title: "Put the verb in the correct tense",
+      instructions: "Past Simple or Past Continuous? Tap a gap and type.",
+      items: [
+        "I [[was running // run]] in the park when I [[fell // fall]] and [[hurt // hurt]] my knee.",
+        "While Mum [[was paying // pay]] at the supermarket, I [[saw // see]] my teacher.",
+        "My little brother [[was eating // eat]] sweets when his tooth [[started // start]] to hurt.",
+        "When the doctor [[came // come]] in, I [[was sitting // sit]] in the waiting room.",
+        "We [[were walking // walk]] home when it [[began // begin]] to rain.",
+        "What [[were you doing // you / do]] when your head started to hurt?"
+      ]
+    },
+
+    {
+      type: "dragwords", sticker: "🔁",
+      title: "when or while?",
+      instructions: "Drag the words into the gaps — or tap a word, then tap a gap.",
+      items: [
+        "I broke my arm [[while]] I was skiing.",
+        "[[when]] I got home, Mum was making dinner.",
+        "She was trying on a dress [[when]] her friend called.",
+        "[[while]] we were waiting for the doctor, we read a magazine.",
+        "My back started to hurt [[while]] I was carrying the shopping bags.",
+        "We were having breakfast [[when]] the postman knocked."
+      ]
+    },
+
+    {
+      type: "correct", sticker: "🧐",
+      title: "Fix the story",
+      instructions: "Each sentence has <b>one</b> tense mistake. Fix it right in the box.",
+      items: [
+        { wrong: "While I played tennis, I hurt my shoulder.", answers: ["While I was playing tennis, I hurt my shoulder.", "While I was playing tennis I hurt my shoulder."] },
+        { wrong: "I was falling when I was running.", answers: ["I fell when I was running.", "I fell while I was running."] },
+        { wrong: "They was shopping when it started to snow.", answers: ["They were shopping when it started to snow."] },
+        { wrong: "When I was seeing the price, I was shocked.", answers: ["When I saw the price, I was shocked.", "When I saw the price I was shocked."] }
+      ]
+    },
+
+    {
+      type: "correct", sticker: "🔍",
+      title: "Correct the mistakes",
+      instructions: "Each sentence has <b>one</b> mistake. Fix it right in the box.",
+      items: [
+        { wrong: "My foots hurt after the long walk.", answers: ["My feet hurt after the long walk."] },
+        { wrong: "She has a long hair.", answers: ["She has long hair.", "She's got long hair."] },
+        { wrong: "I need to go to the dentist because my tooths hurt.", answers: ["I need to go to the dentist because my teeth hurt."] },
+        { wrong: "Can I try on it?", answers: ["Can I try it on?"] },
+        { wrong: "He is having blue eyes.", answers: ["He has blue eyes.", "He's got blue eyes.", "He has got blue eyes."] },
+        { wrong: "I buyed new trainers yesterday.", answers: ["I bought new trainers yesterday."] }
+      ]
+    },
+
+    {
+      type: "translate", sticker: "💬",
+      title: "How would you say…?",
+      instructions: "Translate into English.",
+      lang: "UA",
+      items: [
+        { prompt: "У мене болить горло.",
+          answers: ["I have a sore throat.", "I've got a sore throat.", "I have got a sore throat.", "My throat hurts.", "My throat is sore."] },
+        { prompt: "Можна це приміряти?",
+          answers: ["Can I try it on?", "Can I try this on?", "May I try it on?", "May I try this on?", "Could I try it on?", "Could I try this on?"] },
+        { prompt: "У неї довге світле волосся і блакитні очі.",
+          answers: ["She has long fair hair and blue eyes.", "She's got long fair hair and blue eyes.", "She has long blonde hair and blue eyes.", "She's got long blonde hair and blue eyes.", "She has long blond hair and blue eyes.", "She's got long blond hair and blue eyes."] },
+        { prompt: "Скільки коштують ці кросівки?",
+          answers: ["How much are these trainers?", "How much do these trainers cost?", "How much are these sneakers?", "How much do these sneakers cost?"] }
+      ]
+    },
+
+    {
+      type: "write", sticker: "✍️",
+      title: "Describe someone",
+      instructions: "Choose a person from your family or a friend. Write <b>3 sentences</b>: what does he / she look like, and what happened when you were together last weekend? Use <b>was / were + -ing</b> at least once.",
+      checks: [
+        { label: "describes hair or eyes", pattern: "\\b(hair|eyes)\\b" },
+        { label: "uses was / were + -ing", pattern: "\\b(was|were)\\s+\\w+ing\\b" },
+        { label: "uses an appearance word (tall, slim, curly…)", pattern: "\\b(tall|short|slim|curly|straight|wavy|fair|dark|blonde?|pretty|good-looking|beard|glasses)\\b" },
+        { label: "has 3 sentences", sentences: 3 }
+      ],
+      sample: "My sister Anya is tall and slim. She has long dark hair and brown eyes. Last weekend we were walking in the shopping centre when she saw some cool trainers."
+    }
+  ]
+};
+</script>
+
+<script>
+/* =====================================================================
+   ENGINE — no need to edit below this line
+   ===================================================================== */
+(function(){
+"use strict";
+
+/* ---------- helpers ---------- */
+function h(tag, props){
+  const el = document.createElement(tag);
+  if (props) for (const k in props){
+    const v = props[k];
+    if (v == null || v === false) continue;
+    if (k === "class") el.className = v;
+    else if (k === "html") el.innerHTML = v;
+    else if (k === "style") el.style.cssText = v;
+    else if (k.slice(0,2) === "on") el.addEventListener(k.slice(2), v);
+    else el.setAttribute(k, v === true ? "" : v);
+  }
+  for (let i = 2; i < arguments.length; i++){
+    const kids = [].concat(arguments[i]);
+    for (const kid of kids){
+      if (kid == null || kid === false) continue;
+      el.append(kid.nodeType ? kid : document.createTextNode(kid));
+    }
+  }
+  return el;
+}
+function clear(obj){ for (const k of Object.keys(obj)) delete obj[k]; }
+
+function norm(s){
+  s = String(s || "").toLowerCase()
+    .replace(/[’‘`´]/g, "'").replace(/[“”"«»]/g, "");
+  s = s.replace(/\bwon't\b/g, "will not").replace(/\bcan't\b/g, "cannot").replace(/\bcan not\b/g, "cannot")
+       .replace(/n't\b/g, " not").replace(/'m\b/g, " am").replace(/'re\b/g, " are")
+       .replace(/'ve\b/g, " have").replace(/'ll\b/g, " will").replace(/'d\b/g, " would");
+  s = s.replace(/\bmom\b/g, "mum").replace(/\bo'clock\b/g, "oclock");
+  s = s.replace(/[.,!?;:()\[\]–—-]/g, " ").replace(/\s+/g, " ").trim();
+  return s;
+}
+function matches(value, answers){ const v = norm(value); return v !== "" && answers.some(a => norm(a) === v); }
+function similarity(a, b){
+  const A = norm(a).split(" ").filter(Boolean), B = norm(b).split(" ").filter(Boolean);
+  if (!A.length || !B.length) return 0;
+  const pool = B.slice(); let hit = 0;
+  for (const w of A){ const i = pool.indexOf(w); if (i > -1){ hit++; pool.splice(i,1); } }
+  return hit / Math.max(A.length, B.length);
+}
+
+function parseGaps(str){
+  const parts = []; const re = /\[\[(.+?)\]\]/g; let last = 0, m;
+  while ((m = re.exec(str))){
+    if (m.index > last) parts.push({ text: str.slice(last, m.index) });
+    const [ans, hint] = m[1].split(" // ");
+    parts.push({ answers: ans.split("|").map(s => s.trim()), hint: hint ? hint.trim() : null });
+    last = re.lastIndex;
+  }
+  if (last < str.length) parts.push({ text: str.slice(last) });
+  return parts;
+}
+
+function hashStr(s){ let h1 = 1779033703 ^ s.length; for (let i = 0; i < s.length; i++){ h1 = Math.imul(h1 ^ s.charCodeAt(i), 3432918353); h1 = h1 << 13 | h1 >>> 19; } return h1 >>> 0; }
+function shuffle(arr, seedStr){
+  let seed = hashStr(seedStr);
+  const rnd = () => { seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--){ const j = Math.floor(rnd() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
+  return a;
+}
+
+function addReveal(container, text){
+  if (container.querySelector(":scope > .reveal")) return;
+  container.append(h("span", { class: "reveal" }, "→ " + text));
+}
+function removeReveals(root){ root.querySelectorAll(".reveal, .model").forEach(n => n.remove()); }
+
+/* ---------- storage ---------- */
+const KEY = "lesson:" + LESSON.id;
+let SAVE = {};
+try { SAVE = JSON.parse(localStorage.getItem(KEY) || "{}") || {}; } catch (e) { SAVE = {}; }
+function persist(){ try { localStorage.setItem(KEY, JSON.stringify(SAVE)); } catch (e) {} }
+
+/* ---------- theme & header ---------- */
+const root = document.documentElement;
+for (const k in (LESSON.theme || {})) root.style.setProperty("--" + k, LESSON.theme[k]);
+document.title = LESSON.title;
+document.getElementById("kicker").textContent = LESSON.kicker || "";
+document.getElementById("title").textContent = LESSON.title;
+document.getElementById("sub").textContent = LESSON.subtitle || "";
+const st = LESSON.stickers || [];
+document.getElementById("sticker1").textContent = st[0] || "";
+document.getElementById("sticker2").textContent = st[1] || "";
+document.getElementById("pIcon").textContent = (LESSON.confetti || ["⭐"])[1] || "⭐";
+
+/* ---------- confetti ---------- */
+function burst(fromEl){
+  if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const r = fromEl.getBoundingClientRect(); const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+  const set = LESSON.confetti && LESSON.confetti.length ? LESSON.confetti : ["⭐"];
+  for (let i = 0; i < 18; i++){
+    const s = h("span", { class: "confetti" }, set[i % set.length]);
+    document.body.append(s);
+    const dx = (Math.random() - .5) * 340, dy = -60 - Math.random() * 220, rot = (Math.random() - .5) * 540;
+    const anim = s.animate([
+      { transform: `translate(${cx}px, ${cy}px) scale(.6)`, opacity: 1 },
+      { transform: `translate(${cx + dx * .6}px, ${cy + dy}px) rotate(${rot / 2}deg) scale(1.1)`, opacity: 1, offset: .55 },
+      { transform: `translate(${cx + dx}px, ${cy + dy + 160}px) rotate(${rot}deg) scale(.9)`, opacity: 0 }
+    ], { duration: 1100 + Math.random() * 400, easing: "cubic-bezier(.2,.7,.4,1)" });
+    anim.onfinish = () => s.remove();
+  }
+}
+
+/* ---------- drag & drop board (mouse + touch + tap) ---------- */
+function Board(scope, v){
+  const zones = {}, chips = {}; let selected = null;
+  const bank = h("div", { class: "bank", "data-zone": "bank" });
+  register(bank, "bank", false);
+
+  function register(el, id, single){
+    el.dataset.zone = id; zones[id] = { el, single };
+    el.addEventListener("click", () => { if (selected) place(selected, id); });
+  }
+  function zoneOf(c){ const p = c.parentElement; return p && p.dataset.zone ? p.dataset.zone : "bank"; }
+  function unselect(){ if (selected) selected.classList.remove("selected"); selected = null; }
+  function clearMarks(){ scope.querySelectorAll(".ok,.bad").forEach(n => n.classList.remove("ok", "bad")); }
+  function place(c, zid, silent){
+    const z = zones[zid]; if (!z) return;
+    if (z.single) z.el.querySelectorAll(".chip").forEach(o => { if (o !== c) bank.append(o); });
+    z.el.append(c); unselect();
+    if (!silent){ clearMarks(); if (zid === "bank") delete v[c.dataset.id]; else v[c.dataset.id] = zid; syncSingles(); persist(); scope.dispatchEvent(new Event("input", { bubbles: true })); }
+  }
+  function syncSingles(){ // keep saved map in line with what is visible
+    for (const id in chips){ const z = zoneOf(chips[id]); if (z === "bank") delete v[id]; else v[id] = z; }
+  }
+  function tap(c){
+    if (zoneOf(c) !== "bank"){ place(c, "bank"); return; }
+    if (selected === c){ unselect(); return; }
+    unselect(); selected = c; c.classList.add("selected");
+  }
+  function zoneAt(x, y){
+    const el = document.elementFromPoint(x, y); const z = el && el.closest("[data-zone]");
+    return z && scope.contains(z) ? z : null;
+  }
+  let overEl = null;
+  function setOver(z){ if (overEl === z) return; if (overEl) overEl.classList.remove("over"); overEl = z; if (z) z.classList.add("over"); }
+
+  function chip(id, label, value){
+    const c = h("button", { class: "chip", type: "button" }, label);
+    c.dataset.id = id; c.dataset.value = value; chips[id] = c;
+    let d = null;
+    c.addEventListener("pointerdown", e => {
+      if (e.pointerType === "mouse" && e.button !== 0) return;
+      d = { x: e.clientX, y: e.clientY, moved: false, ghost: null };
+      try { c.setPointerCapture(e.pointerId); } catch (_) {}
+    });
+    c.addEventListener("pointermove", e => {
+      if (!d) return;
+      if (!d.moved && Math.hypot(e.clientX - d.x, e.clientY - d.y) > 6){
+        d.moved = true; unselect();
+        const r = c.getBoundingClientRect(); d.ox = d.x - r.left; d.oy = d.y - r.top;
+        d.ghost = c.cloneNode(true); d.ghost.classList.add("ghost"); d.ghost.classList.remove("ok", "bad");
+        d.ghost.style.width = r.width + "px"; document.body.append(d.ghost); c.classList.add("dragging");
+      }
+      if (d.moved){
+        e.preventDefault();
+        d.ghost.style.left = (e.clientX - d.ox) + "px"; d.ghost.style.top = (e.clientY - d.oy) + "px";
+        setOver(zoneAt(e.clientX, e.clientY));
+      }
+    });
+    const end = e => {
+      if (!d) return; const was = d; d = null;
+      if (!was.moved) return;
+      was.ghost.remove(); c.classList.remove("dragging"); setOver(null); c._suppress = true;
+      if (e.type === "pointerup"){ const z = zoneAt(e.clientX, e.clientY); if (z) place(c, z.dataset.zone); }
+    };
+    c.addEventListener("pointerup", end);
+    c.addEventListener("pointercancel", end);
+    c.addEventListener("click", e => { e.stopPropagation(); if (c._suppress){ c._suppress = false; return; } tap(c); });
+    bank.append(c);
+    return c;
+  }
+  function restore(){ for (const id in v){ if (chips[id] && zones[v[id]]) place(chips[id], v[id], true); } }
+  function resetAll(){ for (const id in chips) bank.append(chips[id]); clear(v); clearMarks(); unselect(); }
+  return { bank, register, chip, place, restore, resetAll, chips, zones, zoneOf };
+}
+
+/* ---------- renderers ---------- */
+const RENDER = {};
+
+RENDER.rule = (sec, s, body) => { body.append(h("div", { html: sec.html })); return null; };
+
+RENDER.video = (sec, s, body) => {
+  const box = h("div", { class: "video" });
+  const poster = h("button", { class: "poster", type: "button", "aria-label": "Play video" },
+    h("img", { src: `https://img.youtube.com/vi/${sec.youtube}/hqdefault.jpg`, alt: "" }),
+    h("span", { class: "play" }));
+  poster.addEventListener("click", () => {
+    box.innerHTML = "";
+    box.append(h("iframe", {
+      src: `https://www.youtube-nocookie.com/embed/${sec.youtube}?autoplay=1&rel=0`,
+      title: sec.title || "Video", allow: "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture",
+      allowfullscreen: true
+    }));
+  });
+  box.append(poster); body.append(box);
+  if (sec.note) body.append(h("p", { class: "video-note", html: "👀 " + sec.note }));
+  return null;
+};
+
+RENDER.mcq = (sec, s, body) => {
+  const v = s.v || (s.v = {}); const qs = [];
+  sec.items.forEach((it, i) => {
+    const q = h("div", { class: "q" });
+    const text = h("div", { class: "q-text" }, h("span", { class: "q-num" }, (i + 1) + "."));
+    it.q.split("___").forEach((part, k) => { if (k) text.append(h("span", { class: "blank" })); text.append(h("span", { html: part })); });
+    const opts = h("div", { class: "opts", role: "radiogroup" });
+    const btns = it.options.map((o, j) => {
+      const b = h("button", { class: "opt", type: "button", role: "radio" }, o);
+      b.addEventListener("click", () => { v[i] = j; persist(); paint(); body.dispatchEvent(new Event("input", { bubbles: true })); });
+      opts.append(b); return b;
+    });
+    function paint(){ btns.forEach((b, j) => { b.classList.toggle("sel", v[i] === j); b.classList.remove("ok", "bad", "answer"); b.setAttribute("aria-checked", v[i] === j); }); }
+    paint(); q.append(text, opts); body.append(q);
+    qs.push({ it, btns, i });
+  });
+  return {
+    total: qs.length,
+    check(){ let sc = 0; qs.forEach(({ it, btns, i }) => {
+      btns.forEach(b => b.classList.remove("ok", "bad"));
+      if (v[i] === undefined) return;
+      const ok = v[i] === it.answer; btns[v[i]].classList.add(ok ? "ok" : "bad"); if (ok) sc++;
+    }); return sc; },
+    reveal(){ qs.forEach(({ it, btns, i }) => { if (v[i] !== it.answer) btns[it.answer].classList.add("answer"); }); },
+    reset(){ clear(v); qs.forEach(({ btns }) => btns.forEach(b => b.classList.remove("sel", "ok", "bad", "answer"))); }
+  };
+};
+
+RENDER.gapfill = (sec, s, body) => {
+  const v = s.v || (s.v = {}); const gaps = [];
+  const isList = Array.isArray(sec.items);
+  const items = isList ? sec.items : [sec.text];
+  const list = h(isList ? "ol" : "div", { class: isList ? "lines" : "para" });
+  items.forEach((it, i) => {
+    const line = h(isList ? "li" : "p", { class: "line" });
+    parseGaps(it).forEach((p, j) => {
+      if (p.text != null){ line.append(h("span", { html: p.text })); return; }
+      const key = i + "-" + j;
+      const w = Math.max(5, ...p.answers.map(a => a.length)) + 2;
+      const input = h("input", { class: "gap", type: "text", autocomplete: "off", autocapitalize: "off", autocorrect: "off", spellcheck: "false", "aria-label": p.hint ? "gap, verb: " + p.hint : "gap", style: `width:${w}ch` });
+      input.value = v[key] || "";
+      input.addEventListener("input", () => { v[key] = input.value; persist(); input.classList.remove("ok", "bad"); });
+      input.addEventListener("keydown", e => {
+        if (e.key !== "Enter") return; e.preventDefault();
+        const all = Array.from(body.querySelectorAll("input.gap")); const n = all[all.indexOf(input) + 1];
+        if (n) n.focus(); else input.blur();
+      });
+      const wrap = h("span", { class: "gapwrap" }, input);
+      if (p.hint) wrap.append(h("span", { class: "hint" }, "(" + p.hint + ")"));
+      line.append(wrap); gaps.push({ input, answers: p.answers, wrap });
+    });
+    list.append(line);
+  });
+  body.append(list);
+  return {
+    total: gaps.length,
+    check(){ let sc = 0; gaps.forEach(g => { const ok = matches(g.input.value, g.answers); g.input.classList.toggle("ok", ok); g.input.classList.toggle("bad", !ok); if (ok) sc++; }); return sc; },
+    reveal(){ gaps.forEach(g => { if (!g.input.classList.contains("ok")) addReveal(g.wrap, g.answers[0]); }); },
+    reset(){ clear(v); gaps.forEach(g => { g.input.value = ""; g.input.classList.remove("ok", "bad"); }); }
+  };
+};
+
+RENDER.dragwords = (sec, s, body) => {
+  const v = s.v || (s.v = {}); const B = Board(body, v); const slots = []; const words = [];
+  const list = h("ol", { class: "lines" });
+  sec.items.forEach((it, i) => {
+    const line = h("li", { class: "line" });
+    parseGaps(it).forEach((p, j) => {
+      if (p.text != null){ line.append(h("span", { html: p.text })); return; }
+      const slot = h("span", { class: "slot", role: "button", "aria-label": "drop zone" });
+      B.register(slot, "g" + i + "-" + j, true);
+      slots.push({ slot, answers: p.answers }); words.push(p.answers[0]); line.append(slot);
+    });
+    list.append(line);
+  });
+  (sec.extra || []).forEach(w => words.push(w));
+  const ids = words.map((w, k) => ({ id: "c" + k, w }));
+  shuffle(ids, LESSON.id + sec.title).forEach(o => B.chip(o.id, o.w, o.w));
+  body.append(B.bank, list); B.restore();
+  return {
+    total: slots.length,
+    check(){ let sc = 0; slots.forEach(o => {
+      const c = o.slot.querySelector(".chip"); const ok = !!c && matches(c.dataset.value, o.answers);
+      o.slot.classList.toggle("ok", ok); o.slot.classList.toggle("bad", !ok); if (ok) sc++;
+    }); return sc; },
+    reveal(){
+      B.resetAll(); const used = new Set();
+      slots.forEach(o => { const c = Object.values(B.chips).find(ch => !used.has(ch) && matches(ch.dataset.value, o.answers));
+        if (c){ used.add(c); B.place(c, o.slot.dataset.zone); } });
+    },
+    reset(){ B.resetAll(); persist(); }
+  };
+};
+
+RENDER.match = (sec, s, body) => {
+  const v = s.v || (s.v = {}); const B = Board(body, v); const rows = [];
+  const grid = h("div", { class: "match" });
+  sec.pairs.forEach((p, i) => {
+    const slot = h("div", { class: "slot", role: "button", "aria-label": "drop zone" });
+    B.register(slot, "m" + i, true);
+    grid.append(h("div", { class: "mrow" }, h("div", { class: "left", "data-n": (i + 1) + "", html: p[0] }), slot));
+    rows.push(slot);
+  });
+  shuffle(sec.pairs.map((p, i) => i), LESSON.id + sec.title).forEach(i => B.chip("r" + i, sec.pairs[i][1], String(i)));
+  body.append(B.bank, grid); B.restore();
+  return {
+    total: rows.length,
+    check(){ let sc = 0; rows.forEach((slot, i) => { const c = slot.querySelector(".chip"); const ok = !!c && c.dataset.value === String(i);
+      slot.classList.toggle("ok", ok); slot.classList.toggle("bad", !ok); if (ok) sc++; }); return sc; },
+    reveal(){ B.resetAll(); rows.forEach((slot, i) => B.place(B.chips["r" + i], "m" + i)); },
+    reset(){ B.resetAll(); persist(); }
+  };
+};
+
+RENDER.sort = (sec, s, body) => {
+  const v = s.v || (s.v = {}); const B = Board(body, v);
+  const wrap = h("div", { class: "buckets" }); const all = [];
+  sec.categories.forEach((cat, ci) => {
+    const zone = h("div", { class: "bucket-zone" }); B.register(zone, "b" + ci, false);
+    wrap.append(h("div", { class: "bucket" }, h("h3", { html: cat.name }), zone));
+    cat.words.forEach((w, wi) => all.push({ id: "w" + ci + "-" + wi, w, ci }));
+  });
+  shuffle(all, LESSON.id + sec.title).forEach(o => B.chip(o.id, o.w, String(o.ci)));
+  body.append(B.bank, wrap); B.restore();
+  return {
+    total: all.length,
+    check(){ let sc = 0; Object.values(B.chips).forEach(c => { const z = B.zoneOf(c);
+      const ok = z === "b" + c.dataset.value; c.classList.toggle("ok", ok); c.classList.toggle("bad", !ok && z !== "bank"); if (ok) sc++; }); return sc; },
+    reveal(){ Object.values(B.chips).forEach(c => { if (B.zoneOf(c) !== "b" + c.dataset.value) B.place(c, "b" + c.dataset.value); }); },
+    reset(){ B.resetAll(); persist(); }
+  };
+};
+
+RENDER.correct = (sec, s, body) => {
+  const v = s.v || (s.v = {}); const rows = [];
+  sec.items.forEach((it, i) => {
+    const input = h("input", { class: "full", type: "text", autocomplete: "off", autocapitalize: "sentences", spellcheck: "false", "aria-label": "corrected sentence " + (i + 1) });
+    input.value = v[i] != null ? v[i] : it.wrong;
+    input.addEventListener("input", () => { v[i] = input.value; persist(); input.classList.remove("ok", "bad"); });
+    const row = h("div", { class: "row" }, h("div", { class: "row-label" }, (i + 1) + ". ", h("s", {}, it.wrong)), input);
+    body.append(row); rows.push({ it, input, row });
+  });
+  return {
+    total: rows.length,
+    check(){ let sc = 0; rows.forEach(r => { const ok = matches(r.input.value, r.it.answers); r.input.classList.toggle("ok", ok); r.input.classList.toggle("bad", !ok); if (ok) sc++; }); return sc; },
+    reveal(){ rows.forEach(r => { if (!r.input.classList.contains("ok") && !r.row.querySelector(".model")) r.row.append(h("div", { class: "model" }, "✓ " + r.it.answers[0])); }); },
+    reset(){ clear(v); rows.forEach(r => { r.input.value = r.it.wrong; r.input.classList.remove("ok", "bad"); }); }
+  };
+};
+
+RENDER.translate = (sec, s, body) => {
+  const v = s.v || (s.v = {}); const rows = [];
+  sec.items.forEach((it, i) => {
+    const input = h("input", { class: "full", type: "text", autocomplete: "off", autocapitalize: "sentences", spellcheck: "false", placeholder: "Type in English…", "aria-label": "translation " + (i + 1) });
+    input.value = v[i] || "";
+    input.addEventListener("input", () => { v[i] = input.value; persist(); input.classList.remove("ok", "bad", "close"); const m = row.querySelector(".model"); if (m) m.remove(); });
+    const row = h("div", { class: "row" },
+      h("div", { class: "prompt" }, h("span", { class: "flag" }, sec.lang || ""), (i + 1) + ". " + it.prompt), input);
+    body.append(row); rows.push({ it, input, row });
+  });
+  return {
+    total: rows.length,
+    check(){ let sc = 0; rows.forEach(r => {
+      const old = r.row.querySelector(".model"); if (old) old.remove();
+      r.input.classList.remove("ok", "bad", "close");
+      if (matches(r.input.value, r.it.answers)){ r.input.classList.add("ok"); sc++; return; }
+      const best = Math.max(...r.it.answers.map(a => similarity(r.input.value, a)));
+      if (best >= .7){ r.input.classList.add("close"); r.row.append(h("div", { class: "model close" }, "Almost! Compare: " + r.it.answers[0])); }
+      else r.input.classList.add("bad");
+    }); return sc; },
+    reveal(){ rows.forEach(r => { if (!r.input.classList.contains("ok") && !r.row.querySelector(".model")) r.row.append(h("div", { class: "model" }, "✓ " + r.it.answers[0])); }); },
+    reset(){ clear(v); rows.forEach(r => { r.input.value = ""; r.input.classList.remove("ok", "bad", "close"); }); }
+  };
+};
+
+RENDER.write = (sec, s, body) => {
+  const v = s.v || (s.v = {});
+  const ta = h("textarea", { class: "full", rows: 5, spellcheck: "true", placeholder: "Write here…", "aria-label": "your sentences" });
+  ta.value = v.text || "";
+  ta.addEventListener("input", () => { v.text = ta.value; persist(); });
+  const ul = h("ul", { class: "checks" });
+  const lis = (sec.checks || []).map(c => { const li = h("li", {}, c.label); ul.append(li); return { c, li }; });
+  body.append(ta, ul);
+  function run(){ const t = ta.value;
+    lis.forEach(({ c, li }) => {
+      let ok = false;
+      if (c.pattern) ok = new RegExp(c.pattern, "i").test(t);
+      if (c.sentences) ok = t.split(/[.!?]+|\n+/).filter(x => x.trim().split(/\s+/).length >= 3).length >= c.sentences;
+      li.classList.toggle("done", ok);
+    });
+  }
+  return {
+    total: 0, revealLabel: "See an example",
+    check(){ run(); return null; },
+    reveal(){ if (!body.querySelector(".model")) body.append(h("div", { class: "model" }, "Example: " + sec.sample)); },
+    reset(){ clear(v); ta.value = ""; lis.forEach(({ li }) => li.classList.remove("done")); }
+  };
+};
+
+/* ---------- progress ---------- */
+const graded = [];
+function updateProgress(){
+  let sc = 0, tot = 0;
+  graded.forEach(g => { tot += g.api.total; if (g.s.score != null) sc += g.s.score; });
+  document.getElementById("pScore").textContent = sc;
+  document.getElementById("pTotal").textContent = tot;
+  document.getElementById("pBar").style.width = tot ? (sc / tot * 100) + "%" : "0";
+}
+
+/* ---------- build ---------- */
+const main = document.getElementById("lesson");
+let n = 0;
+LESSON.sections.forEach((sec, idx) => {
+  const sid = "s" + idx; const s = SAVE[sid] || (SAVE[sid] = {});
+  const exercise = sec.type !== "rule" && sec.type !== "video";
+  const card = h("section", { class: "card", id: sid });
+  if (sec.sticker) card.append(h("div", { class: "deco", "aria-hidden": "true" }, sec.sticker));
+  const ticket = h("div", { class: "ticket" + (exercise ? "" : " alt") }, exercise ? String(++n) : (sec.type === "video" ? "▶" : "!"));
+  card.append(h("div", { class: "card-head" }, ticket, h("div", {}, h("h2", { html: sec.title || "" }))));
+  if (sec.instructions) card.append(h("p", { class: "instr", html: sec.instructions }));
+  else card.append(h("div", { style: "height:14px" }));
+  const body = h("div", { class: "card-body" }); card.append(body);
+  const api = RENDER[sec.type] ? RENDER[sec.type](sec, s, body) : null;
+  main.append(card);
+  if (!api) return;
+
+  const score = h("span", { class: "score" });
+  const btnCheck = h("button", { class: "btn btn-check", type: "button" }, "Check");
+  const btnShow = h("button", { class: "btn btn-soft", type: "button", hidden: true }, api.revealLabel || "👀 Show answers");
+  const btnReset = h("button", { class: "btn", type: "button" }, "Reset");
+  card.append(h("div", { class: "card-foot" }, btnCheck, btnShow, btnReset, score));
+
+  function showScore(){
+    if (!api.total || s.score == null){ score.textContent = ""; score.classList.remove("perfect"); return; }
+    score.textContent = s.score + " / " + api.total + (s.score === api.total ? " 🎉" : "");
+    score.classList.toggle("perfect", s.score === api.total);
+  }
+  function doCheck(silent){
+    const r = api.check(); s.checked = true;
+    if (api.total) s.score = r;
+    persist(); showScore(); updateProgress(); btnShow.hidden = false;
+    if (!silent && api.total && r === api.total){ burst(btnCheck); btnCheck.classList.remove("wiggle"); void btnCheck.offsetWidth; btnCheck.classList.add("wiggle"); }
+  }
+  btnCheck.addEventListener("click", () => doCheck(false));
+  let revealing = false;
+  btnShow.addEventListener("click", () => { revealing = true; api.reveal(); revealing = false; });
+  btnReset.addEventListener("click", () => {
+    api.reset(); removeReveals(body);
+    delete s.score; delete s.checked; persist();
+    btnShow.hidden = true; showScore(); updateProgress();
+  });
+  // any edit after checking hides the old score
+  body.addEventListener("input", () => { if (!revealing && s.score != null && api.total){ delete s.score; delete s.checked; persist(); showScore(); updateProgress(); } });
+
+  if (api.total) graded.push({ api, s });
+  if (s.checked) doCheck(true);
+});
+updateProgress();
+
+document.getElementById("resetAll").addEventListener("click", () => {
+  if (!confirm("Clear all your answers in this lesson?")) return;
+  SAVE = {}; persist(); try { localStorage.removeItem(KEY); } catch (e) {}
+  location.reload();
+});
+})();
+</script>
+</body>
+</html>
