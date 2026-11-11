@@ -1,0 +1,1241 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rewind: Past Perfect</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&family=JetBrains+Mono:wght@500;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+
+<!--
+  ===================================================================
+  LESSON TEMPLATE
+  To make a new lesson: copy this file and edit ONLY the LESSON object
+  in the first <script> (title, theme colours, sections).
+  Emoji: put a name like "laptop" to use assets/emoji/laptop.png,
+  or a normal emoji character.
+  ===================================================================
+-->
+
+<style>
+  :root{
+    --bg:#F3F4FA; --paper:#FFFFFF; --ink:#14152B; --muted:#6B6E8A;
+    --accent:#5B5BF7; --accent2:#FF4F9A; --soft:#E7E8FF;
+    --r:#FF4D6D; --g:#22C993; --b:#4D7CFF;
+    --ok:#14A374; --ok-bg:#E0F7EE; --bad:#E5484D; --bad-bg:#FDE7E8;
+    --close:#B07A06; --close-bg:#FFF3D6;
+    --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+    --head:"Space Grotesk","DM Sans",system-ui,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{margin:0;color:var(--ink);font:17px/1.6 "DM Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+    background:var(--bg);
+    background-image:radial-gradient(color-mix(in srgb,var(--ink) 11%,transparent) 1px,transparent 1.2px);
+    background-size:22px 22px}
+  .wrap{max-width:820px;margin:0 auto;padding:0 18px}
+  button{font:inherit}
+  img.emo{width:1.15em;height:1.15em;vertical-align:-.2em;display:inline-block}
+
+  /* RGB stripe */
+  .rgb{display:flex;height:8px}
+  .rgb i{flex:1}.rgb i:nth-child(1){background:var(--r)}.rgb i:nth-child(2){background:var(--g)}.rgb i:nth-child(3){background:var(--b)}
+
+  /* hero */
+  .hero{position:relative;padding:44px 0 16px}
+  .kicker{display:inline-block;font:700 12.5px/1.5 var(--mono);letter-spacing:.02em;color:var(--accent);background:var(--paper);border:1.5px solid var(--ink);padding:5px 12px;border-radius:8px;max-width:calc(100% - 90px)}
+  h1{font-family:var(--head);font-weight:700;font-size:clamp(46px,10vw,84px);line-height:.95;margin:18px 0 0;letter-spacing:-.035em}
+  h1 .cur{display:inline-block;width:.09em;height:.82em;margin-left:.08em;background:var(--accent2);vertical-align:-.04em;animation:blink 1.1s steps(1) infinite}
+  @keyframes blink{50%{opacity:0}}
+  h1 .glitch{background:linear-gradient(90deg,var(--r),var(--g) 50%,var(--b));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .sub{color:var(--muted);margin:18px 0 0;max-width:52ch;font-size:18px}
+  .sticker{position:absolute;user-select:none;-webkit-user-select:none;animation:bob 5s ease-in-out infinite;filter:drop-shadow(0 10px 14px rgba(20,21,43,.18))}
+  .sticker img{width:100%;height:100%;display:block}
+  .s1{right:0;top:30px;width:96px;height:96px;rotate:10deg}
+  .s2{right:92px;top:120px;width:60px;height:60px;rotate:-12deg;animation-delay:-2.5s}
+  @keyframes bob{0%,100%{translate:0 0}50%{translate:0 -8px}}
+
+  /* progress */
+  .progress{position:sticky;top:0;z-index:30;display:flex;align-items:center;gap:12px;padding:12px 0;font:700 13.5px var(--mono);background:color-mix(in srgb,var(--bg) 88%,transparent);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+  .progress .lbl{color:var(--muted)}
+  .bar{flex:1;height:12px;border:1.5px solid var(--ink);border-radius:99px;overflow:hidden;background:var(--paper)}
+  .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--r),var(--g),var(--b));transition:width .6s cubic-bezier(.3,1.4,.5,1)}
+
+  /* part divider */
+  .part{display:flex;align-items:center;gap:14px;margin:56px 0 6px}
+  .part .pi{width:54px;height:54px;flex:none;display:grid;place-items:center;font-size:40px}
+  .part .pi img{width:54px;height:54px}
+  .part .pn{font:700 13px var(--mono);letter-spacing:.08em;color:var(--pc,var(--accent))}
+  .part h2{font-family:var(--head);font-size:30px;line-height:1.1;margin:0;letter-spacing:-.02em}
+  .part p{margin:2px 0 0;color:var(--muted);font-size:15.5px}
+
+  /* window cards */
+  .card{position:relative;background:var(--paper);border:1.5px solid var(--ink);border-radius:18px;margin:26px 0;box-shadow:6px 6px 0 var(--ink);overflow:visible}
+  .winbar{display:flex;align-items:center;gap:7px;padding:10px 14px;border-bottom:1.5px solid var(--ink);background:color-mix(in srgb,var(--soft) 55%,#fff);border-radius:16.5px 16.5px 0 0}
+  .winbar i{width:11px;height:11px;border-radius:50%;border:1.3px solid var(--ink)}
+  .winbar i:nth-child(1){background:var(--r)}.winbar i:nth-child(2){background:#FFC53D}.winbar i:nth-child(3){background:var(--g)}
+  .winbar span{margin-left:8px;font:700 11.5px var(--mono);letter-spacing:.06em;color:var(--muted);text-transform:uppercase}
+  .card-in{padding:20px 22px 18px}
+  .deco{position:absolute;right:16px;top:-26px;width:52px;height:52px;rotate:10deg;user-select:none;font-size:40px;line-height:52px;text-align:center;filter:drop-shadow(0 6px 8px rgba(20,21,43,.18))}
+  .deco img{width:100%;height:100%}
+  .card-head{display:flex;align-items:flex-start;gap:12px}
+  .ticket{flex:none;min-width:44px;height:34px;display:grid;place-items:center;padding:0 9px;background:var(--ink);color:var(--paper);font:700 15px var(--mono);border-radius:8px}
+  .ticket.alt{background:var(--accent2)}
+  h2.t{font-family:var(--head);font-weight:700;font-size:23px;line-height:1.2;margin:2px 0 0;letter-spacing:-.01em}
+  .instr{color:var(--muted);margin:8px 0 18px;font-size:15.5px}
+  .instr b{color:var(--ink)}
+
+  .card-foot{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:18px;padding-top:14px;border-top:1.5px dashed color-mix(in srgb,var(--ink) 18%,transparent)}
+  .btn{font-weight:700;font-size:15px;border-radius:10px;padding:9px 18px;cursor:pointer;border:1.5px solid var(--ink);background:var(--paper);color:var(--ink);transition:transform .12s,box-shadow .12s;box-shadow:3px 3px 0 var(--ink)}
+  .btn:hover{transform:translate(-1px,-1px);box-shadow:4px 4px 0 var(--ink)}
+  .btn:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--ink)}
+  .btn-check{background:var(--accent);color:#fff}
+  .btn-soft{background:var(--soft)}
+  .score{margin-left:auto;font:700 17px var(--mono)}
+  .score.perfect{color:var(--ok)}
+  .wiggle{animation:wiggle .5s}
+  @keyframes wiggle{25%{rotate:-4deg}50%{rotate:4deg}75%{rotate:-2deg}}
+
+  /* theory blocks */
+  .rule p{margin:0 0 12px}
+  .rule h3{font-family:var(--head);font-size:18px;margin:22px 0 8px}
+  .rule h3:first-child{margin-top:0}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:14px 0}
+  .box{border-radius:12px;padding:12px 14px;background:var(--soft);border:1.5px solid color-mix(in srgb,var(--ink) 12%,transparent)}
+  .box.pink{background:color-mix(in srgb,var(--accent2) 13%,#fff)}
+  .box.green{background:color-mix(in srgb,var(--g) 14%,#fff)}
+  .box h4{margin:0 0 4px;font:700 12px var(--mono);text-transform:uppercase;letter-spacing:.07em;color:var(--muted)}
+  .box p{margin:0;font-size:15.5px}
+  .formula{font:700 clamp(18px,3.6vw,24px) var(--mono);text-align:center;padding:16px 10px;margin:12px 0;border:1.5px dashed var(--accent);border-radius:12px;background:color-mix(in srgb,var(--accent) 6%,#fff)}
+  .formula .h{color:var(--accent2)}.formula .v{color:var(--accent)}
+  table.form{width:100%;border-collapse:collapse;font-size:15.5px;margin:10px 0 4px}
+  table.form th,table.form td{border-bottom:1px solid color-mix(in srgb,var(--ink) 12%,transparent);padding:8px 8px;text-align:left;vertical-align:top}
+  table.form th{font:700 12px var(--mono);text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+  .hl{background:color-mix(in srgb,var(--accent2) 22%,transparent);border-radius:4px;padding:0 3px;font-weight:700}
+  .hl2{background:color-mix(in srgb,var(--accent) 18%,transparent);border-radius:4px;padding:0 3px;font-weight:700}
+  .note{margin-top:14px;font-size:15px;background:var(--close-bg);border-radius:12px;padding:10px 14px}
+  .notes-tip{display:flex;gap:10px;align-items:flex-start;margin-top:14px;font-size:15px;background:color-mix(in srgb,var(--g) 13%,#fff);border-radius:12px;padding:10px 14px}
+  .notes-tip img{width:30px;height:30px;flex:none}
+  .cat{border:1.5px solid var(--ink);border-radius:14px;padding:14px 16px 10px;margin:14px 0;background:#fff}
+  .cat .tag{display:inline-block;font:700 12px var(--mono);background:var(--ink);color:#fff;border-radius:6px;padding:2px 8px;margin-bottom:6px}
+  .cat p{margin:4px 0}
+  .ex{font-style:italic}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
+  .chips span{font:700 13.5px var(--mono);border:1.5px solid var(--ink);border-radius:8px;padding:3px 10px;background:#fff}
+  .story{font-size:17.5px;line-height:1.8;background:color-mix(in srgb,var(--soft) 45%,#fff);border-left:4px solid var(--accent);border-radius:0 12px 12px 0;padding:14px 18px;margin:8px 0 14px}
+  ol.qs{margin:0 0 6px;padding-left:1.4em}
+  ol.qs li{margin:0 0 6px}
+  details{margin-top:12px;border:1.5px solid var(--ink);border-radius:12px;background:#fff}
+  details summary{cursor:pointer;padding:10px 14px;font-weight:700;list-style:none}
+  details summary::-webkit-details-marker{display:none}
+  details summary::before{content:"▸ ";color:var(--accent)}
+  details[open] summary::before{content:"▾ "}
+  details > div{padding:0 14px 12px}
+  @media (max-width:600px){.grid2{grid-template-columns:1fr}}
+
+  /* timelines */
+  .tl{position:relative;height:104px;margin:10px 4px 6px}
+  .tl::before{content:"";position:absolute;left:0;right:12px;top:52px;height:3px;background:var(--ink);border-radius:3px}
+  .tl::after{content:"";position:absolute;right:0;top:46.5px;border-left:13px solid var(--ink);border-top:7px solid transparent;border-bottom:7px solid transparent}
+  .tl .now{position:absolute;right:30px;top:44px;width:3px;height:19px;background:var(--muted);border-radius:2px}
+  .tl .now::after{content:"now";position:absolute;top:22px;left:50%;translate:-50% 0;font:700 11.5px var(--mono);color:var(--muted)}
+  .tl .pt{position:absolute;left:var(--x);top:43px;width:21px;height:21px;margin-left:-10.5px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 3px #fff,0 0 0 4.5px var(--ink)}
+  .tl .pt.e{background:var(--accent2)}
+  .tl .pt b,.tl .mk b,.tl .sp b{position:absolute;left:50%;translate:-50% 0;white-space:nowrap;font:700 13px var(--mono);bottom:30px}
+  .tl .pt i,.tl .mk i,.tl .sp i{position:absolute;left:50%;translate:-50% 0;white-space:nowrap;font:500 12px var(--mono);color:var(--muted);font-style:normal;top:30px}
+  .tl .pt.e b{color:var(--accent2)} .tl .pt b{color:var(--accent)}
+  .tl .mk{position:absolute;left:var(--x);top:24px;height:58px;border-left:2.5px dashed var(--accent)}
+  .tl .mk b{bottom:auto;top:-22px;color:var(--accent)} .tl .mk i{top:60px}
+  .tl .sp{position:absolute;left:var(--x);width:var(--w);top:47px;height:13px;border-radius:7px;background:color-mix(in srgb,var(--accent2) 60%,#fff);border:1.5px solid var(--ink)}
+  .tl .sp b{color:var(--accent2)}
+  .tl .arc{position:absolute;left:var(--x);width:var(--w);top:6px;height:30px;border:2px dashed var(--muted);border-bottom:0;border-radius:40px 40px 0 0}
+  .tl .arc::before{content:"";position:absolute;left:-7px;bottom:-4px;border-top:9px solid var(--muted);border-left:6px solid transparent;border-right:6px solid transparent}
+  .tl.big{height:122px}
+  .tl.big::before{top:66px}.tl.big::after{top:60.5px}.tl.big .now{top:58px}.tl.big .pt{top:57px}.tl.big .arc{top:12px;height:40px}
+  .tl .arc span{position:absolute;top:-13px;left:50%;translate:-50% 0;background:var(--paper);padding:0 6px;font:700 11px var(--mono);color:var(--muted);white-space:nowrap}
+  @media (max-width:520px){.tl .pt b,.tl .mk b,.tl .sp b{font-size:11.5px}.tl .pt i,.tl .mk i,.tl .sp i{font-size:10.5px}}
+
+  /* gap fill */
+  .lines{margin:0;padding-left:1.6em}
+  .lines li::marker{color:var(--accent);font:700 14px var(--mono)}
+  .line{margin:0 0 4px;line-height:2.4}
+  .para .line{line-height:2.5}
+  .gapwrap{white-space:nowrap}
+  .gap{font:inherit;font-size:16.5px;color:var(--ink);border:0;border-bottom:2.5px solid var(--accent);background:var(--soft);border-radius:7px 7px 2px 2px;padding:1px 8px;min-width:5ch;max-width:100%;text-align:center;outline:none;transition:background .15s,box-shadow .15s}
+  .gap:focus{background:#fff;box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 25%,transparent)}
+  .hint{color:var(--muted);font:500 .8em var(--mono);margin-left:5px}
+  input.ok,textarea.ok{background:var(--ok-bg);border-color:var(--ok);color:#0f5f45}
+  input.bad{background:var(--bad-bg);border-color:var(--bad);text-decoration:underline wavy var(--bad);text-underline-offset:4px}
+  input.close{background:var(--close-bg);border-color:var(--close)}
+  .reveal{display:inline-block;margin-left:6px;font-size:.84em;font-weight:700;color:#0f5f45;background:var(--ok-bg);padding:0 9px;border-radius:99px;line-height:1.9;white-space:nowrap}
+
+  /* multiple choice */
+  .q{margin:0 0 18px}
+  .q-text{margin-bottom:8px}
+  .q-num{font:700 14px var(--mono);color:var(--accent);margin-right:8px}
+  .blank{display:inline-block;width:60px;border-bottom:2px solid var(--muted);margin:0 3px;translate:0 -4px}
+  .opts{display:flex;flex-wrap:wrap;gap:8px}
+  .opt{font-size:15.5px;border:1.5px solid var(--ink);background:#fff;color:var(--ink);border-radius:10px;padding:6px 14px;cursor:pointer;transition:transform .12s,background .15s;text-align:left}
+  .opt:hover{transform:translateY(-1px)}
+  .opt.sel{background:var(--ink);color:#fff}
+  .opt.ok{background:var(--ok);border-color:var(--ok);color:#fff}
+  .opt.bad{background:var(--bad);border-color:var(--bad);color:#fff}
+  .opt.answer{box-shadow:0 0 0 3px var(--ok)}
+  .tf .q{display:flex;gap:14px;align-items:center;justify-content:space-between;padding:10px 0;margin:0;border-bottom:1px solid color-mix(in srgb,var(--ink) 10%,transparent)}
+  .tf .q-text{margin:0}
+  .tf .opts{flex:none;flex-wrap:nowrap}
+  @media (max-width:560px){.tf .q{flex-direction:column;align-items:flex-start;gap:8px}}
+
+  /* drag & drop */
+  .bank{display:flex;flex-wrap:wrap;gap:9px;padding:12px;min-height:60px;margin-bottom:18px;border:1.5px dashed color-mix(in srgb,var(--ink) 35%,transparent);border-radius:14px;background:color-mix(in srgb,var(--soft) 40%,#fff);transition:background .15s}
+  .bank:empty::before{content:"All placed ✨";color:var(--muted);font-size:14px;align-self:center}
+  .bank.over{background:var(--soft)}
+  .chip{font-size:15px;font-weight:700;line-height:1.35;background:#fff;color:var(--ink);border:1.5px solid var(--ink);border-radius:9px;padding:5px 11px;box-shadow:2px 2px 0 var(--accent);cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;text-align:left}
+  .chip.selected{outline:3px solid var(--accent2);outline-offset:2px;rotate:-2deg}
+  .chip.dragging{opacity:.28}
+  .chip.ghost{position:fixed;z-index:1000;pointer-events:none;margin:0;rotate:-4deg;scale:1.05;box-shadow:5px 6px 0 var(--accent)}
+  .chip.ok{background:var(--ok-bg);border-color:var(--ok);box-shadow:none}
+  .chip.bad{background:var(--bad-bg);border-color:var(--bad);box-shadow:none}
+  .slot{display:inline-flex;align-items:center;justify-content:center;min-width:96px;min-height:40px;padding:2px;margin:0 4px;vertical-align:middle;border:1.5px dashed color-mix(in srgb,var(--ink) 40%,transparent);border-radius:11px;cursor:pointer;transition:background .15s,border-color .15s}
+  .slot .chip{box-shadow:none}
+  .slot.over,.bucket-zone.over{background:var(--soft);border-color:var(--accent)}
+  .slot.ok{border-style:solid;border-color:var(--ok);background:var(--ok-bg)}
+  .slot.bad{border-style:solid;border-color:var(--bad);background:var(--bad-bg)}
+  .slot.ok .chip,.slot.bad .chip{background:transparent;border-color:transparent}
+  .match{display:grid;gap:10px}
+  .mrow{display:grid;grid-template-columns:1fr 1.15fr;gap:10px;align-items:center}
+  .mrow .left{font-weight:500}
+  .mrow .left::before{content:attr(data-n);font:700 14px var(--mono);color:var(--accent);margin-right:8px}
+  .mrow .slot{display:flex;justify-content:flex-start;width:100%;min-height:46px;margin:0}
+  @media (max-width:560px){.mrow{grid-template-columns:1fr;gap:6px}.mrow+.mrow{margin-top:8px}}
+  .buckets{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+  .bucket{border:1.5px solid var(--ink);border-radius:14px;overflow:hidden;background:#fff}
+  .bucket h3{margin:0;padding:8px 12px;font-size:15px;background:var(--soft);border-bottom:1.5px solid var(--ink)}
+  .bucket-zone{min-height:118px;padding:10px;display:flex;flex-wrap:wrap;gap:8px;align-content:flex-start;transition:background .15s}
+
+  /* full-width inputs */
+  .row{margin:0 0 16px}
+  .row-label{font-size:14.5px;color:var(--muted);margin-bottom:5px}
+  .row-label s{text-decoration-color:var(--bad);text-decoration-thickness:2px}
+  .prompt{font-weight:500;margin-bottom:6px}
+  .prompt .num{font:700 14px var(--mono);color:var(--accent);margin-right:6px}
+  .key{display:inline-block;font:700 12.5px var(--mono);background:var(--ink);color:#fff;border-radius:6px;padding:1px 8px;margin-left:6px}
+  .full{display:block;width:100%;font:inherit;font-size:16.5px;color:var(--ink);padding:10px 14px;border:1.5px solid color-mix(in srgb,var(--ink) 30%,transparent);border-radius:11px;background:#fff;outline:none;transition:border-color .15s,background .15s}
+  .full:focus{border-color:var(--accent)}
+  textarea.full{resize:vertical;min-height:150px;line-height:1.55}
+  .model{margin-top:7px;font-size:15px;color:#0f5f45;background:var(--ok-bg);padding:7px 12px;border-radius:10px}
+  .model.close{color:#7a5300;background:var(--close-bg)}
+  .model.warn{color:#8a2b2e;background:var(--bad-bg)}
+  .checks{list-style:none;padding:0;margin:12px 0 0;display:grid;gap:6px;font-size:15px}
+  .checks li::before{content:"○";display:inline-block;width:1.4em;font-weight:800;color:var(--muted)}
+  .checks li.done::before{content:"✓";color:var(--ok)}
+  .checks li.done{color:#0f5f45}
+  .wordbox{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 12px}
+  .wordbox span{font:700 13px var(--mono);background:var(--soft);border-radius:6px;padding:2px 8px}
+  .wordbox span.used{background:var(--ok-bg);color:#0f5f45;text-decoration:line-through}
+
+  .page-foot{text-align:center;padding:24px 0 70px;color:var(--muted);font-size:14px}
+  .page-foot .btn{margin-bottom:14px}
+  .page-foot small{display:block;margin-top:8px;font-size:12px;opacity:.8}
+
+  .confetti{position:fixed;z-index:999;pointer-events:none;font-size:22px;left:0;top:0;width:28px;height:28px}
+  .confetti img{width:100%;height:100%}
+
+  @media (max-width:560px){
+    body{font-size:16.5px}
+    .card-in{padding:18px 15px 15px}
+    .card{box-shadow:4px 4px 0 var(--ink)}
+    .s1{width:72px;height:72px;top:24px}
+    .s2{display:none}
+    .score{width:100%;margin-left:0;order:-1}
+    .deco{width:44px;height:44px;top:-20px}
+    .gapwrap{white-space:normal}
+  }
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="rgb" aria-hidden="true"><i></i><i></i><i></i></div>
+
+<div class="wrap">
+  <header class="hero">
+    <div class="sticker s1" id="sticker1" aria-hidden="true"></div>
+    <div class="sticker s2" id="sticker2" aria-hidden="true"></div>
+    <span class="kicker" id="kicker"></span>
+    <h1 id="title"></h1>
+    <p class="sub" id="sub"></p>
+  </header>
+
+  <div class="progress" aria-live="polite">
+    <span class="lbl">progress</span><span><b id="pScore">0</b>/<b id="pTotal">0</b></span>
+    <div class="bar"><i id="pBar"></i></div>
+  </div>
+
+  <main id="lesson"></main>
+
+  <footer class="page-foot">
+    <button class="btn btn-soft" id="resetAll" type="button">↺ Reset all answers</button>
+    <div>Your answers are saved on this device.</div>
+    <small>Emoji: Microsoft Fluent Emoji (MIT licence)</small>
+  </footer>
+</div>
+
+<script>
+/* =====================================================================
+   LESSON CONTENT — edit this object to make a new lesson
+   ---------------------------------------------------------------------
+   Gaps:  [[answer]]  ·  several right answers: [[hadn't|had not]]
+          hint after " // ":  [[had left // leave]]
+   Section types: part, rule, mcq, tf, gapfill, dragwords, match, sort,
+                  correct, rephrase, open, write
+   ===================================================================== */
+const LESSON = {
+  id: "past-perfect-digital-colour-01",
+  kicker: "// grammar.update → Past Perfect",
+  titleHTML: 'Re<span class="glitch">wind</span><span class="cur"></span>',
+  title: "Rewind: Past Perfect",
+  subtitle: "Passwords, pixels and colours you never noticed — let’s travel to the past of the past.",
+  stickers: ["rewind", "palette"],
+  confetti: ["sparkles", "100", "palette", "rewind"],
+  theme: {
+    bg: "#F3F4FA", paper: "#FFFFFF", ink: "#14152B", muted: "#6B6E8A",
+    accent: "#5B5BF7", accent2: "#FF4F9A", soft: "#E7E8FF"
+  },
+
+  sections: [
+
+    /* ================= PART 1 · WARM-UP ================= */
+    { type: "part", n: "01", icon: "thinking", color: "var(--r)", title: "Warm-up", text: "Talk, guess, notice." },
+
+    {
+      type: "rule", label: "warm-up · talk", sticker: "speech",
+      title: "Let’s talk",
+      html: `
+        <ol class="qs">
+          <li>What is the first colour you notice when you unlock your phone? Why do you think so many apps are blue?</li>
+          <li>Some colours <b>warn</b> us about <b>danger</b>. Which ones? Where do you see them?</li>
+          <li>Is your <b>digital self</b> the same as your real self? What’s different?</li>
+          <li>How much do you <b>rely on</b> your phone? Could you live without it for a week?</li>
+          <li>Have you ever lost access to an account? What had happened?</li>
+        </ol>`
+    },
+
+    {
+      type: "rule", label: "warm-up · detective mode", sticker: "detective",
+      title: "What happened first?",
+      html: `
+        <p>Read the story. Look at the highlighted verbs.</p>
+        <div class="story">
+          On Sunday evening, Mia <span class="hl2">logged in</span> to her account and froze. Her profile picture was bright green, and all her photos <span class="hl">had disappeared</span>.
+          Someone <span class="hl">had changed</span> her password. Then she remembered: the day before, she <span class="hl">had clicked</span> on a strange link in a message.
+        </div>
+        <ol class="qs">
+          <li>Which happened <b>first</b>: Mia logged in, or someone changed her password?</li>
+          <li>Look at <span class="hl">had changed</span>. How is it made? What two parts do you see?</li>
+          <li>Why does the writer say <i>had clicked</i>, not just <i>clicked</i>?</li>
+          <li>What do you think this tense is called? Why?</li>
+        </ol>
+        <details><summary>Reveal the answer</summary><div>
+          <p>This is the <b>Past Perfect</b>: <b>had + past participle</b> (<i>had changed, had clicked, had disappeared</i>).</p>
+          <p>The story is already in the past (<i>Mia logged in</i>). The Past Perfect takes us <b>even further back</b> — to things that happened <b>before</b> that moment. It’s the “past of the past”.</p>
+        </div></details>`
+    },
+
+    {
+      type: "match", label: "warm-up · vocabulary", sticker: "brain",
+      title: "Words you’ll need",
+      instructions: "Match each word to its meaning. Drag — or tap a meaning, then tap a slot.",
+      pairs: [
+        ["interfere", "to get in the way of something"],
+        ["rely on", "to need something and feel you can’t be without it"],
+        ["take over", "to take control of something"],
+        ["interrupt", "to stop someone while they are speaking or doing something"],
+        ["hack", "to get into someone’s computer or account illegally"],
+        ["visible", "easy to see"],
+        ["colour-blind", "unable to see the difference between some colours"],
+        ["warn", "to tell someone about a possible danger"],
+        ["represent", "to be a symbol of something"],
+        ["dye", "to change the colour of hair or fabric"]
+      ]
+    },
+
+    /* ================= PART 2 · THEORY ================= */
+    { type: "part", n: "02", icon: "notebook", color: "var(--g)", title: "Theory", text: "Read, discuss, write it down." },
+
+    {
+      type: "rule", label: "theory · the big idea", sticker: "rewind",
+      title: "The past of the past",
+      html: `
+        <p>When we tell a story about the past, we usually use the Past Simple. But sometimes we need to <b>rewind</b> and talk about something that happened <b>even earlier</b>. That’s the job of the Past Perfect.</p>
+        <div class="tl big">
+          <div class="arc" style="--x:30%;--w:34%"><span>rewind</span></div>
+          <div class="pt e" style="--x:30%"><b>had changed</b><i>① earlier past</i></div>
+          <div class="pt" style="--x:64%"><b>logged in</b><i>② past</i></div>
+          <div class="now"></div>
+        </div>
+        <p class="ex" style="text-align:center">When Mia <span class="hl2">logged in</span>, someone <span class="hl">had changed</span> her password.</p>
+        <div class="grid2">
+          <div class="box"><h4>② the story moment</h4><p><b>Past Simple</b><br><i>Mia logged in. She froze.</i></p></div>
+          <div class="box pink"><h4>① before that moment</h4><p><b>Past Perfect</b><br><i>Someone had changed her password.</i></p></div>
+        </div>
+        <div class="notes-tip"><img src="assets/emoji/pencil.png" alt=""><div><b>Notes:</b> draw this timeline and write one example of your own under it.</div></div>`
+    },
+
+    {
+      type: "rule", label: "theory · form", sticker: "puzzle",
+      title: "How to build it",
+      html: `
+        <div class="formula"><span class="h">had</span> + <span class="v">past participle (V3)</span></div>
+        <p>Good news: <b>had</b> is the same for every person — <i>I, you, he, she, it, we, they</i>.</p>
+        <table class="form">
+          <tr><th></th><th>Form</th><th>Example</th></tr>
+          <tr><td><b>+</b></td><td>subject + <b>had</b> + V3</td><td>She <b>had deleted</b> the post.</td></tr>
+          <tr><td><b>−</b></td><td>subject + <b>hadn’t</b> (had not) + V3</td><td>I <b>hadn’t saved</b> the file.</td></tr>
+          <tr><td><b>?</b></td><td><b>Had</b> + subject + V3?</td><td><b>Had</b> you <b>backed up</b> your photos?</td></tr>
+          <tr><td><b>⇄</b></td><td>Yes, … <b>had</b>. / No, … <b>hadn’t</b>.</td><td>Yes, I <b>had</b>. / No, I <b>hadn’t</b>.</td></tr>
+          <tr><td><b>Wh?</b></td><td>Wh- + <b>had</b> + subject + V3?</td><td>Why <b>had</b> the screen <b>turned</b> black?</td></tr>
+        </table>
+        <div class="grid2">
+          <div class="box"><h4>regular verbs → -ed</h4><p>change → <b>changed</b>, upload → <b>uploaded</b>, rely → <b>relied</b></p></div>
+          <div class="box pink"><h4>irregular → 3rd form</h4><p>go → <b>gone</b>, see → <b>seen</b>, steal → <b>stolen</b>, forget → <b>forgotten</b></p></div>
+        </div>
+        <div class="note">⚠️ <b>’d</b> can mean <b>had</b> or <b>would</b>. Look at the next word: <b>’d + V3</b> = had (<i>I’d forgotten</i>), <b>’d + base verb</b> = would (<i>I’d forget</i>).</div>
+        <div class="note">⚠️ Never <s>had went</s>, <s>had saw</s>, <s>had took</s> — after <b>had</b> we always use the <b>3rd form</b>: <i>had gone, had seen, had taken</i>.</div>`
+    },
+
+    {
+      type: "rule", label: "theory · when we use it", sticker: "sparkles",
+      title: "When do we use it?",
+      html: `
+        <div class="cat">
+          <span class="tag">A · the earlier action</span>
+          <p>One past action happened <b>before</b> another past action.</p>
+          <div class="tl">
+            <div class="pt e" style="--x:28%"><b>had finished</b><i>first</i></div>
+            <div class="pt" style="--x:66%"><b>opened</b><i>second</i></div>
+            <div class="now"></div>
+          </div>
+          <p class="ex">When I opened the app, the update <b>had</b> already <b>finished</b>.</p>
+        </div>
+
+        <div class="cat">
+          <span class="tag">B · before a time in the past</span>
+          <p>Something was complete <b>before a certain moment</b> — often with <b>by + time</b> or <b>by the time</b>.</p>
+          <div class="tl">
+            <div class="pt e" style="--x:26%"><b>had posted</b><i>1,000 photos</i></div>
+            <div class="mk" style="--x:62%"><b>by 2020</b><i>deadline</i></div>
+            <div class="now"></div>
+          </div>
+          <p class="ex">By 2020, she <b>had posted</b> over a thousand photos. · By the time we arrived, the film <b>had started</b>.</p>
+        </div>
+
+        <div class="cat">
+          <span class="tag">C · the reason (looking back)</span>
+          <p>We explain a past situation by going back to its <b>cause</b> — often with <b>because</b> or <b>so</b>.</p>
+          <div class="tl">
+            <div class="pt e" style="--x:28%"><b>had hacked</b><i>cause</i></div>
+            <div class="pt" style="--x:64%"><b>was furious</b><i>result</i></div>
+            <div class="now"></div>
+          </div>
+          <p class="ex">She was furious because someone <b>had hacked</b> her account.</p>
+        </div>
+
+        <div class="cat">
+          <span class="tag">D · experience up to a past moment</span>
+          <p>Life experience <b>until</b> a moment in the past — with <b>never, ever, before, the first time</b>.</p>
+          <div class="tl">
+            <div class="sp" style="--x:4%;--w:52%"><b>had never seen</b><i>my whole life</i></div>
+            <div class="pt" style="--x:68%"><b>that night</b><i>moment</i></div>
+            <div class="now"></div>
+          </div>
+          <p class="ex">I <b>had never seen</b> such vivid colours before that night. · It was the first time I <b>had</b> ever <b>used</b> a VR headset.</p>
+        </div>
+
+        <div class="cat">
+          <span class="tag">E · reporting & realising</span>
+          <p>After <b>said, told, thought, realised, remembered, found out, noticed</b> we often “move back” one tense.</p>
+          <div class="tl">
+            <div class="pt e" style="--x:28%"><b>had lost</b><i>what happened</i></div>
+            <div class="pt" style="--x:64%"><b>said</b><i>reporting</i></div>
+            <div class="now"></div>
+          </div>
+          <p class="ex">“I lost my phone.” → Tom said he <b>had lost</b> his phone. · I suddenly realised I <b>had forgotten</b> my password.</p>
+        </div>
+
+        <div class="note">🚫 <b>We don’t use it</b> for routines and habits (<i>Every day I <b>checked</b> my phone</i>), for actions that are still true now (use the Present Perfect), or for a simple list of actions in the order they happened (<i>I woke up, <b>checked</b> my messages and <b>got</b> up</i>).</div>
+        <div class="notes-tip"><img src="assets/emoji/pencil.png" alt=""><div><b>Notes:</b> write the five letters A–E and one example of your own for each.</div></div>`
+    },
+
+    {
+      type: "rule", label: "theory · compare", sticker: "eye",
+      title: "Past Simple or Past Perfect?",
+      html: `
+        <p>One small word changes the whole story. Compare:</p>
+        <div class="grid2">
+          <div class="box">
+            <h4>Past Simple</h4>
+            <p class="ex">When we arrived, the film <b>started</b>.</p>
+            <div class="tl">
+              <div class="pt" style="--x:30%"><b>arrived</b><i>1</i></div>
+              <div class="pt e" style="--x:62%"><b>started</b><i>2</i></div>
+            </div>
+            <p>We arrived <b>first</b> — then the film started. We saw everything. 😊</p>
+          </div>
+          <div class="box pink">
+            <h4>Past Perfect</h4>
+            <p class="ex">When we arrived, the film <b>had started</b>.</p>
+            <div class="tl">
+              <div class="pt e" style="--x:30%"><b>had started</b><i>1</i></div>
+              <div class="pt" style="--x:62%"><b>arrived</b><i>2</i></div>
+            </div>
+            <p>The film started <b>first</b> — we missed the beginning. 😬</p>
+          </div>
+        </div>
+        <div class="note">💡 With <b>before</b> and <b>after</b>, the order is already clear, so the Past Perfect is <b>optional</b>: <i>After I <b>(had) finished</b> my homework, I went online.</i> Both are correct.</div>
+        <h3>Signal words</h3>
+        <div class="chips"><span>already</span><span>just</span><span>never</span><span>ever</span><span>yet</span><span>before</span><span>after</span><span>when</span><span>by + time</span><span>by the time</span><span>as soon as</span><span>until</span><span>because</span><span>the first time</span></div>
+        <p>Typical positions: <i>She <b>had already</b> left.</i> · <i>I <b>had just</b> logged out.</i> · <i>We <b>hadn’t</b> finished <b>yet</b>.</i></p>`
+    },
+
+    /* ================= PART 3 · FORM ================= */
+    { type: "part", n: "03", icon: "puzzle", color: "var(--b)", title: "Practice: form", text: "Build the Past Perfect correctly." },
+
+    {
+      type: "sort", label: "form · sort", sticker: "shuffle",
+      title: "V2 or V3?",
+      instructions: "Only the <b>3rd form</b> can go after <b>had</b>. Sort the verbs.",
+      categories: [
+        { name: "Past Simple (V2) — not after had", words: ["went", "saw", "wrote", "took", "stole"] },
+        { name: "Past Participle (V3) — had + …", words: ["gone", "seen", "written", "taken", "stolen"] }
+      ]
+    },
+
+    {
+      type: "gapfill", label: "form · positive", sticker: "laptop",
+      title: "Build it",
+      instructions: "Put the verbs into the <b>Past Perfect</b>. Tap a gap and type.",
+      items: [
+        "By 2010, she [[had created // create]] three different online profiles.",
+        "I couldn’t log in because I [[had forgotten // forget]] my password.",
+        "When the fire alarm went off, everyone [[had already left // already / leave]] the building.",
+        "The hackers [[had stolen // steal]] thousands of usernames before anyone noticed.",
+        "He wore a red shirt because he [[had read // read]] that red represents good luck.",
+        "By the time the video went viral, it [[had reached // reach]] two million views.",
+        "We [[had never seen // never / see]] such bright colours before we visited the coral reef.",
+        "The app [[had sent // send]] me ten notifications before breakfast.",
+        "My mum [[had dyed // dye]] her hair purple, so I didn’t recognise her on the video call.",
+        "Scientists [[had known // know]] about ultraviolet light long before they built special cameras."
+      ]
+    },
+
+    {
+      type: "gapfill", label: "form · negatives & questions", sticker: "lock",
+      title: "Not yet? Had you?",
+      instructions: "Write the <b>negative</b> or <b>question</b> form. Use the words in brackets.",
+      items: [
+        "I [[hadn’t checked|had not checked // not / check]] my messages, so I missed the news.",
+        "[[Had you ever used // you / ever / use]] a VR headset before last summer?",
+        "She [[hadn’t realised|had not realised|hadn’t realized|had not realized // not / realise]] that her location was public.",
+        "“Had they finished the project before the deadline?” — “Yes, they [[had]].”",
+        "[[Had he backed // he / back]] up his files before the laptop crashed?",
+        "We [[hadn’t expected|had not expected // not / expect]] the update to take so long.",
+        "[[Had she told // she / tell]] anyone her password?",
+        "They [[hadn’t heard|had not heard // not / hear]] of ‘calm technology’ before the lesson.",
+        "Why [[had the screen turned // the screen / turn]] black?",
+        "“Had you seen the warning?” — “No, I [[hadn’t|had not]].”"
+      ]
+    },
+
+    {
+      type: "mcq", label: "form · multiple choice", sticker: "search",
+      title: "Spot the correct form",
+      instructions: "Tap the correct answer.",
+      items: [
+        { q: "By the time we arrived, the concert ___.", options: ["had started", "had start", "has started"], answer: 0 },
+        { q: "She realised she ___ her password.", options: ["had forgot", "had forgotten", "has forgotten"], answer: 1 },
+        { q: "They ___ the video before it went viral.", options: ["had saw", "have seen", "had seen"], answer: 2 },
+        { q: "___ you ever ___ an online course before 2024?", options: ["Had … taken", "Had … took", "Did … taken"], answer: 0 },
+        { q: "I ___ of that app before my friend told me about it.", options: ["hadn’t heard", "didn’t heard", "hadn’t hear"], answer: 0 },
+        { q: "In “I’d already logged out”, <b>’d</b> means:", options: ["would", "had", "did"], answer: 1 },
+        { q: "The photo looked strange because someone ___ a filter.", options: ["had applied", "had apply", "was applied"], answer: 0 },
+        { q: "He ___ his phone at home, so he couldn’t pay.", options: ["had leaved", "had left", "has left"], answer: 1 },
+        { q: "Nobody ___ the warning sign until it turned bright red.", options: ["had noticed", "had notice", "has noticed"], answer: 0 },
+        { q: "When I checked the folder, the files ___.", options: ["disappeared had", "had disappear", "had disappeared"], answer: 2 }
+      ]
+    },
+
+    /* ================= PART 4 · USE ================= */
+    { type: "part", n: "04", icon: "bulb", color: "var(--accent2)", title: "Practice: use", text: "When and why — not just how." },
+
+    {
+      type: "tf", label: "use · true or false", sticker: "crystal",
+      title: "True or false?",
+      instructions: "Read the statements about the Past Perfect. Are they true or false?",
+      items: [
+        { q: "We use the Past Perfect to talk about our daily routine.", answer: false },
+        { q: "The Past Perfect shows that one past action happened before another past action.", answer: true },
+        { q: "The Past Perfect is formed with <i>have / has</i> + past participle.", answer: false },
+        { q: "<b>’d</b> can mean <i>had</i> or <i>would</i>.", answer: true },
+        { q: "We can use <i>by + a time</i> with the Past Perfect: <i>By 9 pm, I had finished.</i>", answer: true },
+        { q: "After <i>before</i> or <i>after</i>, the Past Perfect is always necessary.", answer: false },
+        { q: "For a list of actions in the order they happened, we usually use the Past Simple.", answer: true },
+        { q: "<i>It was the first time I had seen the sea.</i> is correct.", answer: true },
+        { q: "We use the Past Perfect for actions that are still happening now.", answer: false },
+        { q: "“I lost my phone.” can become <i>She said she had lost her phone.</i>", answer: true }
+      ]
+    },
+
+    {
+      type: "mcq", label: "use · which came first", sticker: "hourglass",
+      title: "Which happened first?",
+      instructions: "Read each sentence and tap the action that happened <b>first</b>. Careful — not every sentence uses the Past Perfect!",
+      items: [
+        { q: "When I got to the bus stop, the bus had left.", options: ["I got to the bus stop", "The bus left"], answer: 1 },
+        { q: "She had changed her password before she logged out.", options: ["She changed her password", "She logged out"], answer: 0 },
+        { q: "By the time the teacher arrived, we had finished the test.", options: ["The teacher arrived", "We finished the test"], answer: 1 },
+        { q: "I realised that I had seen that colour illusion before.", options: ["I realised", "I saw the illusion"], answer: 1 },
+        { q: "After he had uploaded the photo, he turned off his phone.", options: ["He uploaded the photo", "He turned off his phone"], answer: 0 },
+        { q: "When we arrived, the film started.", options: ["We arrived", "The film started"], answer: 0 },
+        { q: "The screen went black because the battery had died.", options: ["The screen went black", "The battery died"], answer: 1 },
+        { q: "They told me that someone had hacked the website.", options: ["They told me", "Someone hacked the website"], answer: 1 },
+        { q: "When I opened the app, it had already updated itself.", options: ["I opened the app", "The app updated itself"], answer: 1 },
+        { q: "As soon as I had read the warning, I closed the link.", options: ["I read the warning", "I closed the link"], answer: 0 }
+      ]
+    },
+
+    {
+      type: "match", label: "use · match", sticker: "joystick",
+      title: "Complete the story",
+      instructions: "Match the beginnings and endings.",
+      pairs: [
+        ["By the time I found my charger,", "my phone had died."],
+        ["I didn’t recognise my cousin on the video call", "because she had dyed her hair purple."],
+        ["It was the first time I had ever", "used a virtual reality headset."],
+        ["After the hackers had stolen the data,", "the company warned all its users."],
+        ["Mark Weiser had developed the idea of calm technology", "long before smart homes became popular."],
+        ["She realised she had shared her location", "when strangers started commenting on it."],
+        ["Before I learnt about colour-blindness,", "I had never thought about traffic lights."],
+        ["The red warning light had been visible for hours,", "but nobody had paid attention to it."],
+        ["I had relied on the map app for so long", "that I got lost without it."],
+        ["When I finally joined the online lesson,", "the teacher had already explained the task."]
+      ]
+    },
+
+    {
+      type: "mcq", label: "use · choose the tense", sticker: "eye",
+      title: "Simple or Perfect?",
+      instructions: "Choose the best option.",
+      items: [
+        { q: "When I came home, my brother ___ all the pizza, so there was nothing left.", options: ["ate", "had eaten", "has eaten"], answer: 1 },
+        { q: "Yesterday I woke up, ___ my notifications and got out of bed.", options: ["checked", "had checked", "was checked"], answer: 0 },
+        { q: "I ___ the film before, so I knew the ending.", options: ["saw", "have seen", "had seen"], answer: 2 },
+        { q: "Last year she ___ her phone the moment she woke up every day.", options: ["checked", "had checked", "has checked"], answer: 0 },
+        { q: "By the end of the day, I ___ over 200 messages.", options: ["received", "had received", "have received"], answer: 1 },
+        { q: "When the alarm rang, we ___ the building calmly.", options: ["left", "had left", "have left"], answer: 0 },
+        { q: "He was nervous because he ___ in front of a camera before.", options: ["never spoke", "had never spoken", "has never spoken"], answer: 1 },
+        { q: "After the teacher explained the rules, we ___ the game.", options: ["started", "had started", "have started"], answer: 0 },
+        { q: "When we got to the cinema, the film ___, so we missed the beginning.", options: ["started", "had started", "starts"], answer: 1 },
+        { q: "In 2020, my family ___ to a new city.", options: ["moved", "had moved", "has moved"], answer: 0 }
+      ]
+    },
+
+    {
+      type: "rephrase", label: "use · rewrite", sticker: "pencil",
+      title: "Two sentences → one",
+      instructions: "Join or rewrite the sentences. Use the word in the black box and the <b>Past Perfect</b>.",
+      items: [
+        { prompt: "The film started. Then we arrived at the cinema.", key: "when",
+          answers: ["When we arrived at the cinema, the film had started.", "When we arrived at the cinema, the film had already started.", "The film had started when we arrived at the cinema.", "The film had already started when we arrived at the cinema."] },
+        { prompt: "Everyone left the chat. Then I logged in.", key: "by the time",
+          answers: ["By the time I logged in, everyone had left the chat.", "By the time I logged in, everyone had already left the chat.", "Everyone had left the chat by the time I logged in.", "Everyone had already left the chat by the time I logged in."] },
+        { prompt: "She never saw the Northern Lights before that night.", key: "it was the first time",
+          answers: ["It was the first time she had seen the Northern Lights.", "It was the first time she had ever seen the Northern Lights.", "That night was the first time she had seen the Northern Lights.", "That night was the first time she had ever seen the Northern Lights."] },
+        { prompt: "Someone hacked my account. I didn’t know.", key: "I didn’t know (that)",
+          answers: ["I didn't know that someone had hacked my account.", "I didn't know someone had hacked my account."] },
+        { prompt: "Tom: “I lost my password.”", key: "Tom said",
+          answers: ["Tom said that he had lost his password.", "Tom said he had lost his password."] },
+        { prompt: "The battery died. Then the screen went black.", key: "because",
+          answers: ["The screen went black because the battery had died.", "The screen went black because its battery had died."] }
+      ]
+    },
+
+    /* ================= PART 5 · MIXED ================= */
+    { type: "part", n: "05", icon: "shuffle", color: "var(--accent)", title: "Mixed tenses", text: "Past Simple · Past Continuous · Past Perfect · Present Perfect" },
+
+    {
+      type: "mcq", label: "mixed · multiple choice", sticker: "robot",
+      title: "Which tense?",
+      instructions: "Choose the correct option.",
+      items: [
+        { q: "I ___ this phone for two years now.", options: ["have had", "had had", "was having"], answer: 0 },
+        { q: "While I ___ through my feed, I saw a strange post.", options: ["scrolled", "was scrolling", "had scrolled"], answer: 1 },
+        { q: "___ you ever ___ a colour-blindness test?", options: ["Have … done", "Had … done", "Were … doing"], answer: 0 },
+        { q: "When I checked my bank app, someone ___ money from my account.", options: ["was taking", "had taken", "has taken"], answer: 1 },
+        { q: "Last night I ___ the lights off and went to bed.", options: ["turned", "had turned", "was turning"], answer: 0 },
+        { q: "She was exhausted because she ___ only two hours the night before.", options: ["slept", "had slept", "has slept"], answer: 1 },
+        { q: "At 9 pm yesterday we ___ a documentary about how animals see colour.", options: ["watched", "were watching", "had watched"], answer: 1 },
+        { q: "I ___ three new followers since this morning.", options: ["have got", "had got", "got"], answer: 0 },
+        { q: "By the time the meeting started, I ___ my notes twice.", options: ["have read", "had read", "was reading"], answer: 1 },
+        { q: "My phone ___ while I was talking to the teacher.", options: ["rang", "had rung", "has rung"], answer: 0 }
+      ]
+    },
+
+    {
+      type: "gapfill", label: "mixed · story", sticker: "phone",
+      title: "The day the Wi-Fi died",
+      instructions: "Put the verbs into the correct past (or present perfect) tense.",
+      text: "Last Saturday I [[was sitting // sit]] in my room, editing a video, when the screen suddenly [[went // go]] black. At first I thought my laptop [[had crashed // crash]], but then I [[noticed // notice]] that the light on the router was red. I [[had never seen // never / see]] it red before! I called my dad. He told me that a storm [[had damaged // damage]] the cables in our street. While we [[were waiting // wait]] for the repair, we played board games — something we [[hadn’t done|had not done // not / do]] for years. It was strangely calm. Since that day, I [[have spent // spend]] much less time online, and I [[have started // start]] reading again."
+    },
+
+    {
+      type: "correct", label: "mixed · fix it", sticker: "search",
+      title: "Find and fix",
+      instructions: "Each sentence has <b>one</b> mistake. Fix it right in the box.",
+      items: [
+        { wrong: "By the time I arrived, the lesson has already started.", answers: ["By the time I arrived, the lesson had already started.", "By the time I arrived the lesson had already started."] },
+        { wrong: "She had went to bed before the message came.", answers: ["She had gone to bed before the message came."] },
+        { wrong: "Every morning I had checked my phone before breakfast.", answers: ["Every morning I checked my phone before breakfast."] },
+        { wrong: "When I logged in, I was realising that someone had changed my password.", answers: ["When I logged in, I realised that someone had changed my password.", "When I logged in, I realized that someone had changed my password.", "When I logged in, I realised someone had changed my password.", "When I logged in, I realized someone had changed my password."] },
+        { wrong: "I hadn’t never used that app before.", answers: ["I had never used that app before.", "I hadn't ever used that app before."] },
+        { wrong: "It was the first time I saw such bright colours.", answers: ["It was the first time I had seen such bright colours.", "It was the first time I had ever seen such bright colours."] },
+        { wrong: "They said they have lost their passwords.", answers: ["They said they had lost their passwords.", "They said that they had lost their passwords."] }
+      ]
+    },
+
+    {
+      type: "open", label: "mixed · your ideas", sticker: "bulb",
+      title: "Finish the sentences",
+      instructions: "Finish the sentences in your own words. Use the <b>Past Perfect</b> where it fits.",
+      items: [
+        { prompt: "By the time I got my first smartphone, …", pattern: "\\b(had|hadn't)\\b|\\w'd\\b", sample: "…I had already learnt to use my mum’s tablet." },
+        { prompt: "I felt really embarrassed because …", pattern: "\\b(had|hadn't)\\b|\\w'd\\b", sample: "…I had sent a message to the wrong group chat." },
+        { prompt: "When I finally checked my messages, …", pattern: "\\b(had|hadn't)\\b|\\w'd\\b", sample: "…my friends had already made plans without me." },
+        { prompt: "It was the first time I had ever …", pattern: null, sample: "…seen a rainbow at night." },
+        { prompt: "Before I learnt how bees see colour, I …", pattern: "\\b(had|hadn't)\\b|\\w'd\\b", sample: "…had never thought that flowers have hidden patterns." },
+        { prompt: "My friend was shocked because someone …", pattern: "\\b(had|hadn't)\\b|\\w'd\\b", sample: "…had taken over her account and changed her profile picture." }
+      ]
+    },
+
+    {
+      type: "write", label: "mixed · writing", sticker: "notebook",
+      title: "A digital disaster",
+      instructions: "Write a short story (6–8 sentences): <b>something went wrong online</b>. What were you doing? What happened? What had happened before? Use at least three words from the box.",
+      words: ["hack", "password", "notification", "interrupt", "rely on", "take over", "visible", "warn", "bright", "screen", "private", "access"],
+      checks: [
+        { label: "uses the Past Perfect at least twice", pattern: "\\b(had|hadn't)\\s+(\\w+\\s+)?\\w+(ed|en|wn|ne|t|ught|ung|um|ade|ept)\\b", min: 2 },
+        { label: "uses the Past Continuous (was / were + -ing)", pattern: "\\b(was|were)\\s+\\w+ing\\b" },
+        { label: "uses a time linker (when, by the time, before, after, as soon as)", pattern: "\\b(when|by the time|before|after|as soon as|already)\\b" },
+        { label: "uses at least 3 words from the box", words: 3 },
+        { label: "has at least 6 sentences", sentences: 6 }
+      ],
+      sample: "Last month I was doing my homework when a strange notification appeared on my screen. It said that someone had tried to access my account. I panicked, because I had used the same password for everything. By the time I logged in, the hacker had already taken over my profile. My name was still visible, but my photos had disappeared. Luckily, my brother helped me, and now I never rely on just one password."
+    }
+  ]
+};
+</script>
+
+<script>
+/* =====================================================================
+   ENGINE — no need to edit below this line
+   ===================================================================== */
+(function(){
+"use strict";
+
+/* ---------- helpers ---------- */
+function h(tag, props){
+  const el = document.createElement(tag);
+  if (props) for (const k in props){
+    const v = props[k];
+    if (v == null || v === false) continue;
+    if (k === "class") el.className = v;
+    else if (k === "html") el.innerHTML = v;
+    else if (k === "style") el.style.cssText = v;
+    else if (k.slice(0,2) === "on") el.addEventListener(k.slice(2), v);
+    else el.setAttribute(k, v === true ? "" : v);
+  }
+  for (let i = 2; i < arguments.length; i++){
+    const kids = [].concat(arguments[i]);
+    for (const kid of kids){
+      if (kid == null || kid === false) continue;
+      el.append(kid.nodeType ? kid : document.createTextNode(kid));
+    }
+  }
+  return el;
+}
+function clear(obj){ for (const k of Object.keys(obj)) delete obj[k]; }
+function emo(x, cls){
+  if (!x) return "";
+  if (/^[a-z0-9-]+$/.test(x)) return h("img", { src: "assets/emoji/" + x + ".png", alt: "", class: cls || "", draggable: "false" });
+  return document.createTextNode(x);
+}
+
+function norm(s, dWord){
+  s = String(s || "").toLowerCase()
+    .replace(/[’‘`´]/g, "'").replace(/[“”"«»]/g, "");
+  s = s.replace(/\bwon't\b/g, "will not").replace(/\bcan't\b/g, "cannot").replace(/\bcan not\b/g, "cannot")
+       .replace(/n't\b/g, " not").replace(/'m\b/g, " am").replace(/'re\b/g, " are")
+       .replace(/'ve\b/g, " have").replace(/'ll\b/g, " will").replace(/'d\b/g, " " + (dWord || "had"));
+  s = s.replace(/\b(he|she|it|what|who|there|that)'s\b/g, "$1 is");
+  s = s.replace(/\bmom\b/g, "mum").replace(/\bo'clock\b/g, "oclock");
+  s = s.replace(/[.,!?;:()\[\]–—-]/g, " ").replace(/\s+/g, " ").trim();
+  return s;
+}
+function matches(value, answers){
+  const a = answers.map(x => norm(x));
+  const v1 = norm(value, "had"), v2 = norm(value, "would");
+  return v1 !== "" && (a.includes(v1) || a.includes(v2));
+}
+function similarity(a, b){
+  const A = norm(a).split(" ").filter(Boolean), B = norm(b).split(" ").filter(Boolean);
+  if (!A.length || !B.length) return 0;
+  const pool = B.slice(); let hit = 0;
+  for (const w of A){ const i = pool.indexOf(w); if (i > -1){ hit++; pool.splice(i,1); } }
+  return hit / Math.max(A.length, B.length);
+}
+function parseGaps(str){
+  const parts = []; const re = /\[\[(.+?)\]\]/g; let last = 0, m;
+  while ((m = re.exec(str))){
+    if (m.index > last) parts.push({ text: str.slice(last, m.index) });
+    const [ans, hint] = m[1].split(" // ");
+    parts.push({ answers: ans.split("|").map(s => s.trim()), hint: hint ? hint.trim() : null });
+    last = re.lastIndex;
+  }
+  if (last < str.length) parts.push({ text: str.slice(last) });
+  return parts;
+}
+function hashStr(s){ let h1 = 1779033703 ^ s.length; for (let i = 0; i < s.length; i++){ h1 = Math.imul(h1 ^ s.charCodeAt(i), 3432918353); h1 = h1 << 13 | h1 >>> 19; } return h1 >>> 0; }
+function shuffle(arr, seedStr){
+  let seed = hashStr(seedStr);
+  const rnd = () => { seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--){ const j = Math.floor(rnd() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
+  return a;
+}
+function addReveal(container, text){
+  if (container.querySelector(":scope > .reveal")) return;
+  container.append(h("span", { class: "reveal" }, "→ " + text));
+}
+function removeReveals(root){ root.querySelectorAll(".reveal, .model").forEach(n => n.remove()); }
+function fire(el){ el.dispatchEvent(new Event("input", { bubbles: true })); }
+
+/* ---------- storage ---------- */
+const KEY = "lesson:" + LESSON.id;
+let SAVE = {};
+try { SAVE = JSON.parse(localStorage.getItem(KEY) || "{}") || {}; } catch (e) { SAVE = {}; }
+function persist(){ try { localStorage.setItem(KEY, JSON.stringify(SAVE)); } catch (e) {} }
+
+/* ---------- theme & header ---------- */
+const root = document.documentElement;
+for (const k in (LESSON.theme || {})) root.style.setProperty("--" + k, LESSON.theme[k]);
+document.title = LESSON.title;
+document.getElementById("kicker").textContent = LESSON.kicker || "";
+const t = document.getElementById("title");
+if (LESSON.titleHTML) t.innerHTML = LESSON.titleHTML; else t.textContent = LESSON.title;
+document.getElementById("sub").textContent = LESSON.subtitle || "";
+const st = LESSON.stickers || [];
+document.getElementById("sticker1").append(emo(st[0]));
+document.getElementById("sticker2").append(emo(st[1]));
+
+/* ---------- confetti ---------- */
+function burst(fromEl){
+  if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const r = fromEl.getBoundingClientRect(); const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+  const set = LESSON.confetti && LESSON.confetti.length ? LESSON.confetti : ["⭐"];
+  for (let i = 0; i < 16; i++){
+    const s = h("span", { class: "confetti" }, emo(set[i % set.length]));
+    document.body.append(s);
+    const dx = (Math.random() - .5) * 360, dy = -60 - Math.random() * 230, rot = (Math.random() - .5) * 540;
+    const anim = s.animate([
+      { transform: `translate(${cx}px, ${cy}px) scale(.5)`, opacity: 1 },
+      { transform: `translate(${cx + dx * .6}px, ${cy + dy}px) rotate(${rot / 2}deg) scale(1.1)`, opacity: 1, offset: .55 },
+      { transform: `translate(${cx + dx}px, ${cy + dy + 170}px) rotate(${rot}deg) scale(.9)`, opacity: 0 }
+    ], { duration: 1150 + Math.random() * 400, easing: "cubic-bezier(.2,.7,.4,1)" });
+    anim.onfinish = () => s.remove();
+  }
+}
+
+/* ---------- drag & drop board (mouse + touch + tap) ---------- */
+function Board(scope, v){
+  const zones = {}, chips = {}; let selected = null;
+  const bank = h("div", { class: "bank" });
+  register(bank, "bank", false);
+  function register(el, id, single){
+    el.dataset.zone = id; zones[id] = { el, single };
+    el.addEventListener("click", () => { if (selected) place(selected, id); });
+  }
+  function zoneOf(c){ const p = c.parentElement; return p && p.dataset.zone ? p.dataset.zone : "bank"; }
+  function unselect(){ if (selected) selected.classList.remove("selected"); selected = null; }
+  function clearMarks(){ scope.querySelectorAll(".ok,.bad").forEach(n => n.classList.remove("ok", "bad")); }
+  function place(c, zid, silent){
+    const z = zones[zid]; if (!z) return;
+    if (z.single) z.el.querySelectorAll(".chip").forEach(o => { if (o !== c) bank.append(o); });
+    z.el.append(c); unselect();
+    if (!silent){ clearMarks(); for (const id in chips){ const zz = zoneOf(chips[id]); if (zz === "bank") delete v[id]; else v[id] = zz; } persist(); fire(scope); }
+  }
+  function tap(c){
+    if (zoneOf(c) !== "bank"){ place(c, "bank"); return; }
+    if (selected === c){ unselect(); return; }
+    unselect(); selected = c; c.classList.add("selected");
+  }
+  function zoneAt(x, y){
+    const el = document.elementFromPoint(x, y); const z = el && el.closest("[data-zone]");
+    return z && scope.contains(z) ? z : null;
+  }
+  let overEl = null;
+  function setOver(z){ if (overEl === z) return; if (overEl) overEl.classList.remove("over"); overEl = z; if (z) z.classList.add("over"); }
+  function chip(id, label, value){
+    const c = h("button", { class: "chip", type: "button", html: label });
+    c.dataset.id = id; c.dataset.value = value; chips[id] = c;
+    let d = null;
+    c.addEventListener("pointerdown", e => {
+      if (e.pointerType === "mouse" && e.button !== 0) return;
+      d = { x: e.clientX, y: e.clientY, moved: false, ghost: null };
+      try { c.setPointerCapture(e.pointerId); } catch (_) {}
+    });
+    c.addEventListener("pointermove", e => {
+      if (!d) return;
+      if (!d.moved && Math.hypot(e.clientX - d.x, e.clientY - d.y) > 6){
+        d.moved = true; unselect();
+        const r = c.getBoundingClientRect(); d.ox = d.x - r.left; d.oy = d.y - r.top;
+        d.ghost = c.cloneNode(true); d.ghost.classList.add("ghost"); d.ghost.classList.remove("ok", "bad");
+        d.ghost.style.width = r.width + "px"; document.body.append(d.ghost); c.classList.add("dragging");
+      }
+      if (d.moved){
+        e.preventDefault();
+        d.ghost.style.left = (e.clientX - d.ox) + "px"; d.ghost.style.top = (e.clientY - d.oy) + "px";
+        setOver(zoneAt(e.clientX, e.clientY));
+      }
+    });
+    const end = e => {
+      if (!d) return; const was = d; d = null;
+      if (!was.moved) return;
+      was.ghost.remove(); c.classList.remove("dragging"); setOver(null); c._suppress = true;
+      if (e.type === "pointerup"){ const z = zoneAt(e.clientX, e.clientY); if (z) place(c, z.dataset.zone); }
+    };
+    c.addEventListener("pointerup", end);
+    c.addEventListener("pointercancel", end);
+    c.addEventListener("click", e => { e.stopPropagation(); if (c._suppress){ c._suppress = false; return; } tap(c); });
+    bank.append(c);
+    return c;
+  }
+  function restore(){ for (const id in v){ if (chips[id] && zones[v[id]]) place(chips[id], v[id], true); } }
+  function resetAll(){ for (const id in chips) bank.append(chips[id]); clear(v); clearMarks(); unselect(); }
+  return { bank, register, chip, place, restore, resetAll, chips, zones, zoneOf };
+}
+
+/* ---------- renderers ---------- */
+const RENDER = {};
+const LABEL = { rule: "theory", mcq: "multiple choice", tf: "true / false", gapfill: "gap fill", dragwords: "drag & drop", match: "match", sort: "sort", correct: "correct the mistakes", rephrase: "rewrite", translate: "translate", open: "your ideas", write: "writing" };
+
+RENDER.rule = (sec, s, body) => { body.append(h("div", { class: "rule", html: sec.html })); return null; };
+
+function mcqCore(sec, s, body, items){
+  const v = s.v || (s.v = {}); const qs = [];
+  items.forEach((it, i) => {
+    const q = h("div", { class: "q" });
+    const text = h("div", { class: "q-text" }, h("span", { class: "q-num" }, String(i + 1).padStart(2, "0")));
+    it.q.split("___").forEach((part, k) => { if (k) text.append(h("span", { class: "blank" })); text.append(h("span", { html: part })); });
+    const opts = h("div", { class: "opts", role: "radiogroup" });
+    const btns = it.options.map((o, j) => {
+      const b = h("button", { class: "opt", type: "button", role: "radio", html: o });
+      b.addEventListener("click", () => { v[i] = j; persist(); paint(); fire(body); });
+      opts.append(b); return b;
+    });
+    function paint(){ btns.forEach((b, j) => { b.classList.toggle("sel", v[i] === j); b.classList.remove("ok", "bad", "answer"); b.setAttribute("aria-checked", v[i] === j); }); }
+    paint(); q.append(text, opts); body.append(q);
+    qs.push({ it, btns, i });
+  });
+  return {
+    total: qs.length,
+    check(){ let sc = 0; qs.forEach(({ it, btns, i }) => {
+      btns.forEach(b => b.classList.remove("ok", "bad"));
+      if (v[i] === undefined) return;
+      const ok = v[i] === it.answer; btns[v[i]].classList.add(ok ? "ok" : "bad"); if (ok) sc++;
+    }); return sc; },
+    reveal(){ qs.forEach(({ it, btns, i }) => { if (v[i] !== it.answer) btns[it.answer].classList.add("answer"); }); },
+    reset(){ clear(v); qs.forEach(({ btns }) => btns.forEach(b => b.classList.remove("sel", "ok", "bad", "answer"))); }
+  };
+}
+RENDER.mcq = (sec, s, body) => mcqCore(sec, s, body, sec.items);
+RENDER.tf = (sec, s, body) => { body.classList.add("tf"); return mcqCore(sec, s, body, sec.items.map(it => ({ q: it.q, options: ["True", "False"], answer: it.answer ? 0 : 1 }))); };
+
+RENDER.gapfill = (sec, s, body) => {
+  const v = s.v || (s.v = {}); const gaps = [];
+  const isList = Array.isArray(sec.items);
+  const items = isList ? sec.items : [sec.text];
+  const list = h(isList ? "ol" : "div", { class: isList ? "lines" : "para story" });
+  items.forEach((it, i) => {
+    const line = h(isList ? "li" : "p", { class: "line" });
+    parseGaps(it).forEach((p, j) => {
+      if (p.text != null){ line.append(h("span", { html: p.text })); return; }
+      const key = i + "-" + j;
+      const w = Math.max(5, ...p.answers.map(a => a.length)) + 2;
+      const input = h("input", { class: "gap", type: "text", autocomplete: "off", autocapitalize: "off", autocorrect: "off", spellcheck: "false", "aria-label": p.hint ? "gap: " + p.hint : "gap", style: `width:${w}ch` });
+      input.value = v[key] || "";
+      input.addEventListener("input", () => { v[key] = input.value; persist(); input.classList.remove("ok", "bad"); });
+      input.addEventListener("keydown", e => {
+        if (e.key !== "Enter") return; e.preventDefault();
+        const all = Array.from(body.querySelectorAll("input.gap")); const n = all[all.indexOf(input) + 1];
+        if (n) n.focus(); else input.blur();
+      });
+      const wrap = h("span", { class: "gapwrap" }, input);
+      if (p.hint) wrap.append(h("span", { class: "hint" }, "(" + p.hint + ")"));
+      line.append(wrap); gaps.push({ input, answers: p.answers, wrap });
+    });
+    list.append(line);
+  });
+  body.append(list);
+  return {
+    total: gaps.length,
+    check(){ let sc = 0; gaps.forEach(g => { const ok = matches(g.input.value, g.answers); g.input.classList.toggle("ok", ok); g.input.classList.toggle("bad", !ok); if (ok) sc++; }); return sc; },
+    reveal(){ gaps.forEach(g => { if (!g.input.classList.contains("ok")) addReveal(g.wrap, g.answers[0]); }); },
+    reset(){ clear(v); gaps.forEach(g => { g.input.value = ""; g.input.classList.remove("ok", "bad"); }); }
+  };
+};
+
+RENDER.dragwords = (sec, s, body) => {
+  const v = s.v || (s.v = {}); const B = Board(body, v); const slots = []; const words = [];
+  const list = h("ol", { class: "lines" });
+  sec.items.forEach((it, i) => {
+    const line = h("li", { class: "line" });
+    parseGaps(it).forEach((p, j) => {
+      if (p.text != null){ line.append(h("span", { html: p.text })); return; }
+      const slot = h("span", { class: "slot", role: "button", "aria-label": "drop zone" });
+      B.register(slot, "g" + i + "-" + j, true);
+      slots.push({ slot, answers: p.answers }); words.push(p.answers[0]); line.append(slot);
+    });
+    list.append(line);
+  });
+  (sec.extra || []).forEach(w => words.push(w));
+  shuffle(words.map((w, k) => ({ id: "c" + k, w })), LESSON.id + sec.title).forEach(o => B.chip(o.id, o.w, o.w));
+  body.append(B.bank, list); B.restore();
+  return {
+    total: slots.length,
+    check(){ let sc = 0; slots.forEach(o => {
+      const c = o.slot.querySelector(".chip"); const ok = !!c && matches(c.dataset.value, o.answers);
+      o.slot.classList.toggle("ok", ok); o.slot.classList.toggle("bad", !ok); if (ok) sc++;
+    }); return sc; },
+    reveal(){
+      B.resetAll(); const used = new Set();
+      slots.forEach(o => { const c = Object.values(B.chips).find(ch => !used.has(ch) && matches(ch.dataset.value, o.answers));
+        if (c){ used.add(c); B.place(c, o.slot.dataset.zone); } });
+    },
+    reset(){ B.resetAll(); persist(); }
+  };
+};
+
+RENDER.match = (sec, s, body) => {
+  const v = s.v || (s.v = {}); const B = Board(body, v); const rows = [];
+  const grid = h("div", { class: "match" });
+  sec.pairs.forEach((p, i) => {
+    const slot = h("div", { class: "slot", role: "button", "aria-label": "drop zone" });
+    B.register(slot, "m" + i, true);
+    grid.append(h("div", { class: "mrow" }, h("div", { class: "left", "data-n": String(i + 1).padStart(2, "0"), html: p[0] }), slot));
+    rows.push(slot);
+  });
+  shuffle(sec.pairs.map((p, i) => i), LESSON.id + sec.title).forEach(i => B.chip("r" + i, sec.pairs[i][1], String(i)));
+  body.append(B.bank, grid); B.restore();
+  return {
+    total: rows.length,
+    check(){ let sc = 0; rows.forEach((slot, i) => { const c = slot.querySelector(".chip"); const ok = !!c && c.dataset.value === String(i);
+      slot.classList.toggle("ok", ok); slot.classList.toggle("bad", !ok); if (ok) sc++; }); return sc; },
+    reveal(){ B.resetAll(); rows.forEach((slot, i) => B.place(B.chips["r" + i], "m" + i)); },
+    reset(){ B.resetAll(); persist(); }
+  };
+};
+
+RENDER.sort = (sec, s, body) => {
+  const v = s.v || (s.v = {}); const B = Board(body, v);
+  const wrap = h("div", { class: "buckets" }); const all = [];
+  sec.categories.forEach((cat, ci) => {
+    const zone = h("div", { class: "bucket-zone" }); B.register(zone, "b" + ci, false);
+    wrap.append(h("div", { class: "bucket" }, h("h3", { html: cat.name }), zone));
+    cat.words.forEach((w, wi) => all.push({ id: "w" + ci + "-" + wi, w, ci }));
+  });
+  shuffle(all, LESSON.id + sec.title).forEach(o => B.chip(o.id, o.w, String(o.ci)));
+  body.append(B.bank, wrap); B.restore();
+  return {
+    total: all.length,
+    check(){ let sc = 0; Object.values(B.chips).forEach(c => { const z = B.zoneOf(c);
+      const ok = z === "b" + c.dataset.value; c.classList.toggle("ok", ok); c.classList.toggle("bad", !ok && z !== "bank"); if (ok) sc++; }); return sc; },
+    reveal(){ Object.values(B.chips).forEach(c => { if (B.zoneOf(c) !== "b" + c.dataset.value) B.place(c, "b" + c.dataset.value); }); },
+    reset(){ B.resetAll(); persist(); }
+  };
+};
+
+RENDER.correct = (sec, s, body) => {
+  const v = s.v || (s.v = {}); const rows = [];
+  sec.items.forEach((it, i) => {
+    const input = h("input", { class: "full", type: "text", autocomplete: "off", autocapitalize: "sentences", spellcheck: "false", "aria-label": "corrected sentence " + (i + 1) });
+    input.value = v[i] != null ? v[i] : it.wrong;
+    input.addEventListener("input", () => { v[i] = input.value; persist(); input.classList.remove("ok", "bad"); });
+    const row = h("div", { class: "row" }, h("div", { class: "row-label" }, h("span", { class: "num", style: "font:700 13px var(--mono);color:var(--accent);margin-right:6px" }, String(i + 1).padStart(2, "0")), h("s", {}, it.wrong)), input);
+    body.append(row); rows.push({ it, input, row });
+  });
+  return {
+    total: rows.length,
+    check(){ let sc = 0; rows.forEach(r => { const ok = matches(r.input.value, r.it.answers); r.input.classList.toggle("ok", ok); r.input.classList.toggle("bad", !ok); if (ok) sc++; }); return sc; },
+    reveal(){ rows.forEach(r => { if (!r.input.classList.contains("ok") && !r.row.querySelector(".model")) r.row.append(h("div", { class: "model" }, "✓ " + r.it.answers[0])); }); },
+    reset(){ clear(v); rows.forEach(r => { r.input.value = r.it.wrong; r.input.classList.remove("ok", "bad"); }); }
+  };
+};
+
+RENDER.rephrase = RENDER.translate = (sec, s, body) => {
+  const v = s.v || (s.v = {}); const rows = [];
+  sec.items.forEach((it, i) => {
+    const input = h("input", { class: "full", type: "text", autocomplete: "off", autocapitalize: "sentences", spellcheck: "false", placeholder: "Type the full sentence…", "aria-label": "answer " + (i + 1) });
+    input.value = v[i] || "";
+    const prompt = h("div", { class: "prompt" }, h("span", { class: "num" }, String(i + 1).padStart(2, "0")), h("span", { html: it.prompt }));
+    if (it.key) prompt.append(h("span", { class: "key" }, it.key));
+    const row = h("div", { class: "row" }, prompt, input);
+    input.addEventListener("input", () => { v[i] = input.value; persist(); input.classList.remove("ok", "bad", "close"); const m = row.querySelector(".model"); if (m) m.remove(); });
+    body.append(row); rows.push({ it, input, row });
+  });
+  return {
+    total: rows.length,
+    check(){ let sc = 0; rows.forEach(r => {
+      const old = r.row.querySelector(".model"); if (old) old.remove();
+      r.input.classList.remove("ok", "bad", "close");
+      if (matches(r.input.value, r.it.answers)){ r.input.classList.add("ok"); sc++; return; }
+      const best = Math.max(...r.it.answers.map(a => similarity(r.input.value, a)));
+      if (best >= .7){ r.input.classList.add("close"); r.row.append(h("div", { class: "model close" }, "Almost! Compare: " + r.it.answers[0])); }
+      else r.input.classList.add("bad");
+    }); return sc; },
+    reveal(){ rows.forEach(r => { if (!r.input.classList.contains("ok") && !r.row.querySelector(".model")) r.row.append(h("div", { class: "model" }, "✓ " + r.it.answers[0])); }); },
+    reset(){ clear(v); rows.forEach(r => { r.input.value = ""; r.input.classList.remove("ok", "bad", "close"); }); }
+  };
+};
+
+RENDER.open = (sec, s, body) => {
+  const v = s.v || (s.v = {}); const rows = [];
+  sec.items.forEach((it, i) => {
+    const input = h("input", { class: "full", type: "text", autocomplete: "off", autocapitalize: "off", spellcheck: "true", placeholder: "…", "aria-label": it.prompt });
+    input.value = v[i] || "";
+    const row = h("div", { class: "row" }, h("div", { class: "prompt" }, h("span", { class: "num" }, String(i + 1).padStart(2, "0")), it.prompt), input);
+    input.addEventListener("input", () => { v[i] = input.value; persist(); input.classList.remove("ok", "bad"); const m = row.querySelector(".model"); if (m) m.remove(); });
+    body.append(row); rows.push({ it, input, row });
+  });
+  return {
+    total: rows.length, revealLabel: "👀 Show examples",
+    check(){ let sc = 0; rows.forEach(r => {
+      const old = r.row.querySelector(".model"); if (old) old.remove();
+      const txt = r.input.value.trim(); const long = txt.split(/\s+/).filter(Boolean).length >= 3;
+      const okPattern = !r.it.pattern || new RegExp(r.it.pattern, "i").test(txt.replace(/[’‘]/g, "'"));
+      const ok = long && okPattern;
+      r.input.classList.toggle("ok", ok); r.input.classList.toggle("bad", !ok);
+      if (!ok) r.row.append(h("div", { class: "model warn" }, !long ? "Write a bit more — at least three words." : "Try to use the Past Perfect (had + V3)."));
+      if (ok) sc++;
+    }); return sc; },
+    reveal(){ rows.forEach(r => { const old = r.row.querySelector(".model"); if (old) old.remove(); r.row.append(h("div", { class: "model" }, "Example: " + r.it.sample)); }); },
+    reset(){ clear(v); rows.forEach(r => { r.input.value = ""; r.input.classList.remove("ok", "bad"); }); }
+  };
+};
+
+RENDER.write = (sec, s, body) => {
+  const v = s.v || (s.v = {});
+  let box = null;
+  if (sec.words){ box = h("div", { class: "wordbox" }); sec.words.forEach(w => box.append(h("span", { "data-w": w }, w))); body.append(box); }
+  const ta = h("textarea", { class: "full", rows: 7, spellcheck: "true", placeholder: "Write here…", "aria-label": "your text" });
+  ta.value = v.text || "";
+  const ul = h("ul", { class: "checks" });
+  const lis = (sec.checks || []).map(c => { const li = h("li", {}, c.label); ul.append(li); return { c, li }; });
+  body.append(ta, ul);
+  function usedWords(t){ return (sec.words || []).filter(w => new RegExp("\\b" + w.replace(/\s+/g, "\\s+") + "\\w*", "i").test(t)); }
+  function run(){ const tx = ta.value.replace(/[’‘]/g, "'");
+    const used = usedWords(tx);
+    if (box) box.querySelectorAll("span").forEach(sp => sp.classList.toggle("used", used.includes(sp.dataset.w)));
+    lis.forEach(({ c, li }) => {
+      let ok = false;
+      if (c.pattern){ const n = (tx.match(new RegExp(c.pattern, "gi")) || []).length; ok = n >= (c.min || 1); }
+      if (c.words) ok = used.length >= c.words;
+      if (c.sentences) ok = tx.split(/[.!?]+|\n+/).filter(x => x.trim().split(/\s+/).length >= 3).length >= c.sentences;
+      li.classList.toggle("done", ok);
+    });
+  }
+  ta.addEventListener("input", () => { v.text = ta.value; persist(); run(); });
+  run();
+  return {
+    total: 0, revealLabel: "See an example",
+    check(){ run(); return null; },
+    reveal(){ if (!body.querySelector(".model")) body.append(h("div", { class: "model" }, "Example: " + sec.sample)); },
+    reset(){ clear(v); ta.value = ""; run(); }
+  };
+};
+
+/* ---------- progress ---------- */
+const graded = [];
+function updateProgress(){
+  let sc = 0, tot = 0;
+  graded.forEach(g => { tot += g.api.total; if (g.s.score != null) sc += g.s.score; });
+  document.getElementById("pScore").textContent = sc;
+  document.getElementById("pTotal").textContent = tot;
+  document.getElementById("pBar").style.width = tot ? (sc / tot * 100) + "%" : "0";
+}
+
+/* ---------- build ---------- */
+const main = document.getElementById("lesson");
+let n = 0;
+LESSON.sections.forEach((sec, idx) => {
+  if (sec.type === "part"){
+    main.append(h("div", { class: "part", style: sec.color ? "--pc:" + sec.color : "" },
+      h("div", { class: "pi" }, emo(sec.icon)),
+      h("div", {}, h("div", { class: "pn" }, "PART " + sec.n), h("h2", {}, sec.title), sec.text ? h("p", {}, sec.text) : null)));
+    return;
+  }
+  const sid = "s" + idx; const s = SAVE[sid] || (SAVE[sid] = {});
+  const exercise = sec.type !== "rule";
+  const card = h("section", { class: "card", id: sid });
+  card.append(h("div", { class: "winbar", "aria-hidden": "true" }, h("i"), h("i"), h("i"), h("span", {}, sec.label || LABEL[sec.type] || "")));
+  if (sec.sticker) card.append(h("div", { class: "deco", "aria-hidden": "true" }, emo(sec.sticker)));
+  const inner = h("div", { class: "card-in" }); card.append(inner);
+  const ticket = h("div", { class: "ticket" + (exercise ? "" : " alt") }, exercise ? String(++n).padStart(2, "0") : "i");
+  inner.append(h("div", { class: "card-head" }, ticket, h("div", {}, h("h2", { class: "t", html: sec.title || "" }))));
+  if (sec.instructions) inner.append(h("p", { class: "instr", html: sec.instructions }));
+  else inner.append(h("div", { style: "height:14px" }));
+  const body = h("div", { class: "card-body" }); inner.append(body);
+  const api = RENDER[sec.type] ? RENDER[sec.type](sec, s, body) : null;
+  main.append(card);
+  if (!api) return;
+
+  const score = h("span", { class: "score" });
+  const btnCheck = h("button", { class: "btn btn-check", type: "button" }, "Check");
+  const btnShow = h("button", { class: "btn btn-soft", type: "button", hidden: true }, api.revealLabel || "👀 Show answers");
+  const btnReset = h("button", { class: "btn", type: "button" }, "Reset");
+  inner.append(h("div", { class: "card-foot" }, btnCheck, btnShow, btnReset, score));
+
+  function showScore(){
+    if (!api.total || s.score == null){ score.textContent = ""; score.classList.remove("perfect"); return; }
+    score.textContent = s.score + "/" + api.total + (s.score === api.total ? " ✓" : "");
+    score.classList.toggle("perfect", s.score === api.total);
+  }
+  function doCheck(silent){
+    const r = api.check(); s.checked = true;
+    if (api.total) s.score = r;
+    persist(); showScore(); updateProgress(); btnShow.hidden = false;
+    if (!silent && api.total && r === api.total){ burst(btnCheck); btnCheck.classList.remove("wiggle"); void btnCheck.offsetWidth; btnCheck.classList.add("wiggle"); }
+  }
+  btnCheck.addEventListener("click", () => doCheck(false));
+  let revealing = false;
+  btnShow.addEventListener("click", () => { revealing = true; api.reveal(); revealing = false; });
+  btnReset.addEventListener("click", () => {
+    api.reset(); removeReveals(body);
+    delete s.score; delete s.checked; persist();
+    btnShow.hidden = true; showScore(); updateProgress();
+  });
+  body.addEventListener("input", () => { if (!revealing && s.score != null && api.total){ delete s.score; delete s.checked; persist(); showScore(); updateProgress(); } });
+
+  if (api.total) graded.push({ api, s });
+  if (s.checked) doCheck(true);
+});
+updateProgress();
+
+document.getElementById("resetAll").addEventListener("click", () => {
+  if (!confirm("Clear all your answers in this lesson?")) return;
+  SAVE = {}; try { localStorage.removeItem(KEY); } catch (e) {}
+  location.reload();
+});
+})();
+</script>
+</body>
+</html>
