@@ -1,0 +1,1325 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Snapshot</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Reenie+Beanie&family=Young+Serif&display=swap" rel="stylesheet">
+<!-- LESSON TEMPLATE: edit only the LESSON object. Emoji names → assets/emoji/<name>.png -->
+<style>
+  /* ===== Deep Dive · ocean theme ===== */
+  :root{
+    --surface:#0F6A86; --mid:#0A3556; --abyss:#041325;
+    --paper:#F4FBFA; --ink:#0B2236; --muted:#5A7083; --line:rgba(11,34,54,.14);
+    --accent:#FF6B57; --accent2:#13B5A8; --sand:#F2D49B; --soft:#E1F3F0;
+    --light:#EAF8F6; --lightmuted:#A9C9D2;
+    --ok:#0E9E7A; --ok-bg:#DDF6EE; --bad:#E2483D; --bad-bg:#FDE6E3; --close:#A46B00; --close-bg:#FFF1D2;
+    --head:"Gloock",Georgia,serif; --mono:"Martian Mono",ui-monospace,Menlo,monospace; --body:"Schibsted Grotesk",system-ui,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%;background:var(--abyss)}
+  body{margin:0;color:var(--ink);font:17px/1.6 var(--body);
+    background:linear-gradient(180deg,var(--surface) 0,#0C4C6E 520px,var(--mid) 1400px,#06223B 3200px,var(--abyss) 6000px);min-height:100vh;position:relative;overflow-x:hidden}
+  body::before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.22;mix-blend-mode:screen;
+    background:radial-gradient(ellipse 40px 14px at 20% 10%,#fff 0,transparent 70%),radial-gradient(ellipse 60px 18px at 70% 6%,#fff 0,transparent 70%),radial-gradient(ellipse 30px 10px at 45% 16%,#fff 0,transparent 70%);
+    animation:caustic 9s ease-in-out infinite alternate}
+  @keyframes caustic{to{transform:translate(-30px,12px) scale(1.1)}}
+  .wrap{max-width:820px;margin:0 auto;padding:0 18px;position:relative;z-index:1}
+  button{font:inherit}
+  img.emo{width:1.15em;height:1.15em;vertical-align:-.2em}
+  .bubbles{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+  .bubbles i{position:absolute;bottom:-30px;border:1.5px solid rgba(255,255,255,.45);border-radius:50%;animation:rise linear infinite}
+  @keyframes rise{to{transform:translate(var(--dx,20px),-110vh)}}
+
+  /* hero */
+  .hero{position:relative;padding:52px 0 18px;color:var(--light)}
+  .kicker{display:inline-block;font:500 11.5px/1.5 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--sand);border:1px solid rgba(242,212,155,.5);padding:5px 12px;border-radius:99px;max-width:calc(100% - 90px)}
+  h1{font-family:var(--head);font-weight:400;font-size:clamp(56px,13vw,112px);line-height:.9;margin:16px 0 0;letter-spacing:-.02em;color:#fff}
+  h1 em{font-style:normal;color:var(--sand)}
+  .sub{color:var(--lightmuted);margin:16px 0 0;max-width:46ch;font-size:18px}
+  .depthline{margin-top:20px;display:flex;gap:10px;align-items:center;font:500 11px var(--mono);color:var(--lightmuted);letter-spacing:.08em}
+  .depthline::before{content:"";flex:none;width:46px;height:1px;background:var(--lightmuted)}
+  .sticker{position:absolute;user-select:none;animation:bob 6s ease-in-out infinite;filter:drop-shadow(0 12px 16px rgba(0,0,0,.35))}
+  .sticker img{width:100%;height:100%;display:block}
+  .s1{right:0;top:40px;width:110px;height:110px;rotate:-8deg}
+  .s2{right:110px;top:150px;width:58px;height:58px;rotate:12deg;animation-delay:-3s}
+  @keyframes bob{0%,100%{translate:0 0}50%{translate:0 -10px}}
+
+  /* progress = depth gauge */
+  .progress{position:sticky;top:10px;z-index:30;display:flex;align-items:center;gap:12px;margin:0 -6px;padding:10px 18px;border-radius:99px;font:500 12px var(--mono);color:var(--light);background:rgba(6,34,59,.86);border:1px solid rgba(255,255,255,.16);box-shadow:0 10px 26px rgba(0,0,0,.3);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+  .progress .lbl{color:var(--lightmuted);text-transform:uppercase;letter-spacing:.08em}
+  .bar{flex:1;height:10px;border-radius:99px;overflow:hidden;background:rgba(255,255,255,.12)}
+  .bar i{display:block;height:100%;width:0;border-radius:99px;background:linear-gradient(90deg,var(--accent2),var(--sand),var(--accent));transition:width .6s cubic-bezier(.3,1.4,.5,1)}
+  .progress .fx{display:flex;align-items:center;gap:5px;white-space:nowrap}
+  .progress .fx img{width:18px;height:18px}
+
+  /* parts = depth markers */
+  .part{display:flex;align-items:center;gap:16px;margin:64px 0 8px;color:var(--light)}
+  .part .pi{width:58px;height:58px;flex:none;display:grid;place-items:center;border-radius:50%;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18)}
+  .part .pi img{width:40px;height:40px}
+  .part .pn{font:500 11px var(--mono);letter-spacing:.1em;color:var(--sand)}
+  .part h2{font-family:var(--head);font-weight:400;font-size:36px;line-height:1.05;margin:2px 0 0}
+  .part p{margin:3px 0 0;color:var(--lightmuted);font-size:15.5px}
+
+  /* cards */
+  .card{position:relative;background:var(--paper);border-radius:24px;margin:26px 0;box-shadow:0 18px 40px rgba(0,0,0,.28),0 0 0 1px rgba(255,255,255,.06)}
+  .winbar{display:flex;align-items:center;gap:8px;padding:14px 22px 0}
+  .winbar i{display:none}
+  .winbar span{font:500 10.5px var(--mono);letter-spacing:.12em;color:var(--accent2);text-transform:uppercase}
+  .card-in{padding:8px 24px 20px}
+  .deco{position:absolute;right:18px;top:-28px;width:56px;height:56px;rotate:8deg;user-select:none;filter:drop-shadow(0 8px 10px rgba(0,0,0,.25))}
+  .deco img{width:100%;height:100%}
+  .card-head{display:flex;align-items:center;gap:14px}
+  .ticket{flex:none;width:44px;height:44px;display:grid;place-items:center;border-radius:50%;background:var(--ink);color:#fff;font:500 13px var(--mono);box-shadow:0 0 0 4px var(--paper),0 0 0 6px var(--accent2)}
+  .ticket.alt{background:var(--accent);box-shadow:0 0 0 4px var(--paper),0 0 0 6px var(--sand)}
+  h2.t{font-family:var(--head);font-weight:400;font-size:27px;line-height:1.1;margin:0}
+  .instr{color:var(--muted);margin:10px 0 18px;font-size:15.5px}
+  .instr b{color:var(--ink)}
+  .card-foot{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:18px;padding-top:14px;border-top:1px solid var(--line)}
+  .btn{font-weight:600;font-size:15px;border-radius:99px;padding:9px 20px;cursor:pointer;border:1.5px solid var(--ink);background:transparent;color:var(--ink);transition:transform .12s,background .15s}
+  .btn:hover{transform:translateY(-1px)}
+  .btn:active{transform:translateY(1px)}
+  .btn-check{background:var(--accent);border-color:var(--accent);color:#fff}
+  .btn-soft{background:var(--soft);border-color:transparent}
+  .score{margin-left:auto;font:500 15px var(--mono)}
+  .score.perfect{color:var(--ok)}
+  .wiggle{animation:wiggle .5s}
+  @keyframes wiggle{25%{rotate:-4deg}50%{rotate:4deg}75%{rotate:-2deg}}
+
+  /* theory */
+  .rule p{margin:0 0 12px}
+  .rule h3{font-family:var(--head);font-weight:400;font-size:21px;margin:22px 0 8px}
+  .rule h3:first-child{margin-top:0}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:14px 0}
+  .box{border-radius:16px;padding:12px 14px;background:var(--soft)}
+  .box.pink{background:#FFE9E4}
+  .box.sand{background:#FBF0D9}
+  .box h4{margin:0 0 4px;font:500 10.5px var(--mono);text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}
+  .box p{margin:0;font-size:15.5px}
+  table.form{width:100%;border-collapse:collapse;font-size:15.5px;margin:10px 0 4px}
+  table.form th,table.form td{border-bottom:1px solid var(--line);padding:8px;text-align:left;vertical-align:top}
+  table.form th{font:500 10.5px var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+  .note{margin-top:14px;font-size:15px;background:var(--close-bg);border-radius:14px;padding:10px 14px}
+  .notes-tip{display:flex;gap:10px;align-items:flex-start;margin-top:14px;font-size:15px;background:var(--soft);border-radius:14px;padding:10px 14px}
+  .notes-tip img{width:30px;height:30px;flex:none}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
+  .chips span{font:500 12.5px var(--mono);border:1px solid var(--ink);border-radius:99px;padding:3px 11px;background:#fff}
+  .colloc{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px;margin:10px 0}
+  .colloc div{background:#fff;border:1px solid var(--line);border-radius:12px;padding:8px 12px;font-size:15.5px}
+  .colloc b{color:var(--accent)}
+  .story{font-size:17px;line-height:1.75;background:#fff;border-left:4px solid var(--accent2);border-radius:0 14px 14px 0;padding:14px 18px;margin:8px 0 14px}
+  ol.qs{margin:0 0 6px;padding-left:1.4em}
+  ol.qs li{margin:0 0 6px}
+  details{margin-top:12px;border:1px solid var(--line);border-radius:14px;background:#fff}
+  details summary{cursor:pointer;padding:10px 14px;font-weight:600;list-style:none}
+  details summary::-webkit-details-marker{display:none}
+  details summary::before{content:"▸ ";color:var(--accent)}
+  details[open] summary::before{content:"▾ "}
+  details > div{padding:0 14px 12px}
+  .hl{background:#FFE0D9;border-radius:4px;padding:0 3px;font-weight:600}
+  .hl2{background:#D3F1EC;border-radius:4px;padding:0 3px;font-weight:600}
+  @media (max-width:600px){.grid2{grid-template-columns:1fr}}
+
+  /* photos */
+  .photos{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:6px 0 14px}
+  .photo{margin:0;border-radius:16px;overflow:hidden;background:#0A3556;position:relative}
+  .photo img{display:block;width:100%;height:100%;aspect-ratio:4/3;object-fit:cover}
+  .photo figcaption{position:absolute;left:0;right:0;bottom:0;padding:22px 12px 8px;font-size:13.5px;color:#fff;background:linear-gradient(transparent,rgba(4,19,37,.85))}
+  .photo figcaption small{display:block;font:400 9.5px var(--mono);opacity:.7;margin-top:2px}
+  .photo.wide{grid-column:1/-1}
+  .photo.wide img{aspect-ratio:16/8}
+  @media (max-width:560px){.photos{grid-template-columns:1fr}}
+
+  /* timeline */
+  .tl{position:relative;height:104px;margin:10px 4px 6px}
+  .tl::before{content:"";position:absolute;left:0;right:12px;top:52px;height:2px;background:var(--ink)}
+  .tl::after{content:"";position:absolute;right:0;top:46px;border-left:13px solid var(--ink);border-top:7px solid transparent;border-bottom:7px solid transparent}
+  .tl .now{position:absolute;right:30px;top:44px;width:2px;height:18px;background:var(--muted)}
+  .tl .now::after{content:"now";position:absolute;top:22px;left:50%;translate:-50% 0;font:500 10.5px var(--mono);color:var(--muted)}
+  .tl .pt{position:absolute;left:var(--x);top:42px;width:20px;height:20px;margin-left:-10px;border-radius:50%;background:var(--accent2);box-shadow:0 0 0 3px var(--paper),0 0 0 4.5px var(--ink)}
+  .tl .pt.e{background:var(--accent)}
+  .tl .pt b,.tl .sp b{position:absolute;left:50%;translate:-50% 0;white-space:nowrap;font:500 12px var(--mono);bottom:30px}
+  .tl .pt i,.tl .sp i{position:absolute;left:50%;translate:-50% 0;white-space:nowrap;font:400 11px var(--mono);color:var(--muted);font-style:normal;top:30px}
+  .tl .sp{position:absolute;left:var(--x);width:var(--w);top:46px;height:13px;border-radius:7px;background:repeating-linear-gradient(90deg,var(--accent2) 0 14px,transparent 14px 22px)}
+  .tl .sp b{color:var(--accent2)}
+  .tl .stop{position:absolute;left:var(--x);top:34px;height:36px;border-left:2px dashed var(--accent)}
+  .tl .stop b{position:absolute;top:-18px;left:4px;white-space:nowrap;font:500 11px var(--mono);color:var(--accent)}
+
+  /* inputs: gaps */
+  .lines{margin:0;padding-left:1.7em}
+  .lines li::marker{color:var(--accent2);font:500 12px var(--mono)}
+  .line{margin:0 0 4px;line-height:2.2}
+  .gapwrap{white-space:nowrap}
+  .gap{font:inherit;font-size:16.5px;color:var(--ink);border:0;border-bottom:2px solid var(--accent2);background:var(--soft);border-radius:8px 8px 2px 2px;padding:1px 8px;min-width:5ch;max-width:100%;text-align:center;outline:none;transition:background .15s,box-shadow .15s}
+  .gap:focus{background:#fff;box-shadow:0 0 0 3px rgba(19,181,168,.25)}
+  .hint{color:var(--muted);font:400 .78em var(--mono);margin-left:5px}
+  input.ok,textarea.ok{background:var(--ok-bg);border-color:var(--ok);color:#0b5e49}
+  input.bad{background:var(--bad-bg);border-color:var(--bad);text-decoration:underline wavy var(--bad);text-underline-offset:4px}
+  input.close{background:var(--close-bg);border-color:var(--close)}
+  .reveal{display:inline-block;margin-left:6px;font-size:.84em;font-weight:600;color:#0b5e49;background:var(--ok-bg);padding:0 9px;border-radius:99px;line-height:1.9;white-space:nowrap}
+  .why{display:block;margin:-2px 0 10px;font-size:14.5px;line-height:1.45;border-radius:10px;padding:6px 10px}
+  .why.ok{background:var(--ok-bg);color:#0b5e49}
+  .why.bad{background:var(--bad-bg);color:#8a2b2e}
+
+  /* multiple choice */
+  .q{margin:0 0 18px}
+  .q-text{margin-bottom:8px}
+  .q-num{font:500 12px var(--mono);color:var(--accent2);margin-right:8px}
+  .blank{display:inline-block;width:60px;border-bottom:2px solid var(--muted);margin:0 3px;translate:0 -4px}
+  .opts{display:flex;flex-wrap:wrap;gap:8px}
+  .opt{font-size:15.5px;border:1.5px solid var(--line);background:#fff;color:var(--ink);border-radius:99px;padding:6px 15px;cursor:pointer;transition:transform .12s,background .15s,border-color .15s;text-align:left}
+  .opt:hover{border-color:var(--ink)}
+  .opt.sel{background:var(--ink);border-color:var(--ink);color:#fff}
+  .opt.ok{background:var(--ok);border-color:var(--ok);color:#fff}
+  .opt.bad{background:var(--bad);border-color:var(--bad);color:#fff}
+  .opt.answer{box-shadow:0 0 0 3px var(--ok)}
+  .tf2 .q{padding:12px 0;margin:0;border-bottom:1px solid var(--line)}
+  .tf2 .q-top{display:flex;gap:14px;align-items:center;justify-content:space-between}
+  .tf2 .q-text{margin:0}
+  .tf2 .opts.tfo{flex:none;flex-wrap:nowrap}
+  .fixbox{margin:10px 0 0 30px;padding:10px 12px;border-left:3px solid var(--accent);background:#FFF3EF;border-radius:0 12px 12px 0}
+  .fixbox .fl{font:500 10.5px var(--mono);color:var(--accent);margin-bottom:6px;text-transform:uppercase;letter-spacing:.08em}
+  .fixbox .opts{flex-direction:column;align-items:flex-start}
+  .warnline{font-size:14px;color:#8a2b2e;margin-top:6px}
+  @media (max-width:560px){.tf2 .q-top{flex-direction:column;align-items:flex-start;gap:8px}.fixbox{margin-left:0}}
+
+  /* drag & drop */
+  .bank{display:flex;flex-wrap:wrap;gap:9px;padding:12px;min-height:60px;margin-bottom:18px;border:1.5px dashed rgba(11,34,54,.25);border-radius:16px;background:var(--soft);transition:background .15s}
+  .bank:empty::before{content:"All placed";color:var(--muted);font-size:14px;align-self:center}
+  .bank.over{background:#d0ece7}
+  .chip{font-size:15px;font-weight:600;line-height:1.35;background:#fff;color:var(--ink);border:1.5px solid var(--ink);border-radius:12px;padding:5px 12px;box-shadow:0 3px 0 var(--accent2);cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;text-align:left}
+  .chip.selected{outline:3px solid var(--accent);outline-offset:2px;rotate:-2deg}
+  .chip.dragging{opacity:.28}
+  .chip.ghost{position:fixed;z-index:1000;pointer-events:none;margin:0;rotate:-4deg;scale:1.05;box-shadow:0 10px 18px rgba(0,0,0,.25)}
+  .chip.ok{background:var(--ok-bg);border-color:var(--ok);box-shadow:none}
+  .chip.bad{background:var(--bad-bg);border-color:var(--bad);box-shadow:none}
+  .slot{display:inline-flex;align-items:center;justify-content:center;min-width:110px;min-height:40px;padding:2px;margin:0 4px;vertical-align:middle;border:1.5px dashed rgba(11,34,54,.35);border-radius:12px;cursor:pointer;transition:background .15s,border-color .15s}
+  .slot .chip{box-shadow:none}
+  .slot.over{background:var(--soft);border-color:var(--accent2)}
+  .slot.ok{border-style:solid;border-color:var(--ok);background:var(--ok-bg)}
+  .slot.bad{border-style:solid;border-color:var(--bad);background:var(--bad-bg)}
+  .slot.ok .chip,.slot.bad .chip{background:transparent;border-color:transparent}
+  .match{display:grid;gap:10px}
+  .mrow{display:grid;grid-template-columns:.8fr 1.4fr;gap:10px;align-items:center}
+  .mrow .left{font-weight:600}
+  .mrow .left::before{content:attr(data-n);font:500 12px var(--mono);color:var(--accent2);margin-right:8px}
+  .mrow .slot{display:flex;justify-content:flex-start;width:100%;min-height:46px;margin:0}
+  @media (max-width:560px){.mrow{grid-template-columns:1fr;gap:6px}.mrow+.mrow{margin-top:8px}}
+
+  /* full inputs */
+  .row{margin:0 0 16px}
+  .row-label{font-size:14.5px;color:var(--muted);margin-bottom:5px}
+  .row-label s{text-decoration-color:var(--bad);text-decoration-thickness:2px}
+  .prompt{font-weight:500;margin-bottom:6px}
+  .prompt .num{font:500 12px var(--mono);color:var(--accent2);margin-right:8px}
+  .key{display:inline-block;font:500 11.5px var(--mono);background:var(--ink);color:#fff;border-radius:99px;padding:2px 10px;margin-left:6px}
+  .full{display:block;width:100%;font:inherit;font-size:16.5px;color:var(--ink);padding:10px 14px;border:1.5px solid rgba(11,34,54,.22);border-radius:14px;background:#fff;outline:none;transition:border-color .15s,background .15s}
+  .full:focus{border-color:var(--accent2)}
+  textarea.full{resize:vertical;min-height:160px;line-height:1.55}
+  .model{margin-top:7px;font-size:15px;color:#0b5e49;background:var(--ok-bg);padding:7px 12px;border-radius:12px}
+  .model.close{color:#7a5300;background:var(--close-bg)}
+  .model.warn{color:#8a2b2e;background:var(--bad-bg)}
+  .checks{list-style:none;padding:0;margin:12px 0 0;display:grid;gap:6px;font-size:15px}
+  .checks li::before{content:"○";display:inline-block;width:1.4em;font-weight:800;color:var(--muted)}
+  .checks li.done::before{content:"✓";color:var(--ok)}
+  .checks li.done{color:#0b5e49}
+  .wordbox{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 12px}
+  .wordbox span{font:500 12px var(--mono);background:var(--soft);border-radius:99px;padding:3px 10px}
+  .wordbox span.used{background:var(--ok-bg);color:#0b5e49;text-decoration:line-through}
+
+  /* drill (automaticity) */
+  .drill{background:var(--ink);color:#fff;border-radius:20px;padding:18px;position:relative;overflow:hidden}
+  .drill .dtop{display:flex;justify-content:space-between;align-items:center;gap:10px;font:500 12px var(--mono);color:var(--lightmuted);flex-wrap:wrap}
+  .drill .dots{display:flex;gap:5px;flex-wrap:wrap}
+  .drill .dots i{width:12px;height:12px;border-radius:50%;border:1.5px solid rgba(255,255,255,.4)}
+  .drill .dots i.half{background:linear-gradient(90deg,var(--sand) 50%,transparent 50%);border-color:var(--sand)}
+  .drill .dots i.full{background:var(--accent2);border-color:var(--accent2)}
+  .drill .timer{font:500 22px var(--mono);color:var(--sand)}
+  .drill .dprompt{font-family:var(--head);font-size:clamp(22px,4.6vw,30px);line-height:1.2;margin:22px 0 14px;min-height:2.4em}
+  .drill .dprompt small{display:block;font:400 12px var(--mono);color:var(--lightmuted);margin-bottom:6px;letter-spacing:.06em;text-transform:uppercase}
+  .drill .drow{display:flex;gap:8px}
+  .drill input{flex:1;min-width:0;font:inherit;font-size:18px;padding:12px 14px;border-radius:14px;border:2px solid rgba(255,255,255,.25);background:rgba(255,255,255,.06);color:#fff;outline:none}
+  .drill input:focus{border-color:var(--accent2)}
+  .drill .go{background:var(--accent);border:0;color:#fff;border-radius:14px;padding:0 18px;font-weight:700;cursor:pointer}
+  .drill .dfb{min-height:26px;margin-top:10px;font-size:15px}
+  .drill .dfb.ok{color:#7CF0CF} .drill .dfb.bad{color:#FFB3A8}
+  .drill.flash-ok{box-shadow:inset 0 0 0 3px #7CF0CF}
+  .drill.flash-bad{animation:shake .35s;box-shadow:inset 0 0 0 3px #FFB3A8}
+  .drill .start{display:block;margin:26px auto 8px;background:var(--accent);color:#fff;border:0;border-radius:99px;padding:14px 30px;font-weight:700;font-size:17px;cursor:pointer}
+  .drill .done{text-align:center;padding:16px 0 4px}
+  .drill .done b{display:block;font:500 40px var(--mono);color:var(--sand)}
+  @keyframes shake{25%{translate:-4px 0}50%{translate:4px 0}75%{translate:-2px 0}}
+
+  /* review */
+  .fixcount{display:flex;align-items:center;gap:14px;padding:14px 16px;border-radius:16px;background:#FBF0D9;margin-bottom:14px}
+  .fixcount img{width:54px;height:54px}
+  .fixcount .big{font:500 32px var(--mono);line-height:1}
+  .fixcount .lbl{font-size:14.5px;color:var(--muted)}
+  .rv-list{display:grid;gap:10px}
+  .rv-item{display:flex;align-items:center;gap:12px;justify-content:space-between;border:1px solid var(--line);border-radius:14px;padding:10px 12px;background:#fff}
+  .rv-item .rv-t{font-weight:600}
+  .rv-item .rv-n{font:400 12px var(--mono);color:var(--bad)}
+  .rv-item.done .rv-n{color:var(--ok)}
+  .rv-empty{color:var(--muted);font-size:15px}
+  .flash{animation:flash 1.2s}
+  @keyframes flash{30%{box-shadow:0 0 0 6px var(--sand),0 18px 40px rgba(0,0,0,.28)}}
+
+  .page-foot{text-align:center;padding:30px 0 80px;color:var(--lightmuted);font-size:14px}
+  .page-foot .btn{margin-bottom:14px;color:var(--light);border-color:rgba(255,255,255,.4)}
+  .page-foot small{display:block;margin-top:8px;font-size:11.5px;opacity:.85;line-height:1.5}
+  .page-foot a{color:var(--lightmuted)}
+  .confetti{position:fixed;z-index:999;pointer-events:none;left:0;top:0;width:30px;height:30px}
+  .confetti img{width:100%;height:100%}
+
+  @media (max-width:560px){
+    body{font-size:16.5px}
+    .card-in{padding:6px 16px 16px}
+    .winbar{padding:12px 16px 0}
+    .s1{width:78px;height:78px;top:30px}
+    .s2{display:none}
+    .score{width:100%;margin-left:0;order:-1}
+    .deco{width:46px;height:46px;top:-22px}
+    .gapwrap{white-space:normal}
+    .part h2{font-size:30px}
+  }
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+  /* ===== Snapshot · instant-photo theme (overrides) ===== */
+  :root{
+    --paper:#FFFDF8; --ink:#2B2118; --muted:#6E6052; --line:rgba(43,33,24,.13);
+    --accent:#F2652F; --accent2:#1B998B; --sand:#F2C14E; --soft:#FBEFDD;
+    --light:#2B2118; --lightmuted:#6E6052;
+    --head:"Young Serif",Georgia,serif; --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace; --body:"Hanken Grotesk",system-ui,sans-serif;
+  }
+  html{background:#E9DCC6}
+  body{background-color:#E9DCC6;background-image:radial-gradient(rgba(120,90,50,.16) 1px,transparent 1.4px),radial-gradient(rgba(120,90,50,.1) 1px,transparent 1.4px);background-size:14px 14px,23px 23px;background-position:0 0,7px 11px}
+  body::before{display:none}
+  .bubbles{display:none}
+  .hero{color:var(--ink)}
+  h1{font-family:var(--head);font-weight:400;font-size:clamp(58px,14vw,124px);line-height:.95;color:var(--ink);letter-spacing:-.01em}
+  h1 em{font-style:normal;color:var(--accent)}
+  .kicker{color:var(--accent);border-color:rgba(242,101,47,.5);background:#FFFDF8}
+  .sub{color:var(--muted)}
+  .sticker{background:#fff;padding:10px 10px 26px;border-radius:3px;box-shadow:0 10px 20px rgba(43,33,24,.22)}
+  .progress{color:var(--ink);background:#FFFDF8;border-color:var(--line);box-shadow:0 8px 20px rgba(43,33,24,.14)}
+  .progress .lbl{color:var(--muted)}
+  .bar{background:#EFE3CF}
+  .bar i{background:linear-gradient(90deg,var(--accent2),var(--sand),var(--accent))}
+  .part{color:var(--ink)}
+  .part .pi{background:#FFFDF8;border:1px solid var(--line);border-radius:6px;rotate:-4deg;box-shadow:0 6px 12px rgba(43,33,24,.15)}
+  .part .pn{color:var(--accent);font-family:var(--mono)}
+  .part p{color:var(--muted)}
+  .card{border-radius:6px;box-shadow:0 12px 26px rgba(43,33,24,.16)}
+  .card::after{content:"";position:absolute;top:-10px;left:50%;width:90px;height:22px;margin-left:-45px;background:rgba(242,193,78,.55);rotate:-2deg;border-radius:2px}
+  .winbar span{color:var(--accent2)}
+  .ticket{border-radius:6px;box-shadow:none;background:var(--ink)}
+  .ticket.alt{background:var(--accent);box-shadow:none}
+  .box{border-radius:6px} .box.pink{background:#FCE3D8} .box.sand{background:#FBF0D2}
+  .colloc b{color:var(--accent)}
+  .hl{background:#FCE0D3} .hl2{background:#D5EFEC}
+  /* polaroid photos */
+  .photos{gap:18px}
+  .photo{background:#fff;border-radius:2px;padding:10px 10px 44px;box-shadow:0 10px 20px rgba(43,33,24,.2);overflow:visible}
+  .photo:nth-child(odd){rotate:-1.6deg} .photo:nth-child(even){rotate:1.4deg}
+  .photo img{border-radius:1px}
+  .photo figcaption{position:absolute;left:10px;right:10px;bottom:6px;padding:0;background:none;color:var(--ink);font:400 22px/1.1 "Reenie Beanie",cursive}
+  .photo figcaption small{font:400 9.5px var(--mono);color:var(--muted);opacity:1;margin-top:3px}
+  .rulecard{background:#fff;border:1px solid var(--line);border-left:6px solid var(--accent2);border-radius:4px;padding:12px 14px;margin:14px 0;font-size:15.5px;background-image:repeating-linear-gradient(180deg,transparent 0 25px,rgba(27,153,139,.12) 25px 26px)}
+  .rulecard h4{margin:0 0 6px;font:500 11px var(--mono);text-transform:uppercase;letter-spacing:.1em;color:var(--accent2)}
+  .rulecard p{margin:0;line-height:26px}
+  .drill{background:var(--ink)}
+  .drill .dtop,.drill .dprompt small{color:#CDBFAE}
+  .drill .timer,.drill .done b{color:var(--sand)}
+  .page-foot{color:var(--muted)} .page-foot .btn{color:var(--ink);border-color:var(--ink)} .page-foot a{color:var(--muted)}
+  .buckets{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
+  .bucket{border:1.5px solid var(--line);border-radius:6px;background:#fff;overflow:hidden}
+  .bucket h3{margin:0;padding:7px 10px;font:600 11px var(--mono);text-transform:uppercase;letter-spacing:.1em;color:#fff;background:var(--accent2)}
+  .bucket-zone{min-height:84px;padding:8px;display:flex;flex-wrap:wrap;gap:6px;align-content:flex-start;cursor:pointer}
+  .bucket-zone.over{background:var(--soft)}
+  .bucket .chip{box-shadow:none}
+  @media (max-width:560px){.photo figcaption{font-size:19px}}
+</style>
+</head>
+<body>
+<div class="bubbles" aria-hidden="true"><i style="left:6%;width:2px;height:28px;animation-duration:14s;animation-delay:-3s;--dx:30px"></i><i style="left:14%;width:2px;height:20px;animation-duration:11s;animation-delay:-8s;--dx:-20px"></i><i style="left:27%;width:2px;height:36px;animation-duration:18s;animation-delay:-2s;--dx:40px"></i><i style="left:41%;width:2px;height:24px;animation-duration:13s;animation-delay:-10s;--dx:-30px"></i><i style="left:55%;width:2px;height:18px;animation-duration:9s;animation-delay:-4s;--dx:20px"></i><i style="left:66%;width:2px;height:32px;animation-duration:16s;animation-delay:-12s;--dx:-40px"></i><i style="left:78%;width:2px;height:22px;animation-duration:12s;animation-delay:-6s;--dx:25px"></i><i style="left:88%;width:2px;height:40px;animation-duration:20s;animation-delay:-1s;--dx:-25px"></i><i style="left:94%;width:2px;height:20px;animation-duration:10s;animation-delay:-9s;--dx:15px"></i><i style="left:35%;width:2px;height:26px;animation-duration:15s;animation-delay:-14s;--dx:35px"></i></div>
+
+<div class="wrap">
+  <header class="hero">
+    <div class="sticker s1" id="sticker1" aria-hidden="true"></div>
+    <div class="sticker s2" id="sticker2" aria-hidden="true"></div>
+    <span class="kicker" id="kicker"></span>
+    <h1 id="title"></h1>
+    <p class="sub" id="sub"></p>
+  </header>
+
+  <div class="progress" aria-live="polite">
+    <span class="lbl">score</span><span><b id="pScore">0</b>/<b id="pTotal">0</b></span>
+    <div class="bar"><i id="pBar"></i></div>
+    <span class="fx" title="Mistakes you fixed yourself"><img src="assets/emoji/star.png" alt=""> <b id="pFix">0</b></span>
+  </div>
+
+  <main id="lesson"></main>
+
+  <footer class="page-foot">
+    <button class="btn btn-soft" id="resetAll" type="button">↺ Reset all answers</button>
+    <div>Your answers are saved on this device.</div>
+    <small>Emoji: Microsoft Fluent Emoji (MIT licence). Photos: Wikimedia Commons — credits under each photo.</small>
+  </footer>
+</div>
+
+<script>
+/* =====================================================================
+   LESSON CONTENT — edit this object to make a new lesson
+   ---------------------------------------------------------------------
+   build:   { who, freq, does, what, where, when, wrong }  (wrong = extra wrong chip)
+   gapfill: items as "text [[answer // hint]]" or { text, why }
+   tf2:     { q, answer: true/false, fix: [options], fixAnswer }
+   ===================================================================== */
+const IMG = f => "assets/img/" + f;
+const LESSON = {
+  id: "snapshot-evuel38-egiu13-14",
+  kicker: "have · was doing & did",
+  titleHTML: 'Snap<em>shot</em>',
+  title: "Snapshot",
+  subtitle: "What were you doing when the photo was taken? And what did you have?",
+  stickers: ["camera", "coffee"],
+  confetti: ["camera", "cake", "coffee", "star", "icecream"],
+
+  sections: [
+
+    /* ================= 1 · WARM-UP ================= */
+    { type: "part", n: "01", icon: "frame", title: "Warm-up", text: "Four snapshots from one weekend." },
+
+    {
+      type: "rule", label: "warm-up · look and talk", sticker: "pin",
+      title: "What was happening?",
+      html: `
+        <div class="photos">
+          <figure class="photo"><img loading="lazy" alt="A big breakfast with eggs, beans and sausages" src="${IMG("breakfast.jpg")}"><figcaption>Saturday, 9 a.m.<small>Photo: Acabashi · CC BY-SA 4.0 · Wikimedia Commons</small></figcaption></figure>
+          <figure class="photo"><img loading="lazy" alt="Two empty chairs in a barber shop" src="${IMG("barber.jpg")}"><figcaption>Saturday, 12 p.m.<small>Photo: Wilfredor · CC0 · Wikimedia Commons</small></figcaption></figure>
+          <figure class="photo"><img loading="lazy" alt="People waiting on a station platform next to a train" src="${IMG("station.jpg")}"><figcaption>Sunday, 8 a.m.<small>Photo: mattbuck · CC BY-SA 3.0 · Wikimedia Commons</small></figcaption></figure>
+          <figure class="photo"><img loading="lazy" alt="An outdoor swimming pool in front of a hotel" src="${IMG("pool.jpg")}"><figcaption>Sunday, 6 p.m.<small>Photo: Marc Ryckaert · CC BY 3.0 · Wikimedia Commons</small></figcaption></figure>
+        </div>
+        <ol class="qs">
+          <li>Look at each photo. What can you <b>have</b> in this place? <i>(breakfast, a swim…)</i></li>
+          <li>Imagine you were there. <b>What were you doing</b> at that time? <i>At 9 a.m. I was having…</i></li>
+          <li>What were <b>you</b> doing at 9 a.m. last Saturday? And at 6 p.m. last Sunday?</li>
+        </ol>`
+    },
+
+    /* ================= 2 · HAVE ================= */
+    { type: "part", n: "02", icon: "coffee", title: "Have", text: "One verb — breakfast, a shower, a good time and more." },
+
+    {
+      type: "rule", label: "vocabulary · have / had / had", sticker: "cake",
+      title: "What can you have?",
+      html: `
+        <div class="colloc">
+          <div>have <b>breakfast</b> · <b>lunch</b> · <b>dinner</b> · <b>a meal</b></div>
+          <div>have <b>a cup of tea / coffee</b> · <b>a drink</b> · <b>an ice cream</b></div>
+          <div>have <b>a lesson</b> · <b>an exam</b> · <b>homework</b></div>
+          <div>have <b>a party</b> · <b>a meeting</b> · <b>a game</b> (of football)</div>
+          <div>have <b>a shower</b> · <b>a bath</b> · <b>a swim</b></div>
+        </div>
+        <h3>Expressions with have</h3>
+        <div class="colloc">
+          <div>Can I <b>have a look</b>? = look at it</div>
+          <div>Can I <b>have a go</b>? = try / ride it</div>
+          <div><b>Have a good journey!</b> — to someone going away</div>
+          <div>Do you <b>have a moment</b>? = some time</div>
+          <div>Can I <b>have a word with</b> you? = speak to you</div>
+          <div>We <b>had a good time</b>. = fun, we enjoyed it</div>
+          <div>I’m going to <b>have my hair cut</b>.</div>
+          <div>I <b>don’t have the time</b>.</div>
+        </div>
+        <div class="grid2">
+          <div class="box"><h4>have got (speaking)</h4><p>I’<b>ve got</b> two sisters. <b>Have</b> you <b>got</b> a pen? I’<b>ve got a cold</b> / <b>a headache</b>.</p></div>
+          <div class="box sand"><h4>have (got) to = must</h4><p>You <b>have to</b> pay. I’<b>ve got to</b> walk to school.</p></div>
+        </div>
+        <div class="note">⚠️ In the past: <b>had to</b>, without <i>got</i>. I <b>had to</b> study yesterday. (not <s>I had got to</s>)</div>`
+    },
+
+    {
+      type: "sort", label: "vocabulary · sort", sticker: "puzzle",
+      title: "Have what?",
+      instructions: "Put each word in the right group — or tap a word, then tap a group.",
+      categories: [
+        { name: "eat & drink", words: ["breakfast", "a cup of tea", "an ice cream"] },
+        { name: "school", words: ["a lesson", "an exam", "homework"] },
+        { name: "free time", words: ["a party", "a game of football"] },
+        { name: "wash & swim", words: ["a shower", "a swim"] }
+      ]
+    },
+
+    {
+      type: "mcq", label: "vocabulary · what do you say?", sticker: "speech",
+      title: "What do you say?",
+      instructions: "Choose the best answer for each situation.",
+      items: [
+        { q: "Your friend is going to Lviv by train. You say: “Bye! Have ___!”", options: ["a good journey", "a good travel", "a nice go"], answer: 0 },
+        { q: "Your classmate has a new phone. You say: “Wow! Can I have ___?”", options: ["a looking", "a look", "the look"], answer: 1 },
+        { q: "Your brother has a new skateboard. You want to try it: “Can I have ___?”", options: ["a go", "a going", "a try on"], answer: 0 },
+        { q: "You need to speak to your teacher: “Can I have ___ you?”", options: ["some words with", "a word with", "a talk to"], answer: 1 },
+        { q: "“Do you have ___? I need some help with my homework.”", options: ["the moment", "a moment", "moments"], answer: 1 },
+        { q: "Your friend sneezes and has a red nose: “Oh! Have you got ___?”", options: ["a cold", "the cold", "cold"], answer: 0 },
+        { q: "“How was the party?” “Great! We had ___.”", options: ["a good fun", "a good time", "good times"], answer: 1 },
+        { q: "“Your hair looks great!” “Thanks! I ___ yesterday.”", options: ["cut my hair at the hairdresser’s", "had my hair cut", "had cut my hair"], answer: 1 },
+        { q: "I want to learn to ski, but I don’t have ___.", options: ["the time", "a time", "times"], answer: 0 },
+        { q: "When I was little, I ___ go to bed at 9 o’clock.", options: ["had got to", "had to", "have got to"], answer: 1 }
+      ]
+    },
+
+    /* ================= 3 · GRAMMAR ================= */
+    { type: "part", n: "03", icon: "film", title: "Grammar", text: "I was doing and I did." },
+
+    {
+      type: "rule", label: "theory · past continuous + past simple", sticker: "clapper",
+      title: "In the middle — or finished?",
+      html: `
+        <p>At 9 o’clock on Saturday I <b>was having</b> breakfast. I started before 9 and finished after 9.</p>
+        <table class="form">
+          <tr><th>+</th><td>I / he / she / it <b>was</b> having · we / you / they <b>were</b> having</td></tr>
+          <tr><th>−</th><td>I <b>wasn’t</b> listening. · They <b>weren’t</b> looking.</td></tr>
+          <tr><th>?</th><td><b>Was</b> she sleeping? · What <b>were</b> you <b>doing</b> at 9?</td></tr>
+        </table>
+        <div class="tl" aria-hidden="true">
+          <div class="sp" style="--x:6%;--w:60%"><b>I was having a shower</b><i>background</i></div>
+          <div class="pt e" style="--x:42%"><b>the phone rang</b><i>event</i></div>
+          <div class="now"></div>
+        </div>
+        <p>I <b>was having</b> a shower when the phone <b>rang</b>. <span style="color:var(--muted)">(background + event)</span></p>
+        <div class="grid2">
+          <div class="box"><h4>past continuous = unfinished</h4><p>Jack <b>was reading</b> when his phone rang. <i>(in the middle)</i></p></div>
+          <div class="box pink"><h4>past simple = complete</h4><p>Jack <b>read</b> a book yesterday. <i>(from beginning to end)</i></p></div>
+        </div>
+        <div class="note">⚠️ <b>when</b> + the event (past simple) · <b>while</b> + the background (past continuous).</div>
+        <div class="rulecard"><h4>rule card — copy it into your notebook</h4>
+          <p><b>Form:</b> was / were + verb-ing<br><b>Use:</b> in the middle of an action at a time in the past<br><b>Examples:</b> At 7 I was having dinner. · I was walking home when it started to rain.<br><b>Trap:</b> one finished action → past simple: I <u>had</u> dinner at 7.</p></div>`
+    },
+
+    {
+      type: "gapfill", label: "grammar · was / were + -ing", sticker: "camera",
+      title: "Where were they? What were they doing?",
+      instructions: "Use <b>was / were + -ing</b>. Watch the negatives and questions!",
+      items: [
+        { text: "At 9 o’clock yesterday my parents [[were having]] <span class=hint>(have)</span> breakfast in the kitchen.", why: "they → were + having." },
+        { text: "Sorry, I didn’t hear you. I [[wasn't listening|was not listening]] <span class=hint>(not / listen)</span>.", why: "I → wasn’t + -ing." },
+        { text: "What [[were you doing]] <span class=hint>(you / do)</span> at 11 o’clock last night?", why: "Question: What + were + you + -ing." },
+        { text: "My sister [[was swimming]] <span class=hint>(swim)</span> in the pool when I arrived.", why: "swim → swimming (double m)." },
+        { text: "[[Was it raining]] <span class=hint>(it / rain)</span> when you left the house?", why: "Question: Was + it + -ing." },
+        { text: "We [[were sitting]] <span class=hint>(sit)</span> at the back of the cinema, so we couldn’t see well.", why: "sit → sitting (double t)." },
+        { text: "Why [[was Tom running]] <span class=hint>(Tom / run)</span>? Was he late for the train?", why: "Why + was + Tom + running." },
+        { text: "They [[weren't looking|were not looking]] <span class=hint>(not / look)</span> at the camera, so the photo is terrible.", why: "they → weren’t + -ing." },
+        { text: "This time last year I [[was living]] <span class=hint>(live)</span> in a different city.", why: "live → living (drop the e)." },
+        { text: "Look at this photo! Here I [[was having]] <span class=hint>(have)</span> my hair cut.", why: "have → having (drop the e)." }
+      ]
+    },
+
+    {
+      type: "mcq", label: "grammar · was doing or did?", sticker: "film",
+      title: "Background or event?",
+      instructions: "Choose the correct form.",
+      items: [
+        { q: "I ___ a shower when the phone rang.", options: ["had", "was having"], answer: 1 },
+        { q: "The phone ___ while I was having a shower.", options: ["rang", "was ringing"], answer: 0 },
+        { q: "We ___ a party last Saturday. Everybody came!", options: ["had", "were having"], answer: 0 },
+        { q: "“What were you doing at 8 p.m.?” “I ___ my homework.”", options: ["did", "was doing"], answer: 1 },
+        { q: "When I ___ up this morning, the sun was shining.", options: ["woke", "was waking"], answer: 0 },
+        { q: "She ___ her leg while she was playing football.", options: ["was breaking", "broke"], answer: 1 },
+        { q: "We ___ to the beach every day when we were on holiday.", options: ["went", "were going"], answer: 0 },
+        { q: "I saw Max in the café. He ___ a cup of coffee with a friend.", options: ["had", "was having"], answer: 1 },
+        { q: "___ TV when I called you last night?", options: ["Did you watch", "Were you watching"], answer: 1 },
+        { q: "When the teacher came in, we ___ our books and started the lesson. (= she came in, and then we did it)", options: ["opened", "were opening"], answer: 0 }
+      ]
+    },
+
+    {
+      type: "gapfill", label: "grammar · a picture story", sticker: "barber",
+      title: "A bad hair day",
+      instructions: "Look at the barber shop photo again and read the story. Put each verb in the <b>past simple</b> or the <b>past continuous</b>.",
+      items: [
+        { text: "Last Saturday I [[had]] <span class=hint>(have)</span> breakfast at nine and then went to the hairdresser’s.", why: "A complete action → past simple: have → had." },
+        { text: "When I [[arrived]] <span class=hint>(arrive)</span>, two people were already waiting.", why: "when + the event → past simple." },
+        { text: "While I [[was waiting]] <span class=hint>(wait)</span>, I read a magazine.", why: "while + the background → past continuous." },
+        { text: "Finally, I sat in the chair, and the hairdresser [[started]] <span class=hint>(start)</span> to cut my hair.", why: "One thing after another → past simple." },
+        { text: "She [[was talking]] <span class=hint>(talk)</span> to her friend on the phone the whole time.", why: "In the middle of it, all the time → past continuous." },
+        { text: "She [[wasn't looking|was not looking]] <span class=hint>(not / look)</span> at my hair at all!", why: "Negative background → wasn’t + -ing." },
+        { text: "Suddenly I [[saw]] <span class=hint>(see)</span> myself in the mirror. My fringe was very, very short!", why: "Suddenly → one moment → past simple: see → saw." },
+        { text: "I [[didn't say|did not say]] <span class=hint>(not / say)</span> anything because I was too shocked.", why: "Negative past simple: didn’t + say." },
+        { text: "When I got home, my brother [[was having]] <span class=hint>(have)</span> lunch in the kitchen.", why: "He was in the middle of it → past continuous." },
+        { text: "He looked at me and [[laughed]] <span class=hint>(laugh)</span> for five minutes. I didn’t have a good time that day!", why: "Two actions one after another → past simple." }
+      ]
+    },
+
+    {
+      type: "rephrase", label: "grammar · when / while", sticker: "repeat",
+      title: "Join the two snapshots",
+      instructions: "Make <b>one</b> sentence. Use the word in the dark box.",
+      items: [
+        { prompt: "I was having a shower. The phone rang.", key: "WHEN", answers: ["I was having a shower when the phone rang.", "When the phone rang, I was having a shower."] },
+        { prompt: "We were having lunch. It started to rain.", key: "WHEN", answers: ["We were having lunch when it started to rain.", "When it started to rain, we were having lunch."] },
+        { prompt: "She was swimming in the pool. She lost her ring.", key: "WHILE", answers: ["She lost her ring while she was swimming in the pool.", "While she was swimming in the pool, she lost her ring."] },
+        { prompt: "I was walking to the station. I met my teacher.", key: "WHEN", answers: ["I was walking to the station when I met my teacher.", "When I met my teacher, I was walking to the station."] },
+        { prompt: "They were watching a film. The lights went out.", key: "WHILE", answers: ["The lights went out while they were watching a film.", "While they were watching a film, the lights went out."] },
+        { prompt: "My dad was cooking dinner. He burned his hand.", key: "WHILE", answers: ["My dad burned his hand while he was cooking dinner.", "While my dad was cooking dinner, he burned his hand.", "My dad burned his hand while cooking dinner."] }
+      ]
+    },
+
+    {
+      type: "correct", label: "fix it · have + tenses", sticker: "detective",
+      title: "Find and fix the mistake",
+      instructions: "Each sentence has <b>one</b> mistake. Correct it in the box.",
+      items: [
+        { wrong: "I was have breakfast when you called.", answers: ["I was having breakfast when you called."] },
+        { wrong: "What did you doing at 7 o'clock yesterday?", answers: ["What were you doing at 7 o'clock yesterday?"] },
+        { wrong: "We was sitting in the café when it started to snow.", answers: ["We were sitting in the café when it started to snow."] },
+        { wrong: "I was reading when my mum was coming home.", answers: ["I was reading when my mum came home."] },
+        { wrong: "That phone looks great. Can I have a looking?", answers: ["That phone looks great. Can I have a look?"] },
+        { wrong: "Yesterday I had got to stay at school until five.", answers: ["Yesterday I had to stay at school until five."] },
+        { wrong: "We had a good fun at the party.", answers: ["We had a good time at the party."] }
+      ]
+    },
+
+    /* ================= 4 · DRILL ================= */
+    { type: "part", n: "04", icon: "zap", title: "Speed drill", text: "Until the phrases come out on their own." },
+
+    {
+      type: "drill", label: "automaticity · speed drill", sticker: "stopwatch",
+      title: "Twelve sentences, twice each",
+      instructions: "Build the full sentence and press <b>Enter</b>. Each one must be right <b>twice</b>. A mistake sends it back.",
+      items: [
+        { cue: "past continuous", prompt: "I / have / breakfast / at 9 o’clock", answers: ["I was having breakfast at 9 o'clock.", "I was having breakfast at nine o'clock.", "At 9 o'clock I was having breakfast."] },
+        { cue: "past continuous + when", prompt: "I / have / a shower / when / the phone / ring", answers: ["I was having a shower when the phone rang."] },
+        { cue: "while", prompt: "she / lose / her phone / while / she / swim", answers: ["She lost her phone while she was swimming."] },
+        { cue: "question", prompt: "what / you / do / at 7 p.m.?", answers: ["What were you doing at 7 p.m.?", "What were you doing at 7 pm?"] },
+        { cue: "negative", prompt: "I / not / listen", answers: ["I wasn't listening."] },
+        { cue: "past simple", prompt: "we / have / a good time / at the party", answers: ["We had a good time at the party."] },
+        { cue: "have", prompt: "can I / have / a look?", answers: ["Can I have a look?"] },
+        { cue: "have", prompt: "have / a good journey!", answers: ["Have a good journey!"] },
+        { cue: "have", prompt: "can I / have / a word with / you?", answers: ["Can I have a word with you?"] },
+        { cue: "past simple", prompt: "I / have / my hair / cut / yesterday", answers: ["I had my hair cut yesterday.", "Yesterday I had my hair cut."] },
+        { cue: "had to", prompt: "I / have to / study / last night", answers: ["I had to study last night.", "Last night I had to study."] },
+        { cue: "have got", prompt: "I / have got / a headache", answers: ["I've got a headache.", "I have got a headache."] }
+      ]
+    },
+
+    /* ================= 5 · WRITING ================= */
+    { type: "part", n: "05", icon: "pencil", title: "Writing", text: "Your own snapshot." },
+
+    {
+      type: "write", label: "writing · yesterday at 7 p.m.", sticker: "notebook",
+      title: "Yesterday at 7 p.m.",
+      instructions: "Write <b>5–7 sentences</b>. Where were you yesterday at 7 p.m.? What were you and the people around you doing? Did something happen? What did you have for dinner?",
+      words: ["breakfast", "lunch", "dinner", "a shower", "a bath", "a swim", "homework", "a lesson", "a party", "a good time", "a look", "a word", "a cup of", "had to"],
+      checks: [
+        { label: "was / were + -ing — at least twice", pattern: "\\b(was|were)\\s+(not\\s+)?\\w+ing\\b", min: 2 },
+        { label: "when or while", pattern: "\\b(when|while)\\b" },
+        { label: "have / had — at least twice", pattern: "\\b(have|has|had|having)\\b", min: 2 },
+        { label: "3+ have-phrases from today (they light up above)", words: 3 },
+        { label: "at least 5 sentences", sentences: 5 }
+      ],
+      sample: "Yesterday at 7 p.m. I was at home. My mum was cooking dinner and my dad was watching the news. I was doing my homework in my room. While I was writing an essay, my friend called me. We had a short chat, and then I had to finish my homework. After that we had dinner together, and I had a hot shower before bed."
+    },
+
+    /* ================= 6 · SELF-CHECK ================= */
+    { type: "part", n: "06", icon: "star", title: "Self-check", text: "What to look at again." },
+
+    { type: "review", label: "self-check", title: "My mistakes today" }
+  ]
+};
+</script>
+<script>
+/* =====================================================================
+   ENGINE — no need to edit below this line
+   ===================================================================== */
+(function(){
+"use strict";
+
+function h(tag, props){
+  const el = document.createElement(tag);
+  if (props) for (const k in props){
+    const v = props[k];
+    if (v == null || v === false) continue;
+    if (k === "class") el.className = v;
+    else if (k === "html") el.innerHTML = v;
+    else if (k === "style") el.style.cssText = v;
+    else if (k.slice(0,2) === "on") el.addEventListener(k.slice(2), v);
+    else el.setAttribute(k, v === true ? "" : v);
+  }
+  for (let i = 2; i < arguments.length; i++){
+    const kids = [].concat(arguments[i]);
+    for (const kid of kids){
+      if (kid == null || kid === false || kid === "") continue;
+      el.append(kid.nodeType ? kid : document.createTextNode(kid));
+    }
+  }
+  return el;
+}
+function clear(obj){ for (const k of Object.keys(obj)) delete obj[k]; }
+function emo(x){
+  if (!x) return "";
+  if (/^[a-z0-9-]+$/.test(x)) return h("img", { src: "assets/emoji/" + x + ".png", alt: "", draggable: "false" });
+  return document.createTextNode(x);
+}
+function norm(s, dWord){
+  s = String(s || "").toLowerCase().replace(/[’‘`´]/g, "'").replace(/[“”"«»]/g, "");
+  s = s.replace(/\bwon't\b/g, "will not").replace(/\bcan't\b/g, "cannot")
+       .replace(/n't\b/g, " not").replace(/'m\b/g, " am").replace(/'re\b/g, " are")
+       .replace(/'ve\b/g, " have").replace(/'ll\b/g, " will").replace(/'d\b/g, " " + (dWord || "had"));
+  s = s.replace(/[.,!?;:()\[\]–—-]/g, " ").replace(/\s+/g, " ").trim();
+  return s;
+}
+function matches(value, answers){
+  const a = answers.map(x => norm(x)); const v1 = norm(value, "had"), v2 = norm(value, "would");
+  return v1 !== "" && (a.includes(v1) || a.includes(v2));
+}
+function parseGaps(str){
+  const parts = []; const re = /\[\[(.+?)\]\]/g; let last = 0, m;
+  while ((m = re.exec(str))){
+    if (m.index > last) parts.push({ text: str.slice(last, m.index) });
+    const [ans, hint] = m[1].split(" // ");
+    parts.push({ answers: ans.split("|").map(s => s.trim()), hint: hint ? hint.trim() : null });
+    last = re.lastIndex;
+  }
+  if (last < str.length) parts.push({ text: str.slice(last) });
+  return parts;
+}
+function hashStr(s){ let h1 = 1779033703 ^ s.length; for (let i = 0; i < s.length; i++){ h1 = Math.imul(h1 ^ s.charCodeAt(i), 3432918353); h1 = h1 << 13 | h1 >>> 19; } return h1 >>> 0; }
+function shuffle(arr, seedStr){
+  let seed = hashStr(seedStr);
+  const rnd = () => { seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--){ const j = Math.floor(rnd() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
+  if (a.length > 1 && a.every((x, i) => x === arr[i])) a.push(a.shift());
+  return a;
+}
+function fire(el){ el.dispatchEvent(new Event("input", { bubbles: true })); }
+const pad = i => String(i + 1).padStart(2, "0");
+
+/* ---------- storage ---------- */
+const KEY = "lesson:" + LESSON.id;
+let SAVE = {};
+try { SAVE = JSON.parse(localStorage.getItem(KEY) || "{}") || {}; } catch (e) { SAVE = {}; }
+function persist(){ try { localStorage.setItem(KEY, JSON.stringify(SAVE)); } catch (e) {} }
+
+/* ---------- header ---------- */
+const root = document.documentElement;
+for (const k in (LESSON.theme || {})) root.style.setProperty("--" + k, LESSON.theme[k]);
+document.title = LESSON.title;
+document.getElementById("kicker").textContent = LESSON.kicker || "";
+const tEl = document.getElementById("title");
+if (LESSON.titleHTML) tEl.innerHTML = LESSON.titleHTML; else tEl.textContent = LESSON.title;
+document.getElementById("sub").textContent = LESSON.subtitle || "";
+const st = LESSON.stickers || [];
+document.getElementById("sticker1").append(emo(st[0]));
+document.getElementById("sticker2").append(emo(st[1]));
+
+function burst(fromEl){
+  if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const r = fromEl.getBoundingClientRect(); const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+  const set = LESSON.confetti && LESSON.confetti.length ? LESSON.confetti : ["⭐"];
+  for (let i = 0; i < 16; i++){
+    const s = h("span", { class: "confetti" }, emo(set[i % set.length]));
+    document.body.append(s);
+    const dx = (Math.random() - .5) * 360, dy = -60 - Math.random() * 230, rot = (Math.random() - .5) * 540;
+    const anim = s.animate([
+      { transform: `translate(${cx}px, ${cy}px) scale(.5)`, opacity: 1 },
+      { transform: `translate(${cx + dx * .6}px, ${cy + dy}px) rotate(${rot / 2}deg) scale(1.1)`, opacity: 1, offset: .55 },
+      { transform: `translate(${cx + dx}px, ${cy + dy + 170}px) rotate(${rot}deg) scale(.9)`, opacity: 0 }
+    ], { duration: 1150 + Math.random() * 400, easing: "cubic-bezier(.2,.7,.4,1)" });
+    anim.onfinish = () => s.remove();
+  }
+}
+
+/* ---------- drag & drop board (mouse + touch + tap) ---------- */
+function Board(scope, v){
+  const zones = {}, chips = {}; let selected = null;
+  const bank = h("div", { class: "bank" });
+  register(bank, bank, "bank", false);
+  function register(clickEl, dropEl, id, single){
+    clickEl.dataset.zone = id; zones[id] = { el: dropEl, box: clickEl, single };
+    clickEl.addEventListener("click", () => { if (selected) place(selected, id); });
+  }
+  function zoneOf(c){ for (const id in zones){ if (zones[id].el === c.parentElement) return id; } return "bank"; }
+  function unselect(){ if (selected) selected.classList.remove("selected"); selected = null; }
+  function clearMarks(){ scope.querySelectorAll(".ok,.bad").forEach(n => n.classList.remove("ok", "bad")); }
+  function place(c, zid, silent){
+    const z = zones[zid]; if (!z) return;
+    if (z.single) z.el.querySelectorAll(".chip").forEach(o => { if (o !== c) bank.append(o); });
+    z.el.append(c); unselect();
+    if (!silent){ clearMarks(); for (const id in chips){ const zz = zoneOf(chips[id]); if (zz === "bank") delete v[id]; else v[id] = zz; } persist(); fire(scope); }
+  }
+  function tap(c){
+    if (zoneOf(c) !== "bank"){ place(c, "bank"); return; }
+    if (selected === c){ unselect(); return; }
+    unselect(); selected = c; c.classList.add("selected");
+  }
+  function zoneAt(x, y){
+    const el = document.elementFromPoint(x, y); const z = el && el.closest("[data-zone]");
+    return z && scope.contains(z) ? z : null;
+  }
+  let overEl = null;
+  function setOver(z){ if (overEl === z) return; if (overEl) overEl.classList.remove("over"); overEl = z; if (z) z.classList.add("over"); }
+  function chip(id, label, value){
+    const c = h("button", { class: "chip", type: "button", html: label });
+    c.dataset.id = id; c.dataset.value = value; chips[id] = c;
+    let d = null;
+    c.addEventListener("pointerdown", e => {
+      if (e.pointerType === "mouse" && e.button !== 0) return;
+      d = { x: e.clientX, y: e.clientY, moved: false, ghost: null };
+      try { c.setPointerCapture(e.pointerId); } catch (_) {}
+    });
+    c.addEventListener("pointermove", e => {
+      if (!d) return;
+      if (!d.moved && Math.hypot(e.clientX - d.x, e.clientY - d.y) > 6){
+        d.moved = true; unselect();
+        const r = c.getBoundingClientRect(); d.ox = d.x - r.left; d.oy = d.y - r.top;
+        d.ghost = c.cloneNode(true); d.ghost.classList.add("ghost"); d.ghost.classList.remove("ok", "bad");
+        d.ghost.style.width = r.width + "px"; document.body.append(d.ghost); c.classList.add("dragging");
+      }
+      if (d.moved){
+        e.preventDefault();
+        d.ghost.style.left = (e.clientX - d.ox) + "px"; d.ghost.style.top = (e.clientY - d.oy) + "px";
+        setOver(zoneAt(e.clientX, e.clientY));
+      }
+    });
+    const end = e => {
+      if (!d) return; const was = d; d = null;
+      if (!was.moved) return;
+      was.ghost.remove(); c.classList.remove("dragging"); setOver(null); c._suppress = true;
+      if (e.type === "pointerup"){ const z = zoneAt(e.clientX, e.clientY); if (z) place(c, z.dataset.zone); }
+    };
+    c.addEventListener("pointerup", end);
+    c.addEventListener("pointercancel", end);
+    c.addEventListener("click", e => { e.stopPropagation(); if (c._suppress){ c._suppress = false; return; } tap(c); });
+    bank.append(c);
+    return c;
+  }
+  function restore(){ for (const id in v){ if (chips[id] && zones[v[id]]) place(chips[id], v[id], true); } }
+  function resetAll(){ for (const id in chips) bank.append(chips[id]); clear(v); clearMarks(); unselect(); }
+  return { bank, register, chip, place, restore, resetAll, chips, zones, zoneOf };
+}
+
+/* ---------- renderers: check() returns one value per item: true / false / null (not answered) ---------- */
+const RENDER = {};
+const LABEL = { mcq: "multiple choice", match: "match", dragwords: "drag & drop", correct: "correct the mistakes", rephrase: "rewrite", write: "writing", drill: "speed drill", rule: "theory", build: "word order", gapfill: "gap fill", tf2: "true / false", slotwrite: "writing", review: "self-check" };
+const ROLES = [
+  ["who", "Who?"], ["freq", "How often?"], ["does", "Does what?"], ["what", "What? Whom?"], ["where", "Where?"], ["when", "When?"]
+];
+
+RENDER.rule = (sec, s, body) => { body.append(h("div", { class: "rule", html: sec.html })); return null; };
+
+RENDER.build = (sec, s, body) => {
+  const v = s.v || (s.v = {}); const items = [];
+  sec.items.forEach((it, i) => {
+    const vi = v[i] || (v[i] = {});
+    const wrap = h("div", { class: "bitem" });
+    const state = h("span", { class: "bstate" });
+    wrap.append(h("div", { class: "bhead" }, h("span", { class: "bnum" }, pad(i)), state));
+    const B = Board(wrap, vi);
+    const row = h("div", { class: "brow" }); const slots = [];
+    ROLES.forEach(([role, q]) => {
+      if (it[role] == null) return;
+      const zone = h("div", { class: "bz" });
+      const box = h("div", { class: "bslot c-" + role, role: "button", "aria-label": q }, h("span", { class: "bq" }, q), zone);
+      B.register(box, zone, "z-" + role, true);
+      row.append(box); slots.push({ role, box, zone });
+    });
+    row.append(h("span", { class: "bdot" }, "."));
+    const chipsData = ROLES.filter(([r]) => it[r] != null).map(([r]) => ({ id: r, label: it[r], value: r }));
+    if (it.wrong) chipsData.push({ id: "x", label: it.wrong, value: "x" });
+    shuffle(chipsData, LESSON.id + sec.title + i).forEach(c => B.chip(c.id, c.label, c.value));
+    wrap.append(B.bank, row); body.append(wrap);
+    B.restore();
+    items.push({ B, slots, state });
+  });
+  return {
+    total: items.length,
+    check(){ return items.map(({ slots, state }) => {
+      let filled = 0, ok = true;
+      slots.forEach(o => {
+        const c = o.zone.querySelector(".chip"); if (c) filled++;
+        const good = !!c && c.dataset.value === o.role;
+        o.box.classList.toggle("ok", good); o.box.classList.toggle("bad", !good);
+        if (!good) ok = false;
+      });
+      if (!filled){ slots.forEach(o => o.box.classList.remove("ok", "bad")); state.textContent = ""; return null; }
+      state.className = "bstate " + (ok ? "ok" : "bad"); state.textContent = ok ? "✓" : "Try again — fix the red slot.";
+      return ok;
+    }); },
+    reveal(){ items.forEach(({ B, slots }) => { B.resetAll(); slots.forEach(o => B.place(B.chips[o.role], "z-" + o.role)); }); },
+    reset(){ items.forEach(({ B, state }) => { B.resetAll(); state.textContent = ""; }); persist(); }
+  };
+};
+
+RENDER.gapfill = (sec, s, body) => {
+  const v = s.v || (s.v = {}); const lines = [];
+  const list = h("ol", { class: "lines" });
+  sec.items.forEach((raw, i) => {
+    const it = typeof raw === "string" ? { text: raw } : raw;
+    const li = h("li", {}); const line = h("div", { class: "line" }); const gaps = [];
+    parseGaps(it.text).forEach((p, j) => {
+      if (p.text != null){ line.append(h("span", { html: p.text })); return; }
+      const key = i + "-" + j;
+      const w = Math.max(5, ...p.answers.map(a => a.length)) + 2;
+      const input = h("input", { class: "gap", type: "text", autocomplete: "off", autocapitalize: "off", autocorrect: "off", spellcheck: "false", "aria-label": p.hint ? "gap: " + p.hint : "gap", style: `width:${w}ch` });
+      input.value = v[key] || "";
+      input.addEventListener("input", () => { v[key] = input.value; persist(); input.classList.remove("ok", "bad"); const y = li.querySelector(".why"); if (y) y.remove(); });
+      input.addEventListener("keydown", e => {
+        if (e.key !== "Enter") return; e.preventDefault();
+        const all = Array.from(body.querySelectorAll("input.gap")); const n = all[all.indexOf(input) + 1];
+        if (n) n.focus(); else input.blur();
+      });
+      const wrap = h("span", { class: "gapwrap" }, input);
+      if (p.hint) wrap.append(h("span", { class: "hint" }, "(" + p.hint + ")"));
+      line.append(wrap); gaps.push({ input, answers: p.answers, wrap });
+    });
+    li.append(line); list.append(li); lines.push({ it, li, gaps });
+  });
+  body.append(list);
+  return {
+    total: lines.length,
+    check(){ return lines.map(({ it, li, gaps }) => {
+      const old = li.querySelector(".why"); if (old) old.remove();
+      if (gaps.every(g => !g.input.value.trim())){ gaps.forEach(g => g.input.classList.remove("ok", "bad")); return null; }
+      let ok = true;
+      gaps.forEach(g => { const good = matches(g.input.value, g.answers); g.input.classList.toggle("ok", good); g.input.classList.toggle("bad", !good); if (!good) ok = false; });
+      if (it.why) li.append(h("span", { class: "why " + (ok ? "ok" : "bad") }, (ok ? "✓ " : "✗ ") + it.why));
+      return ok;
+    }); },
+    reveal(){ lines.forEach(({ gaps }) => gaps.forEach(g => { if (!g.input.classList.contains("ok") && !g.wrap.querySelector(".reveal")) g.wrap.append(h("span", { class: "reveal" }, "→ " + g.answers[0])); })); },
+    reset(){ clear(v); lines.forEach(({ li, gaps }) => { gaps.forEach(g => { g.input.value = ""; g.input.classList.remove("ok", "bad"); }); const y = li.querySelector(".why"); if (y) y.remove(); }); }
+  };
+};
+
+RENDER.tf2 = (sec, s, body) => {
+  const v = s.v || (s.v = {}); const qs = [];
+  body.classList.add("tf2");
+  if (sec.text) body.append(h("div", { class: "story", html: sec.text }));
+  sec.items.forEach((it, i) => {
+    const st = v[i] || (v[i] = {});
+    const q = h("div", { class: "q" });
+    const tfo = h("div", { class: "opts tfo" });
+    const bT = h("button", { class: "opt", type: "button" }, "True");
+    const bF = h("button", { class: "opt", type: "button" }, "False");
+    tfo.append(bT, bF);
+    q.append(h("div", { class: "q-top" }, h("div", { class: "q-text" }, h("span", { class: "q-num" }, pad(i)), h("span", { html: it.q })), tfo));
+    const fixOpts = h("div", { class: "opts" });
+    const fixBtns = it.fix.map((f, j) => { const b = h("button", { class: "opt", type: "button", html: f }); b.addEventListener("click", () => { st.fix = j; persist(); paint(); fire(body); }); fixOpts.append(b); return b; });
+    const fixbox = h("div", { class: "fixbox", hidden: true }, h("div", { class: "fl" }, "Correct it:"), fixOpts);
+    const warn = h("div", { class: "warnline", hidden: true }, "Choose the correct sentence.");
+    q.append(fixbox, warn);
+    bT.addEventListener("click", () => { st.tf = true; delete st.fix; persist(); paint(); fire(body); });
+    bF.addEventListener("click", () => { st.tf = false; persist(); paint(); fire(body); });
+    function paint(){
+      [bT, bF, ...fixBtns].forEach(b => b.classList.remove("ok", "bad", "answer"));
+      bT.classList.toggle("sel", st.tf === true); bF.classList.toggle("sel", st.tf === false);
+      fixbox.hidden = st.tf !== false; warn.hidden = true;
+      fixBtns.forEach((b, j) => b.classList.toggle("sel", st.fix === j));
+    }
+    paint(); body.append(q);
+    qs.push({ it, st, bT, bF, fixBtns, fixbox, warn, paint });
+  });
+  return {
+    total: qs.length,
+    check(){ return qs.map(o => {
+      const { it, st } = o; o.paint();
+      if (st.tf === undefined) return null;
+      const tfOk = st.tf === it.answer;
+      (st.tf ? o.bT : o.bF).classList.add(tfOk ? "ok" : "bad");
+      if (st.tf === false && tfOk){
+        if (st.fix === undefined){ o.warn.hidden = false; return null; }
+        const fixOk = st.fix === it.fixAnswer; o.fixBtns[st.fix].classList.add(fixOk ? "ok" : "bad");
+        return fixOk;
+      }
+      return tfOk;
+    }); },
+    reveal(){ qs.forEach(o => { const { it, st } = o;
+      if (st.tf !== it.answer) (it.answer ? o.bT : o.bF).classList.add("answer");
+      if (!it.answer){ o.fixbox.hidden = false; o.fixBtns[it.fixAnswer].classList.add("answer"); }
+    }); },
+    reset(){ qs.forEach(o => { clear(o.st); o.paint(); }); }
+  };
+};
+
+RENDER.slotwrite = (sec, s, body) => {
+  const v = s.v || (s.v = {}); const rows = [];
+  sec.items.forEach((it, i) => {
+    const input = h("input", { class: "full", type: "text", autocomplete: "off", autocapitalize: "sentences", spellcheck: "true", placeholder: it.who.split(" / ")[0] + " …", "aria-label": "sentence about " + it.who });
+    input.value = v[i] || "";
+    const tags = h("div", { class: "sp-tags" },
+      h("span", { class: "c-who fill" }, "Who? " + it.who),
+      h("span", { class: "c-does" }, "Does what?"), h("span", { class: "c-what" }, "What?"),
+      h("span", { class: "c-where" }, "Where?"), h("span", { class: "c-when" }, "When?"));
+    const row = h("div", { class: "row" }, h("div", { class: "prompt" }, h("span", { class: "num" }, pad(i))), tags, input);
+    row.querySelector(".prompt").append(h("span", {}, ""));
+    input.addEventListener("input", () => { v[i] = input.value; persist(); input.classList.remove("ok", "bad"); const m = row.querySelector(".model"); if (m) m.remove(); });
+    body.append(row); rows.push({ it, input, row });
+  });
+  return {
+    total: rows.length, revealLabel: "👀 Show examples",
+    check(){ return rows.map(r => {
+      const old = r.row.querySelector(".model"); if (old) old.remove();
+      const txt = r.input.value.trim(); if (!txt){ r.input.classList.remove("ok", "bad"); return null; }
+      const words = txt.split(/\s+/).filter(Boolean);
+      const verbOk = /^\s*(\S+\s+){1,3}\w*(s)\b/i.test(txt);
+      const ok = words.length >= 5 && verbOk;
+      r.input.classList.toggle("ok", ok); r.input.classList.toggle("bad", !ok);
+      if (!ok) r.row.append(h("div", { class: "model warn" }, !verbOk ? "Check the verb: he / she / it → -s." : "Add more slots: what? where? when?"));
+      return ok;
+    }); },
+    reveal(){ rows.forEach(r => { const old = r.row.querySelector(".model"); if (old) old.remove(); r.row.append(h("div", { class: "model" }, "Example: " + r.it.sample)); }); },
+    reset(){ clear(v); rows.forEach(r => { r.input.value = ""; r.input.classList.remove("ok", "bad"); }); }
+  };
+};
+
+function similarity(a, b){
+  const A = norm(a).split(" ").filter(Boolean), B = norm(b).split(" ").filter(Boolean);
+  if (!A.length || !B.length) return 0;
+  const pool = B.slice(); let hit = 0;
+  for (const w of A){ const i = pool.indexOf(w); if (i > -1){ hit++; pool.splice(i, 1); } }
+  return hit / Math.max(A.length, B.length);
+}
+
+RENDER.mcq = (sec, s, body) => {
+  const v = s.v || (s.v = {}); const qs = [];
+  sec.items.forEach((it, i) => {
+    const q = h("div", { class: "q" });
+    const text = h("div", { class: "q-text" }, h("span", { class: "q-num" }, pad(i)));
+    it.q.split("___").forEach((part, k) => { if (k) text.append(h("span", { class: "blank" })); text.append(h("span", { html: part })); });
+    const opts = h("div", { class: "opts", role: "radiogroup" });
+    const btns = it.options.map((o, j) => {
+      const b = h("button", { class: "opt", type: "button", role: "radio", html: o });
+      b.addEventListener("click", () => { v[i] = j; persist(); paint(); fire(body); });
+      opts.append(b); return b;
+    });
+    function paint(){ btns.forEach((b, j) => { b.classList.toggle("sel", v[i] === j); b.classList.remove("ok", "bad", "answer"); b.setAttribute("aria-checked", v[i] === j); }); }
+    paint(); q.append(text, opts); body.append(q); qs.push({ it, btns, i, paint });
+  });
+  return {
+    total: qs.length,
+    check(){ return qs.map(({ it, btns, i, paint }) => { paint(); if (v[i] === undefined) return null; const ok = v[i] === it.answer; btns[v[i]].classList.add(ok ? "ok" : "bad"); return ok; }); },
+    reveal(){ qs.forEach(({ it, btns, i }) => { if (v[i] !== it.answer) btns[it.answer].classList.add("answer"); }); },
+    reset(){ clear(v); qs.forEach(({ paint }) => paint()); }
+  };
+};
+
+RENDER.match = (sec, s, body) => {
+  const v = s.v || (s.v = {}); const B = Board(body, v); const rows = [];
+  const grid = h("div", { class: "match" });
+  sec.pairs.forEach((p, i) => {
+    const slot = h("div", { class: "slot", role: "button", "aria-label": "drop zone" });
+    B.register(slot, slot, "m" + i, true);
+    grid.append(h("div", { class: "mrow" }, h("div", { class: "left", "data-n": pad(i), html: p[0] }), slot));
+    rows.push(slot);
+  });
+  shuffle(sec.pairs.map((p, i) => i), LESSON.id + sec.title).forEach(i => B.chip("r" + i, sec.pairs[i][1], String(i)));
+  body.append(B.bank, grid); B.restore();
+  return {
+    total: rows.length,
+    check(){ return rows.map((slot, i) => { const c = slot.querySelector(".chip");
+      if (!c){ slot.classList.remove("ok", "bad"); return null; }
+      const ok = c.dataset.value === String(i); slot.classList.toggle("ok", ok); slot.classList.toggle("bad", !ok); return ok; }); },
+    reveal(){ B.resetAll(); rows.forEach((slot, i) => B.place(B.chips["r" + i], "m" + i)); },
+    reset(){ B.resetAll(); persist(); }
+  };
+};
+
+RENDER.dragwords = (sec, s, body) => {
+  const v = s.v || (s.v = {}); const B = Board(body, v); const slots = []; const words = [];
+  const list = h("ol", { class: "lines" });
+  sec.items.forEach((it, i) => {
+    const line = h("li", { class: "line" });
+    parseGaps(it).forEach((p, j) => {
+      if (p.text != null){ line.append(h("span", { html: p.text })); return; }
+      const slot = h("span", { class: "slot", role: "button", "aria-label": "drop zone" });
+      B.register(slot, slot, "g" + i + "-" + j, true);
+      slots.push({ slot, answers: p.answers }); words.push(p.answers[0]); line.append(slot);
+    });
+    list.append(line);
+  });
+  (sec.extra || []).forEach(w => words.push(w));
+  shuffle(words.map((w, k) => ({ id: "c" + k, w })), LESSON.id + sec.title).forEach(o => B.chip(o.id, o.w, o.w));
+  if (sec.text) body.append(h("div", { class: "story", html: sec.text }));
+  body.append(B.bank, list); B.restore();
+  return {
+    total: slots.length,
+    check(){ return slots.map(o => {
+      const c = o.slot.querySelector(".chip"); if (!c){ o.slot.classList.remove("ok", "bad"); return null; }
+      const ok = matches(c.dataset.value, o.answers); o.slot.classList.toggle("ok", ok); o.slot.classList.toggle("bad", !ok); return ok;
+    }); },
+    reveal(){
+      B.resetAll(); const used = new Set();
+      slots.forEach(o => { const c = Object.values(B.chips).find(ch => !used.has(ch) && matches(ch.dataset.value, o.answers));
+        if (c){ used.add(c); B.place(c, o.slot.dataset.zone); } });
+    },
+    reset(){ B.resetAll(); persist(); }
+  };
+};
+
+RENDER.correct = (sec, s, body) => {
+  const v = s.v || (s.v = {}); const rows = [];
+  sec.items.forEach((it, i) => {
+    const input = h("input", { class: "full", type: "text", autocomplete: "off", autocapitalize: "sentences", spellcheck: "false", "aria-label": "corrected sentence " + (i + 1) });
+    input.value = v[i] != null ? v[i] : it.wrong;
+    input.addEventListener("input", () => { v[i] = input.value; persist(); input.classList.remove("ok", "bad"); });
+    const row = h("div", { class: "row" }, h("div", { class: "row-label" }, h("span", { class: "q-num" }, pad(i)), h("s", {}, it.wrong)), input);
+    body.append(row); rows.push({ it, input, row });
+  });
+  return {
+    total: rows.length,
+    check(){ return rows.map(r => {
+      if (norm(r.input.value) === norm(r.it.wrong) || !r.input.value.trim()){ r.input.classList.remove("ok", "bad"); return null; }
+      const ok = matches(r.input.value, r.it.answers); r.input.classList.toggle("ok", ok); r.input.classList.toggle("bad", !ok); return ok; }); },
+    reveal(){ rows.forEach(r => { if (!r.input.classList.contains("ok") && !r.row.querySelector(".model")) r.row.append(h("div", { class: "model" }, "✓ " + r.it.answers[0])); }); },
+    reset(){ clear(v); rows.forEach(r => { r.input.value = r.it.wrong; r.input.classList.remove("ok", "bad"); }); }
+  };
+};
+
+RENDER.rephrase = (sec, s, body) => {
+  const v = s.v || (s.v = {}); const rows = [];
+  sec.items.forEach((it, i) => {
+    const input = h("input", { class: "full", type: "text", autocomplete: "off", autocapitalize: "sentences", spellcheck: "false", placeholder: "Type the full sentence…", "aria-label": "answer " + (i + 1) });
+    input.value = v[i] || "";
+    const prompt = h("div", { class: "prompt" }, h("span", { class: "num" }, pad(i)), h("span", { html: it.prompt }));
+    if (it.key) prompt.append(h("span", { class: "key" }, it.key));
+    const row = h("div", { class: "row" }, prompt, input);
+    input.addEventListener("input", () => { v[i] = input.value; persist(); input.classList.remove("ok", "bad", "close"); const m = row.querySelector(".model"); if (m) m.remove(); });
+    body.append(row); rows.push({ it, input, row });
+  });
+  return {
+    total: rows.length,
+    check(){ return rows.map(r => {
+      const old = r.row.querySelector(".model"); if (old) old.remove();
+      r.input.classList.remove("ok", "bad", "close");
+      if (!r.input.value.trim()) return null;
+      if (matches(r.input.value, r.it.answers)){ r.input.classList.add("ok"); return true; }
+      const best = Math.max(...r.it.answers.map(a => similarity(r.input.value, a)));
+      if (best >= .7){ r.input.classList.add("close"); r.row.append(h("div", { class: "model close" }, "Almost! Check the form of the words.")); }
+      else r.input.classList.add("bad");
+      return false;
+    }); },
+    reveal(){ rows.forEach(r => { const old = r.row.querySelector(".model"); if (old) old.remove(); if (!r.input.classList.contains("ok")) r.row.append(h("div", { class: "model" }, "✓ " + r.it.answers[0])); }); },
+    reset(){ clear(v); rows.forEach(r => { r.input.value = ""; r.input.classList.remove("ok", "bad", "close"); }); }
+  };
+};
+
+RENDER.write = (sec, s, body) => {
+  const v = s.v || (s.v = {});
+  let box = null;
+  if (sec.words){ box = h("div", { class: "wordbox" }); sec.words.forEach(w => box.append(h("span", { "data-w": w }, w))); body.append(box); }
+  const ta = h("textarea", { class: "full", rows: 8, spellcheck: "true", placeholder: "Write here…", "aria-label": "your text" });
+  ta.value = v.text || "";
+  const ul = h("ul", { class: "checks" });
+  const lis = (sec.checks || []).map(c => { const li = h("li", {}, c.label); ul.append(li); return { c, li }; });
+  body.append(ta, ul);
+  function usedWords(t){ return (sec.words || []).filter(w => new RegExp("\\b" + w.replace(/\s+/g, "\\s+(?:\\w+\\s+)?"), "i").test(t)); }
+  function run(){ const tx = ta.value.replace(/[’‘]/g, "'");
+    const used = usedWords(tx);
+    if (box) box.querySelectorAll("span").forEach(sp => sp.classList.toggle("used", used.includes(sp.dataset.w)));
+    lis.forEach(({ c, li }) => {
+      let ok = false;
+      if (c.pattern){ const n = (tx.match(new RegExp(c.pattern, "gi")) || []).length; ok = n >= (c.min || 1); }
+      if (c.words) ok = used.length >= c.words;
+      if (c.sentences) ok = tx.split(/[.!?]+|\n+/).filter(x => x.trim().split(/\s+/).length >= 3).length >= c.sentences;
+      li.classList.toggle("done", ok);
+    });
+  }
+  ta.addEventListener("input", () => { v.text = ta.value; persist(); run(); });
+  run();
+  return {
+    total: 0, revealLabel: "👀 See an example", alwaysShow: true,
+    check(){ run(); return []; },
+    reveal(){ if (!body.querySelector(".model")) body.append(h("div", { class: "model" }, "Example: " + sec.sample)); },
+    reset(){ clear(v); ta.value = ""; run(); }
+  };
+};
+
+/* automaticity drill: every item must be typed correctly twice; mistakes come back */
+RENDER.drill = (sec, s, body) => {
+  const items = sec.items; const NEED = sec.need || 2;
+  const box = h("div", { class: "drill" }); body.append(box);
+  let q, hits, cur, t0, tick, mistakes;
+  function fmt(ms){ const t = Math.floor(ms / 1000); return Math.floor(t / 60) + ":" + String(t % 60).padStart(2, "0"); }
+  function intro(){
+    clearInterval(tick); box.innerHTML = "";
+    box.append(h("div", { class: "dtop" }, h("span", {}, items.length + " phrases × " + NEED), h("span", {}, s.best ? "best time " + fmt(s.best) : "no best time yet")));
+    box.append(h("div", { class: "dprompt" }, h("small", {}, "how it works"), "Type each answer fast. Mistakes come back until you get them right twice."));
+    const go = h("button", { class: "start", type: "button" }, "Start the dive ↓"); go.addEventListener("click", start); box.append(go);
+  }
+  function start(){
+    q = shuffle(items.map((_, i) => i), "d" + Date.now()); hits = items.map(() => 0); mistakes = 0; t0 = Date.now();
+    box.innerHTML = "";
+    const dots = h("div", { class: "dots" }, items.map(() => h("i")));
+    const timer = h("span", { class: "timer" }, "0:00");
+    const prompt = h("div", { class: "dprompt" });
+    const input = h("input", { type: "text", autocomplete: "off", autocapitalize: "sentences", spellcheck: "false", "aria-label": "your answer" });
+    const go = h("button", { class: "go", type: "button" }, "↵");
+    const fb = h("div", { class: "dfb" });
+    box.append(h("div", { class: "dtop" }, dots, timer), prompt, h("div", { class: "drow" }, input, go), fb);
+    tick = setInterval(() => { timer.textContent = fmt(Date.now() - t0); }, 250);
+    function paintDots(){ [...dots.children].forEach((d, i) => { d.className = hits[i] >= NEED ? "full" : hits[i] > 0 ? "half" : ""; }); }
+    function next(){
+      if (!q.length){ finish(); return; }
+      cur = q.shift(); const it = items[cur];
+      prompt.innerHTML = ""; prompt.append(h("small", {}, it.cue), h("span", { html: it.prompt }));
+      input.value = ""; input.focus({ preventScroll: true });
+    }
+    function submit(){
+      if (cur == null || !input.value.trim()) return;
+      const it = items[cur]; const ok = matches(input.value, it.answers);
+      box.classList.remove("flash-ok", "flash-bad"); void box.offsetWidth; box.classList.add(ok ? "flash-ok" : "flash-bad");
+      if (ok){ hits[cur]++; fb.className = "dfb ok"; fb.textContent = "✓ " + it.answers[0]; if (hits[cur] < NEED) q.splice(Math.min(q.length, 3 + Math.floor(Math.random() * 3)), 0, cur); }
+      else { mistakes++; hits[cur] = 0; fb.className = "dfb bad"; fb.textContent = "✗ " + it.answers[0]; q.splice(Math.min(q.length, 2), 0, cur); }
+      paintDots(); next();
+    }
+    go.addEventListener("click", submit);
+    input.addEventListener("keydown", e => { if (e.key === "Enter"){ e.preventDefault(); submit(); } });
+    paintDots(); next();
+  }
+  function finish(){
+    clearInterval(tick); const ms = Date.now() - t0; const best = !s.best || ms < s.best;
+    if (best){ s.best = ms; persist(); }
+    box.innerHTML = "";
+    const again = h("button", { class: "start", type: "button" }, "Dive again");
+    again.addEventListener("click", start);
+    box.append(h("div", { class: "done" }, h("small", {}, "your time"), h("b", {}, fmt(ms)),
+      h("div", {}, (best ? "New best time! " : "Best: " + fmt(s.best) + ". ") + (mistakes ? mistakes + " slip" + (mistakes > 1 ? "s" : "") + " on the way." : "No mistakes at all!"))), again);
+    burst(again);
+  }
+  intro();
+  return { noFoot: true, total: 0 };
+};
+
+RENDER.sort = (sec, s, body) => {
+  const v = s.v || (s.v = {}); const B = Board(body, v);
+  const wrap = h("div", { class: "buckets" }); const all = [];
+  sec.categories.forEach((cat, ci) => {
+    const zone = h("div", { class: "bucket-zone" }); B.register(zone, zone, "b" + ci, false);
+    wrap.append(h("div", { class: "bucket" }, h("h3", { html: cat.name }), zone));
+    cat.words.forEach((w, wi) => all.push({ id: "w" + ci + "-" + wi, w, ci }));
+  });
+  shuffle(all, LESSON.id + sec.title).forEach(o => B.chip(o.id, o.w, String(o.ci)));
+  body.append(B.bank, wrap); B.restore();
+  const order = all.map(o => o.id);
+  return {
+    total: all.length,
+    check(){ return order.map(id => { const c = B.chips[id]; const z = B.zoneOf(c);
+      c.classList.remove("ok", "bad"); if (z === "bank") return null;
+      const ok = z === "b" + c.dataset.value; c.classList.add(ok ? "ok" : "bad"); return ok; }); },
+    reveal(){ order.forEach(id => { const c = B.chips[id]; if (B.zoneOf(c) !== "b" + c.dataset.value) B.place(c, "b" + c.dataset.value); }); },
+    reset(){ B.resetAll(); persist(); }
+  };
+};
+LABEL.sort = "sort";
+
+/* ---------- build page ---------- */
+const main = document.getElementById("lesson");
+const graded = []; let reviewBox = null; let n = 0;
+
+LESSON.sections.forEach((sec, idx) => {
+  if (sec.type === "part"){
+    main.append(h("div", { class: "part", style: sec.color ? "--pc:" + sec.color : "" },
+      h("div", { class: "pi" }, emo(sec.icon)),
+      h("div", {}, h("div", { class: "pn" }, "PART " + sec.n), h("h2", {}, sec.title), sec.text ? h("p", {}, sec.text) : null)));
+    return;
+  }
+  const sid = "s" + idx; const s = SAVE[sid] || (SAVE[sid] = {});
+  const exercise = sec.type !== "rule" && sec.type !== "review";
+  const card = h("section", { class: "card", id: sid });
+  card.append(h("div", { class: "winbar", "aria-hidden": "true" }, h("i"), h("i"), h("i"), h("span", {}, sec.label || LABEL[sec.type] || "")));
+  if (sec.sticker) card.append(h("div", { class: "deco", "aria-hidden": "true" }, emo(sec.sticker)));
+  const inner = h("div", { class: "card-in" }); card.append(inner);
+  const num = exercise ? pad(n++) : (sec.type === "review" ? "★" : "i");
+  inner.append(h("div", { class: "card-head" }, h("div", { class: "ticket" + (exercise ? "" : " alt") }, num), h("div", {}, h("h2", { class: "t", html: sec.title || "" }))));
+  if (sec.instructions) inner.append(h("p", { class: "instr", html: sec.instructions }));
+  else inner.append(h("div", { style: "height:14px" }));
+  const body = h("div", { class: "card-body" }); inner.append(body);
+  main.append(card);
+
+  if (sec.type === "review"){ reviewBox = body; return; }
+  const api = RENDER[sec.type] ? RENDER[sec.type](sec, s, body) : null;
+  if (!api || api.noFoot) return;
+
+  const score = h("span", { class: "score" });
+  const btnCheck = h("button", { class: "btn btn-check", type: "button" }, "Check");
+  const btnShow = h("button", { class: "btn btn-soft", type: "button", hidden: !api.alwaysShow }, api.revealLabel || "👀 Show answers");
+  const btnReset = h("button", { class: "btn", type: "button" }, "Reset");
+  inner.append(h("div", { class: "card-foot" }, btnCheck, btnShow, btnReset, score));
+  const g = { sec, s, api, card, num, title: sec.title };
+  graded.push(g);
+
+  function showScore(){
+    if (s.score == null || !api.total){ score.textContent = ""; score.classList.remove("perfect"); return; }
+    score.textContent = s.score + "/" + api.total + (s.score === api.total ? " ✓" : "");
+    score.classList.toggle("perfect", s.score === api.total);
+  }
+  function doCheck(silent){
+    const res = api.check(); const sc = res.filter(x => x === true).length;
+    s.score = sc; s.checked = true;
+    if (!silent){
+      s.tries = (s.tries || 0) + 1;
+      s.first = s.first || [];
+      s.fixed = s.fixed || [];
+      res.forEach((r, i) => {
+        if (s.first[i] == null){ if (r !== null) s.first[i] = r; }
+        else if (s.first[i] === false && r === true && !s.revealed) s.fixed[i] = true;
+      });
+    }
+    btnShow.hidden = !api.alwaysShow && !((s.tries || 0) >= 2 && sc < api.total);
+    persist(); showScore(); updateAll();
+    if (!silent && api.total && sc === api.total){ burst(btnCheck); btnCheck.classList.remove("wiggle"); void btnCheck.offsetWidth; btnCheck.classList.add("wiggle"); }
+  }
+  g.doCheck = doCheck;
+  btnCheck.addEventListener("click", () => doCheck(false));
+  btnShow.addEventListener("click", () => { s.revealed = true; persist(); api.reveal(); updateAll(); });
+  btnReset.addEventListener("click", () => {
+    api.reset(); body.querySelectorAll(".reveal,.model,.why").forEach(x => x.remove());
+    delete s.score; delete s.checked; persist(); btnShow.hidden = !api.alwaysShow; showScore(); updateAll();
+  });
+  body.addEventListener("input", () => { if (s.score != null){ delete s.score; delete s.checked; persist(); showScore(); updateAll(); } });
+  if (s.checked) doCheck(true);
+});
+
+/* ---------- progress + self-check ---------- */
+function updateAll(){
+  let sc = 0, tot = 0, fixed = 0;
+  graded.forEach(({ s, api }) => { tot += api.total; if (s.score != null) sc += s.score; (s.fixed || []).forEach(f => { if (f) fixed++; }); });
+  document.getElementById("pScore").textContent = sc;
+  document.getElementById("pTotal").textContent = tot;
+  document.getElementById("pBar").style.width = tot ? (sc / tot * 100) + "%" : "0";
+  document.getElementById("pFix").textContent = fixed;
+  if (!reviewBox) return;
+  reviewBox.innerHTML = "";
+  reviewBox.append(h("div", { class: "fixcount" }, emo("star"),
+    h("div", {}, h("div", { class: "big" }, "+" + fixed), h("div", { class: "lbl" }, "mistakes you fixed yourself"))));
+  const list = h("div", { class: "rv-list" }); let any = false, checkedAny = false;
+  graded.forEach(g => {
+    const first = g.s.first || []; if (first.length) checkedAny = true;
+    const wrong = [], done = [];
+    first.forEach((f, i) => { if (f === false){ (g.s.fixed && g.s.fixed[i] ? done : wrong).push(i + 1); } });
+    if (!wrong.length && !done.length) return;
+    any = true;
+    const btn = h("button", { class: "btn", type: "button" }, wrong.length ? "Fix →" : "See →");
+    btn.addEventListener("click", () => { g.card.scrollIntoView({ behavior: "smooth", block: "start" }); g.card.classList.remove("flash"); void g.card.offsetWidth; g.card.classList.add("flash"); });
+    list.append(h("div", { class: "rv-item" + (wrong.length ? "" : " done") },
+      h("div", {}, h("div", { class: "rv-t" }, g.num + " · " + g.title.replace(/<[^>]+>/g, "")),
+        h("div", { class: "rv-n" }, wrong.length ? "to fix: " + wrong.join(", ") + (g.s.revealed ? " (answers shown)" : "") : "all fixed ✓")),
+      btn));
+  });
+  if (!any) list.append(h("div", { class: "rv-empty" }, checkedAny ? "No mistakes — wow! 🎉" : "Check some exercises first. Your mistakes will appear here."));
+  reviewBox.append(list);
+}
+updateAll();
+
+document.getElementById("resetAll").addEventListener("click", () => {
+  if (!confirm("Clear all your answers in this lesson?")) return;
+  SAVE = {}; try { localStorage.removeItem(KEY); } catch (e) {}
+  location.reload();
+});
+})();
+</script>
+</body>
+</html>
