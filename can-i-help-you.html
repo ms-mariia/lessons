@@ -1,0 +1,1455 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Can I Help You?</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bowlby+One&family=Instrument+Sans:wght@400;500;600;700&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+<!-- LESSON TEMPLATE: edit only the LESSON object. Emoji names → assets/emoji/<name>.png -->
+<style>
+  /* ===== Deep Dive · ocean theme ===== */
+  :root{
+    --surface:#0F6A86; --mid:#0A3556; --abyss:#041325;
+    --paper:#F4FBFA; --ink:#0B2236; --muted:#5A7083; --line:rgba(11,34,54,.14);
+    --accent:#FF6B57; --accent2:#13B5A8; --sand:#F2D49B; --soft:#E1F3F0;
+    --light:#EAF8F6; --lightmuted:#A9C9D2;
+    --ok:#0E9E7A; --ok-bg:#DDF6EE; --bad:#E2483D; --bad-bg:#FDE6E3; --close:#A46B00; --close-bg:#FFF1D2;
+    --head:"Gloock",Georgia,serif; --mono:"Martian Mono",ui-monospace,Menlo,monospace; --body:"Schibsted Grotesk",system-ui,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%;background:var(--abyss)}
+  body{margin:0;color:var(--ink);font:17px/1.6 var(--body);
+    background:linear-gradient(180deg,var(--surface) 0,#0C4C6E 520px,var(--mid) 1400px,#06223B 3200px,var(--abyss) 6000px);min-height:100vh;position:relative;overflow-x:hidden}
+  body::before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.22;mix-blend-mode:screen;
+    background:radial-gradient(ellipse 40px 14px at 20% 10%,#fff 0,transparent 70%),radial-gradient(ellipse 60px 18px at 70% 6%,#fff 0,transparent 70%),radial-gradient(ellipse 30px 10px at 45% 16%,#fff 0,transparent 70%);
+    animation:caustic 9s ease-in-out infinite alternate}
+  @keyframes caustic{to{transform:translate(-30px,12px) scale(1.1)}}
+  .wrap{max-width:820px;margin:0 auto;padding:0 18px;position:relative;z-index:1}
+  button{font:inherit}
+  img.emo{width:1.15em;height:1.15em;vertical-align:-.2em}
+  .bubbles{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+  .bubbles i{position:absolute;bottom:-30px;border:1.5px solid rgba(255,255,255,.45);border-radius:50%;animation:rise linear infinite}
+  @keyframes rise{to{transform:translate(var(--dx,20px),-110vh)}}
+
+  /* hero */
+  .hero{position:relative;padding:52px 0 18px;color:var(--light)}
+  .kicker{display:inline-block;font:500 11.5px/1.5 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--sand);border:1px solid rgba(242,212,155,.5);padding:5px 12px;border-radius:99px;max-width:calc(100% - 90px)}
+  h1{font-family:var(--head);font-weight:400;font-size:clamp(56px,13vw,112px);line-height:.9;margin:16px 0 0;letter-spacing:-.02em;color:#fff}
+  h1 em{font-style:normal;color:var(--sand)}
+  .sub{color:var(--lightmuted);margin:16px 0 0;max-width:46ch;font-size:18px}
+  .depthline{margin-top:20px;display:flex;gap:10px;align-items:center;font:500 11px var(--mono);color:var(--lightmuted);letter-spacing:.08em}
+  .depthline::before{content:"";flex:none;width:46px;height:1px;background:var(--lightmuted)}
+  .sticker{position:absolute;user-select:none;animation:bob 6s ease-in-out infinite;filter:drop-shadow(0 12px 16px rgba(0,0,0,.35))}
+  .sticker img{width:100%;height:100%;display:block}
+  .s1{right:0;top:40px;width:110px;height:110px;rotate:-8deg}
+  .s2{right:110px;top:150px;width:58px;height:58px;rotate:12deg;animation-delay:-3s}
+  @keyframes bob{0%,100%{translate:0 0}50%{translate:0 -10px}}
+
+  /* progress = depth gauge */
+  .progress{position:sticky;top:10px;z-index:30;display:flex;align-items:center;gap:12px;margin:0 -6px;padding:10px 18px;border-radius:99px;font:500 12px var(--mono);color:var(--light);background:rgba(6,34,59,.86);border:1px solid rgba(255,255,255,.16);box-shadow:0 10px 26px rgba(0,0,0,.3);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+  .progress .lbl{color:var(--lightmuted);text-transform:uppercase;letter-spacing:.08em}
+  .bar{flex:1;height:10px;border-radius:99px;overflow:hidden;background:rgba(255,255,255,.12)}
+  .bar i{display:block;height:100%;width:0;border-radius:99px;background:linear-gradient(90deg,var(--accent2),var(--sand),var(--accent));transition:width .6s cubic-bezier(.3,1.4,.5,1)}
+  .progress .fx{display:flex;align-items:center;gap:5px;white-space:nowrap}
+  .progress .fx img{width:18px;height:18px}
+
+  /* parts = depth markers */
+  .part{display:flex;align-items:center;gap:16px;margin:64px 0 8px;color:var(--light)}
+  .part .pi{width:58px;height:58px;flex:none;display:grid;place-items:center;border-radius:50%;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18)}
+  .part .pi img{width:40px;height:40px}
+  .part .pn{font:500 11px var(--mono);letter-spacing:.1em;color:var(--sand)}
+  .part h2{font-family:var(--head);font-weight:400;font-size:36px;line-height:1.05;margin:2px 0 0}
+  .part p{margin:3px 0 0;color:var(--lightmuted);font-size:15.5px}
+
+  /* cards */
+  .card{position:relative;background:var(--paper);border-radius:24px;margin:26px 0;box-shadow:0 18px 40px rgba(0,0,0,.28),0 0 0 1px rgba(255,255,255,.06)}
+  .winbar{display:flex;align-items:center;gap:8px;padding:14px 22px 0}
+  .winbar i{display:none}
+  .winbar span{font:500 10.5px var(--mono);letter-spacing:.12em;color:var(--accent2);text-transform:uppercase}
+  .card-in{padding:8px 24px 20px}
+  .deco{position:absolute;right:18px;top:-28px;width:56px;height:56px;rotate:8deg;user-select:none;filter:drop-shadow(0 8px 10px rgba(0,0,0,.25))}
+  .deco img{width:100%;height:100%}
+  .card-head{display:flex;align-items:center;gap:14px}
+  .ticket{flex:none;width:44px;height:44px;display:grid;place-items:center;border-radius:50%;background:var(--ink);color:#fff;font:500 13px var(--mono);box-shadow:0 0 0 4px var(--paper),0 0 0 6px var(--accent2)}
+  .ticket.alt{background:var(--accent);box-shadow:0 0 0 4px var(--paper),0 0 0 6px var(--sand)}
+  h2.t{font-family:var(--head);font-weight:400;font-size:27px;line-height:1.1;margin:0}
+  .instr{color:var(--muted);margin:10px 0 18px;font-size:15.5px}
+  .instr b{color:var(--ink)}
+  .card-foot{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:18px;padding-top:14px;border-top:1px solid var(--line)}
+  .btn{font-weight:600;font-size:15px;border-radius:99px;padding:9px 20px;cursor:pointer;border:1.5px solid var(--ink);background:transparent;color:var(--ink);transition:transform .12s,background .15s}
+  .btn:hover{transform:translateY(-1px)}
+  .btn:active{transform:translateY(1px)}
+  .btn-check{background:var(--accent);border-color:var(--accent);color:#fff}
+  .btn-soft{background:var(--soft);border-color:transparent}
+  .score{margin-left:auto;font:500 15px var(--mono)}
+  .score.perfect{color:var(--ok)}
+  .wiggle{animation:wiggle .5s}
+  @keyframes wiggle{25%{rotate:-4deg}50%{rotate:4deg}75%{rotate:-2deg}}
+
+  /* theory */
+  .rule p{margin:0 0 12px}
+  .rule h3{font-family:var(--head);font-weight:400;font-size:21px;margin:22px 0 8px}
+  .rule h3:first-child{margin-top:0}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:14px 0}
+  .box{border-radius:16px;padding:12px 14px;background:var(--soft)}
+  .box.pink{background:#FFE9E4}
+  .box.sand{background:#FBF0D9}
+  .box h4{margin:0 0 4px;font:500 10.5px var(--mono);text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}
+  .box p{margin:0;font-size:15.5px}
+  table.form{width:100%;border-collapse:collapse;font-size:15.5px;margin:10px 0 4px}
+  table.form th,table.form td{border-bottom:1px solid var(--line);padding:8px;text-align:left;vertical-align:top}
+  table.form th{font:500 10.5px var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+  .note{margin-top:14px;font-size:15px;background:var(--close-bg);border-radius:14px;padding:10px 14px}
+  .notes-tip{display:flex;gap:10px;align-items:flex-start;margin-top:14px;font-size:15px;background:var(--soft);border-radius:14px;padding:10px 14px}
+  .notes-tip img{width:30px;height:30px;flex:none}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
+  .chips span{font:500 12.5px var(--mono);border:1px solid var(--ink);border-radius:99px;padding:3px 11px;background:#fff}
+  .colloc{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px;margin:10px 0}
+  .colloc div{background:#fff;border:1px solid var(--line);border-radius:12px;padding:8px 12px;font-size:15.5px}
+  .colloc b{color:var(--accent)}
+  .story{font-size:17px;line-height:1.75;background:#fff;border-left:4px solid var(--accent2);border-radius:0 14px 14px 0;padding:14px 18px;margin:8px 0 14px}
+  ol.qs{margin:0 0 6px;padding-left:1.4em}
+  ol.qs li{margin:0 0 6px}
+  details{margin-top:12px;border:1px solid var(--line);border-radius:14px;background:#fff}
+  details summary{cursor:pointer;padding:10px 14px;font-weight:600;list-style:none}
+  details summary::-webkit-details-marker{display:none}
+  details summary::before{content:"▸ ";color:var(--accent)}
+  details[open] summary::before{content:"▾ "}
+  details > div{padding:0 14px 12px}
+  .hl{background:#FFE0D9;border-radius:4px;padding:0 3px;font-weight:600}
+  .hl2{background:#D3F1EC;border-radius:4px;padding:0 3px;font-weight:600}
+  @media (max-width:600px){.grid2{grid-template-columns:1fr}}
+
+  /* photos */
+  .photos{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:6px 0 14px}
+  .photo{margin:0;border-radius:16px;overflow:hidden;background:#0A3556;position:relative}
+  .photo img{display:block;width:100%;height:100%;aspect-ratio:4/3;object-fit:cover}
+  .photo figcaption{position:absolute;left:0;right:0;bottom:0;padding:22px 12px 8px;font-size:13.5px;color:#fff;background:linear-gradient(transparent,rgba(4,19,37,.85))}
+  .photo figcaption small{display:block;font:400 9.5px var(--mono);opacity:.7;margin-top:2px}
+  .photo.wide{grid-column:1/-1}
+  .photo.wide img{aspect-ratio:16/8}
+  @media (max-width:560px){.photos{grid-template-columns:1fr}}
+
+  /* timeline */
+  .tl{position:relative;height:104px;margin:10px 4px 6px}
+  .tl::before{content:"";position:absolute;left:0;right:12px;top:52px;height:2px;background:var(--ink)}
+  .tl::after{content:"";position:absolute;right:0;top:46px;border-left:13px solid var(--ink);border-top:7px solid transparent;border-bottom:7px solid transparent}
+  .tl .now{position:absolute;right:30px;top:44px;width:2px;height:18px;background:var(--muted)}
+  .tl .now::after{content:"now";position:absolute;top:22px;left:50%;translate:-50% 0;font:500 10.5px var(--mono);color:var(--muted)}
+  .tl .pt{position:absolute;left:var(--x);top:42px;width:20px;height:20px;margin-left:-10px;border-radius:50%;background:var(--accent2);box-shadow:0 0 0 3px var(--paper),0 0 0 4.5px var(--ink)}
+  .tl .pt.e{background:var(--accent)}
+  .tl .pt b,.tl .sp b{position:absolute;left:50%;translate:-50% 0;white-space:nowrap;font:500 12px var(--mono);bottom:30px}
+  .tl .pt i,.tl .sp i{position:absolute;left:50%;translate:-50% 0;white-space:nowrap;font:400 11px var(--mono);color:var(--muted);font-style:normal;top:30px}
+  .tl .sp{position:absolute;left:var(--x);width:var(--w);top:46px;height:13px;border-radius:7px;background:repeating-linear-gradient(90deg,var(--accent2) 0 14px,transparent 14px 22px)}
+  .tl .sp b{color:var(--accent2)}
+  .tl .stop{position:absolute;left:var(--x);top:34px;height:36px;border-left:2px dashed var(--accent)}
+  .tl .stop b{position:absolute;top:-18px;left:4px;white-space:nowrap;font:500 11px var(--mono);color:var(--accent)}
+
+  /* inputs: gaps */
+  .lines{margin:0;padding-left:1.7em}
+  .lines li::marker{color:var(--accent2);font:500 12px var(--mono)}
+  .line{margin:0 0 4px;line-height:2.2}
+  .gapwrap{white-space:nowrap}
+  .gap{font:inherit;font-size:16.5px;color:var(--ink);border:0;border-bottom:2px solid var(--accent2);background:var(--soft);border-radius:8px 8px 2px 2px;padding:1px 8px;min-width:5ch;max-width:100%;text-align:center;outline:none;transition:background .15s,box-shadow .15s}
+  .gap:focus{background:#fff;box-shadow:0 0 0 3px rgba(19,181,168,.25)}
+  .hint{color:var(--muted);font:400 .78em var(--mono);margin-left:5px}
+  input.ok,textarea.ok{background:var(--ok-bg);border-color:var(--ok);color:#0b5e49}
+  input.bad{background:var(--bad-bg);border-color:var(--bad);text-decoration:underline wavy var(--bad);text-underline-offset:4px}
+  input.close{background:var(--close-bg);border-color:var(--close)}
+  .reveal{display:inline-block;margin-left:6px;font-size:.84em;font-weight:600;color:#0b5e49;background:var(--ok-bg);padding:0 9px;border-radius:99px;line-height:1.9;white-space:nowrap}
+  .why{display:block;margin:-2px 0 10px;font-size:14.5px;line-height:1.45;border-radius:10px;padding:6px 10px}
+  .why.ok{background:var(--ok-bg);color:#0b5e49}
+  .why.bad{background:var(--bad-bg);color:#8a2b2e}
+
+  /* multiple choice */
+  .q{margin:0 0 18px}
+  .q-text{margin-bottom:8px}
+  .q-num{font:500 12px var(--mono);color:var(--accent2);margin-right:8px}
+  .blank{display:inline-block;width:60px;border-bottom:2px solid var(--muted);margin:0 3px;translate:0 -4px}
+  .opts{display:flex;flex-wrap:wrap;gap:8px}
+  .opt{font-size:15.5px;border:1.5px solid var(--line);background:#fff;color:var(--ink);border-radius:99px;padding:6px 15px;cursor:pointer;transition:transform .12s,background .15s,border-color .15s;text-align:left}
+  .opt:hover{border-color:var(--ink)}
+  .opt.sel{background:var(--ink);border-color:var(--ink);color:#fff}
+  .opt.ok{background:var(--ok);border-color:var(--ok);color:#fff}
+  .opt.bad{background:var(--bad);border-color:var(--bad);color:#fff}
+  .opt.answer{box-shadow:0 0 0 3px var(--ok)}
+  .tf2 .q{padding:12px 0;margin:0;border-bottom:1px solid var(--line)}
+  .tf2 .q-top{display:flex;gap:14px;align-items:center;justify-content:space-between}
+  .tf2 .q-text{margin:0}
+  .tf2 .opts.tfo{flex:none;flex-wrap:nowrap}
+  .fixbox{margin:10px 0 0 30px;padding:10px 12px;border-left:3px solid var(--accent);background:#FFF3EF;border-radius:0 12px 12px 0}
+  .fixbox .fl{font:500 10.5px var(--mono);color:var(--accent);margin-bottom:6px;text-transform:uppercase;letter-spacing:.08em}
+  .fixbox .opts{flex-direction:column;align-items:flex-start}
+  .warnline{font-size:14px;color:#8a2b2e;margin-top:6px}
+  @media (max-width:560px){.tf2 .q-top{flex-direction:column;align-items:flex-start;gap:8px}.fixbox{margin-left:0}}
+
+  /* drag & drop */
+  .bank{display:flex;flex-wrap:wrap;gap:9px;padding:12px;min-height:60px;margin-bottom:18px;border:1.5px dashed rgba(11,34,54,.25);border-radius:16px;background:var(--soft);transition:background .15s}
+  .bank:empty::before{content:"All placed";color:var(--muted);font-size:14px;align-self:center}
+  .bank.over{background:#d0ece7}
+  .chip{font-size:15px;font-weight:600;line-height:1.35;background:#fff;color:var(--ink);border:1.5px solid var(--ink);border-radius:12px;padding:5px 12px;box-shadow:0 3px 0 var(--accent2);cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;text-align:left}
+  .chip.selected{outline:3px solid var(--accent);outline-offset:2px;rotate:-2deg}
+  .chip.dragging{opacity:.28}
+  .chip.ghost{position:fixed;z-index:1000;pointer-events:none;margin:0;rotate:-4deg;scale:1.05;box-shadow:0 10px 18px rgba(0,0,0,.25)}
+  .chip.ok{background:var(--ok-bg);border-color:var(--ok);box-shadow:none}
+  .chip.bad{background:var(--bad-bg);border-color:var(--bad);box-shadow:none}
+  .slot{display:inline-flex;align-items:center;justify-content:center;min-width:110px;min-height:40px;padding:2px;margin:0 4px;vertical-align:middle;border:1.5px dashed rgba(11,34,54,.35);border-radius:12px;cursor:pointer;transition:background .15s,border-color .15s}
+  .slot .chip{box-shadow:none}
+  .slot.over{background:var(--soft);border-color:var(--accent2)}
+  .slot.ok{border-style:solid;border-color:var(--ok);background:var(--ok-bg)}
+  .slot.bad{border-style:solid;border-color:var(--bad);background:var(--bad-bg)}
+  .slot.ok .chip,.slot.bad .chip{background:transparent;border-color:transparent}
+  .match{display:grid;gap:10px}
+  .mrow{display:grid;grid-template-columns:.8fr 1.4fr;gap:10px;align-items:center}
+  .mrow .left{font-weight:600}
+  .mrow .left::before{content:attr(data-n);font:500 12px var(--mono);color:var(--accent2);margin-right:8px}
+  .mrow .slot{display:flex;justify-content:flex-start;width:100%;min-height:46px;margin:0}
+  @media (max-width:560px){.mrow{grid-template-columns:1fr;gap:6px}.mrow+.mrow{margin-top:8px}}
+
+  /* full inputs */
+  .row{margin:0 0 16px}
+  .row-label{font-size:14.5px;color:var(--muted);margin-bottom:5px}
+  .row-label s{text-decoration-color:var(--bad);text-decoration-thickness:2px}
+  .prompt{font-weight:500;margin-bottom:6px}
+  .prompt .num{font:500 12px var(--mono);color:var(--accent2);margin-right:8px}
+  .key{display:inline-block;font:500 11.5px var(--mono);background:var(--ink);color:#fff;border-radius:99px;padding:2px 10px;margin-left:6px}
+  .full{display:block;width:100%;font:inherit;font-size:16.5px;color:var(--ink);padding:10px 14px;border:1.5px solid rgba(11,34,54,.22);border-radius:14px;background:#fff;outline:none;transition:border-color .15s,background .15s}
+  .full:focus{border-color:var(--accent2)}
+  textarea.full{resize:vertical;min-height:160px;line-height:1.55}
+  .model{margin-top:7px;font-size:15px;color:#0b5e49;background:var(--ok-bg);padding:7px 12px;border-radius:12px}
+  .model.close{color:#7a5300;background:var(--close-bg)}
+  .model.warn{color:#8a2b2e;background:var(--bad-bg)}
+  .checks{list-style:none;padding:0;margin:12px 0 0;display:grid;gap:6px;font-size:15px}
+  .checks li::before{content:"○";display:inline-block;width:1.4em;font-weight:800;color:var(--muted)}
+  .checks li.done::before{content:"✓";color:var(--ok)}
+  .checks li.done{color:#0b5e49}
+  .wordbox{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 12px}
+  .wordbox span{font:500 12px var(--mono);background:var(--soft);border-radius:99px;padding:3px 10px}
+  .wordbox span.used{background:var(--ok-bg);color:#0b5e49;text-decoration:line-through}
+
+  /* drill (automaticity) */
+  .drill{background:var(--ink);color:#fff;border-radius:20px;padding:18px;position:relative;overflow:hidden}
+  .drill .dtop{display:flex;justify-content:space-between;align-items:center;gap:10px;font:500 12px var(--mono);color:var(--lightmuted);flex-wrap:wrap}
+  .drill .dots{display:flex;gap:5px;flex-wrap:wrap}
+  .drill .dots i{width:12px;height:12px;border-radius:50%;border:1.5px solid rgba(255,255,255,.4)}
+  .drill .dots i.half{background:linear-gradient(90deg,var(--sand) 50%,transparent 50%);border-color:var(--sand)}
+  .drill .dots i.full{background:var(--accent2);border-color:var(--accent2)}
+  .drill .timer{font:500 22px var(--mono);color:var(--sand)}
+  .drill .dprompt{font-family:var(--head);font-size:clamp(22px,4.6vw,30px);line-height:1.2;margin:22px 0 14px;min-height:2.4em}
+  .drill .dprompt small{display:block;font:400 12px var(--mono);color:var(--lightmuted);margin-bottom:6px;letter-spacing:.06em;text-transform:uppercase}
+  .drill .drow{display:flex;gap:8px}
+  .drill input{flex:1;min-width:0;font:inherit;font-size:18px;padding:12px 14px;border-radius:14px;border:2px solid rgba(255,255,255,.25);background:rgba(255,255,255,.06);color:#fff;outline:none}
+  .drill input:focus{border-color:var(--accent2)}
+  .drill .go{background:var(--accent);border:0;color:#fff;border-radius:14px;padding:0 18px;font-weight:700;cursor:pointer}
+  .drill .dfb{min-height:26px;margin-top:10px;font-size:15px}
+  .drill .dfb.ok{color:#7CF0CF} .drill .dfb.bad{color:#FFB3A8}
+  .drill.flash-ok{box-shadow:inset 0 0 0 3px #7CF0CF}
+  .drill.flash-bad{animation:shake .35s;box-shadow:inset 0 0 0 3px #FFB3A8}
+  .drill .start{display:block;margin:26px auto 8px;background:var(--accent);color:#fff;border:0;border-radius:99px;padding:14px 30px;font-weight:700;font-size:17px;cursor:pointer}
+  .drill .done{text-align:center;padding:16px 0 4px}
+  .drill .done b{display:block;font:500 40px var(--mono);color:var(--sand)}
+  @keyframes shake{25%{translate:-4px 0}50%{translate:4px 0}75%{translate:-2px 0}}
+
+  /* review */
+  .fixcount{display:flex;align-items:center;gap:14px;padding:14px 16px;border-radius:16px;background:#FBF0D9;margin-bottom:14px}
+  .fixcount img{width:54px;height:54px}
+  .fixcount .big{font:500 32px var(--mono);line-height:1}
+  .fixcount .lbl{font-size:14.5px;color:var(--muted)}
+  .rv-list{display:grid;gap:10px}
+  .rv-item{display:flex;align-items:center;gap:12px;justify-content:space-between;border:1px solid var(--line);border-radius:14px;padding:10px 12px;background:#fff}
+  .rv-item .rv-t{font-weight:600}
+  .rv-item .rv-n{font:400 12px var(--mono);color:var(--bad)}
+  .rv-item.done .rv-n{color:var(--ok)}
+  .rv-empty{color:var(--muted);font-size:15px}
+  .flash{animation:flash 1.2s}
+  @keyframes flash{30%{box-shadow:0 0 0 6px var(--sand),0 18px 40px rgba(0,0,0,.28)}}
+
+  .page-foot{text-align:center;padding:30px 0 80px;color:var(--lightmuted);font-size:14px}
+  .page-foot .btn{margin-bottom:14px;color:var(--light);border-color:rgba(255,255,255,.4)}
+  .page-foot small{display:block;margin-top:8px;font-size:11.5px;opacity:.85;line-height:1.5}
+  .page-foot a{color:var(--lightmuted)}
+  .confetti{position:fixed;z-index:999;pointer-events:none;left:0;top:0;width:30px;height:30px}
+  .confetti img{width:100%;height:100%}
+
+  @media (max-width:560px){
+    body{font-size:16.5px}
+    .card-in{padding:6px 16px 16px}
+    .winbar{padding:12px 16px 0}
+    .s1{width:78px;height:78px;top:30px}
+    .s2{display:none}
+    .score{width:100%;margin-left:0;order:-1}
+    .deco{width:46px;height:46px;top:-22px}
+    .gapwrap{white-space:normal}
+    .part h2{font-size:30px}
+  }
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+  /* ---- word-order slots (fixed colours for the whole lesson) ---- */
+  :root{ --sWho:#4D7CFF; --sDoes:#FF4D6D; --sWhat:#14B887; --sWhere:#F09A00; --sWhen:#9B5CFF; --sFreq:#6B6E8A; }
+  .c-who{--c:var(--sWho)} .c-does{--c:var(--sDoes)} .c-what{--c:var(--sWhat)} .c-where{--c:var(--sWhere)} .c-when{--c:var(--sWhen)} .c-freq{--c:var(--sFreq)}
+  .legend{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+  .legend .lg{flex:1 1 120px;border:2px solid var(--c);border-radius:12px;overflow:hidden;background:#fff;text-align:center}
+  .legend .lg b{display:block;background:var(--c);color:#fff;font:700 13px var(--mono);padding:5px 6px}
+  .legend .lg span{display:block;padding:7px 6px;font-weight:700}
+  .w{color:var(--c);font-weight:700;border-bottom:3px solid var(--c);padding:0 1px}
+  .arrow{font:700 14px var(--mono);color:var(--muted);text-align:center;margin:-2px 0 6px}
+
+  .bitem{padding:14px 0 16px;border-bottom:1.5px dashed color-mix(in srgb,var(--ink) 14%,transparent)}
+  .bitem:last-child{border-bottom:0}
+  .bitem .bhead{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+  .bitem .bnum{font:700 14px var(--mono);color:var(--accent)}
+  .bitem .bstate{font-size:14px;font-weight:700}
+  .bitem .bstate.ok{color:var(--ok)} .bitem .bstate.bad{color:var(--bad)}
+  .bitem .bank{min-height:52px;margin-bottom:10px;padding:9px}
+  .brow{display:flex;flex-wrap:wrap;gap:8px;align-items:stretch}
+  .bslot{flex:1 1 118px;min-width:108px;border:2px dashed var(--c);border-radius:12px;background:color-mix(in srgb,var(--c) 7%,#fff);display:flex;flex-direction:column;cursor:pointer;transition:background .15s,box-shadow .15s}
+  .bslot .bq{font:700 11.5px var(--mono);color:var(--c);padding:4px 8px 0}
+  .bslot .bz{flex:1;min-height:42px;display:flex;align-items:center;justify-content:center;padding:4px 6px 6px}
+  .bslot.over{background:color-mix(in srgb,var(--c) 18%,#fff)}
+  .bslot .chip{box-shadow:none;width:100%;text-align:center}
+  .bslot.ok{border-style:solid;background:var(--ok-bg);border-color:var(--ok)}
+  .bslot.bad{border-style:solid;background:var(--bad-bg);border-color:var(--bad);animation:shake .35s}
+  .bslot.ok .bq{color:var(--ok)} .bslot.bad .bq{color:var(--bad)}
+  .bslot.bad .bq::after{content:"  ✗ not here";}
+  .bdot{align-self:center;font:700 22px var(--head)}
+  @keyframes shake{25%{translate:-3px 0}50%{translate:3px 0}75%{translate:-2px 0}}
+
+  /* slot prompts for writing */
+  .sp-tags{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 7px}
+  .sp-tags span{font:700 12.5px var(--mono);border-radius:6px;padding:2px 8px;border:1.5px solid var(--c);color:var(--c);background:#fff}
+  .sp-tags span.fill{background:var(--c);color:#fff}
+
+  /* rule card */
+  .rcard{border:2px solid var(--ink);border-radius:14px;overflow:hidden;margin:14px 0 4px;background:#fff}
+  .rcard div{display:grid;grid-template-columns:110px 1fr;border-bottom:1.5px solid color-mix(in srgb,var(--ink) 12%,transparent)}
+  .rcard div:last-child{border-bottom:0}
+  .rcard b{font:700 12.5px var(--mono);text-transform:uppercase;letter-spacing:.06em;background:var(--soft);padding:10px 12px}
+  .rcard span{padding:10px 12px}
+  @media (max-width:520px){.rcard div{grid-template-columns:1fr}.rcard b{padding:6px 12px}}
+
+  /* ===== Can I help you? · shop-receipt theme (overrides) ===== */
+  :root{
+    --paper:#FFFDF5; --ink:#22223B; --muted:#5F6077; --line:rgba(34,34,59,.14);
+    --accent:#FF6B9A; --accent2:#13A89E; --sand:#FFD23F; --soft:#DDF7F3;
+    --light:#22223B; --lightmuted:#5F6077;
+    --head:"Bowlby One",Impact,sans-serif; --mono:"Courier Prime",ui-monospace,Menlo,monospace; --body:"Instrument Sans",system-ui,sans-serif;
+    --sQw:#3D3D5C; --sAux:#B5179E;
+  }
+  .c-qw{--c:var(--sQw)} .c-aux{--c:var(--sAux)}
+  html{background:#BFEFE9}
+  body{background-color:#BFEFE9;background-image:repeating-linear-gradient(90deg,rgba(255,255,255,.55) 0 34px,transparent 34px 68px)}
+  body::before{display:none}
+  .bubbles{display:none}
+  .hero{color:var(--ink)}
+  h1{font-family:var(--head);font-weight:400;font-size:clamp(46px,12vw,104px);line-height:.98;color:var(--ink);letter-spacing:-.01em}
+  h1 em{font-style:normal;color:var(--accent);-webkit-text-stroke:0}
+  .kicker{color:var(--ink);background:var(--sand);border-color:var(--ink);font-family:var(--mono);font-weight:700}
+  .sub{color:var(--muted)}
+  .sticker{filter:drop-shadow(0 10px 14px rgba(34,34,59,.25))}
+  .progress{color:var(--ink);background:var(--paper);border:2px solid var(--ink);box-shadow:0 8px 18px rgba(34,34,59,.18)}
+  .progress .lbl{color:var(--accent2);font-family:var(--mono);font-weight:700}
+  .bar{background:#E7E5DA}
+  .bar i{background:repeating-linear-gradient(90deg,var(--ink) 0 2px,transparent 2px 4px,var(--ink) 4px 7px,transparent 7px 9px)}
+  .part{color:var(--ink)}
+  .part .pi{background:var(--paper);border:2px dashed var(--ink);border-radius:14px}
+  .part .pn{color:var(--accent);font-family:var(--mono);font-weight:700}
+  .part p{color:var(--muted)}
+  /* receipt cards: torn zig-zag bottom edge */
+  .card{border-radius:6px 6px 0 0;box-shadow:0 14px 28px rgba(34,34,59,.16);margin-bottom:40px}
+  .card::after{content:"";position:absolute;left:0;right:0;bottom:-11px;height:12px;background:linear-gradient(135deg,var(--paper) 50%,transparent 50%) 0 0/16px 12px,linear-gradient(225deg,var(--paper) 50%,transparent 50%) 0 0/16px 12px;background-repeat:repeat-x}
+  .card .lbl,.winbar{font-family:var(--mono)}
+  .winbar span{color:var(--accent2);font-weight:700}
+  .ticket{border-radius:8px;background:var(--ink);box-shadow:none;font-family:var(--mono);font-weight:700}
+  .ticket.alt{background:var(--accent);box-shadow:none}
+  .box{border-radius:8px} .box.pink{background:#FFE3EC} .box.sand{background:#FFF5CC}
+  .colloc div{border-radius:8px}
+  .colloc b{color:var(--accent2)}
+  .opt.sel{background:var(--accent2);border-color:var(--accent2)}
+  .chip{box-shadow:0 3px 0 var(--accent2)}
+  .photo{border-radius:8px;border:2px solid var(--ink)}
+  .photo figcaption{background:linear-gradient(transparent,rgba(34,34,59,.88))}
+  .drill{background:var(--ink)}
+  .drill .dtop,.drill .dprompt small{color:#C8C8DC}
+  .drill .timer,.drill .done b{color:var(--sand)}
+  .page-foot{color:var(--muted)} .page-foot .btn{color:var(--ink);border-color:var(--ink)} .page-foot a{color:var(--muted)}
+  /* store guide (reading) */
+  .guide{border:2px solid var(--ink);border-radius:8px;overflow:hidden;margin:10px 0 16px;background:#fff;font-size:15px}
+  .guide .gh{background:var(--ink);color:#fff;font:400 18px var(--head);padding:10px 14px;letter-spacing:.02em}
+  .guide .gh small{display:block;font:400 12.5px var(--mono);color:var(--sand)}
+  .guide div.fl{display:grid;grid-template-columns:118px 1fr;border-top:1.5px dashed var(--line)}
+  .guide div.fl b{font:700 13px var(--mono);text-transform:uppercase;background:var(--soft);padding:9px 10px}
+  .guide div.fl span{padding:9px 12px}
+  .guide .gf{padding:9px 14px;background:#FFF5CC;font-size:14px;border-top:1.5px dashed var(--line)}
+  .signs{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 12px}
+  .signs span{font:400 15px var(--head);letter-spacing:.04em;border:2.5px solid var(--ink);border-radius:6px;padding:4px 12px;background:#fff}
+  .signs span.r{background:var(--accent);color:#fff;border-color:var(--accent)} .signs span.g{background:var(--accent2);color:#fff;border-color:var(--accent2)}
+  .dlg{margin:6px 0 12px;display:flex;flex-direction:column;gap:6px}
+  .dlg p{margin:0;padding:8px 12px;border-radius:12px;max-width:88%;font-size:15.5px}
+  .dlg p.a{background:var(--soft);align-self:flex-start} .dlg p.c{background:#FFE3EC;align-self:flex-end}
+  .dlg p small{display:block;font:700 11px var(--mono);color:var(--muted);text-transform:uppercase}
+  .qtable{width:100%;border-collapse:collapse;font-size:15px;margin:8px 0 14px}
+  .qtable td,.qtable th{border:1.5px solid var(--line);padding:7px 8px;text-align:left;vertical-align:top}
+  .qtable th{font:700 12px var(--mono);text-transform:uppercase;background:var(--soft)}
+  @media (max-width:520px){.guide div.fl{grid-template-columns:1fr}.guide div.fl b{padding:5px 10px}.qtable{font-size:13.5px}}
+</style>
+</head>
+<body>
+<div class="bubbles" aria-hidden="true"><i style="left:6%;width:2px;height:28px;animation-duration:14s;animation-delay:-3s;--dx:30px"></i><i style="left:14%;width:2px;height:20px;animation-duration:11s;animation-delay:-8s;--dx:-20px"></i><i style="left:27%;width:2px;height:36px;animation-duration:18s;animation-delay:-2s;--dx:40px"></i><i style="left:41%;width:2px;height:24px;animation-duration:13s;animation-delay:-10s;--dx:-30px"></i><i style="left:55%;width:2px;height:18px;animation-duration:9s;animation-delay:-4s;--dx:20px"></i><i style="left:66%;width:2px;height:32px;animation-duration:16s;animation-delay:-12s;--dx:-40px"></i><i style="left:78%;width:2px;height:22px;animation-duration:12s;animation-delay:-6s;--dx:25px"></i><i style="left:88%;width:2px;height:40px;animation-duration:20s;animation-delay:-1s;--dx:-25px"></i><i style="left:94%;width:2px;height:20px;animation-duration:10s;animation-delay:-9s;--dx:15px"></i><i style="left:35%;width:2px;height:26px;animation-duration:15s;animation-delay:-14s;--dx:35px"></i></div>
+
+<div class="wrap">
+  <header class="hero">
+    <div class="sticker s1" id="sticker1" aria-hidden="true"></div>
+    <div class="sticker s2" id="sticker2" aria-hidden="true"></div>
+    <span class="kicker" id="kicker"></span>
+    <h1 id="title"></h1>
+    <p class="sub" id="sub"></p>
+  </header>
+
+  <div class="progress" aria-live="polite">
+    <span class="lbl">score</span><span><b id="pScore">0</b>/<b id="pTotal">0</b></span>
+    <div class="bar"><i id="pBar"></i></div>
+    <span class="fx" title="Mistakes you fixed yourself"><img src="assets/emoji/star.png" alt=""> <b id="pFix">0</b></span>
+  </div>
+
+  <main id="lesson"></main>
+
+  <footer class="page-foot">
+    <button class="btn btn-soft" id="resetAll" type="button">↺ Reset all answers</button>
+    <div>Your answers are saved on this device.</div>
+    <small>Emoji: Microsoft Fluent Emoji (MIT license). Photos: Wikimedia Commons — credits under each photo.</small>
+  </footer>
+</div>
+
+<script>
+/* =====================================================================
+   LESSON CONTENT — edit this object to make a new lesson
+   ---------------------------------------------------------------------
+   build:   { who, freq, does, what, where, when, wrong }  (wrong = extra wrong chip)
+   gapfill: items as "text [[answer // hint]]" or { text, why }
+   tf2:     { q, answer: true/false, fix: [options], fixAnswer }
+   ===================================================================== */
+const IMG = f => "assets/img/" + f;
+const LESSON = {
+  id: "can-i-help-you-egiu7-44-evuel19-us",
+  kicker: "shopping · do / does questions",
+  titleHTML: 'Can I <em>help</em> you?',
+  title: "Can I help you?",
+  subtitle: "Stores, salespeople — and how to ask questions with do and does.",
+  stickers: ["bags", "receipt"],
+  confetti: ["bags", "coin", "gift", "check", "label"],
+
+  sections: [
+
+    /* ================= 1 · WARM-UP ================= */
+    { type: "part", n: "01", icon: "shop", title: "Warm-up", text: "Where are we?" },
+
+    {
+      type: "rule", label: "warm-up · look and talk", sticker: "cart",
+      title: "What store is it?",
+      html: `
+        <div class="photos">
+          <figure class="photo"><img loading="lazy" alt="A bakery on a town square" src="${IMG("bakery.jpg")}"><figcaption><b>A</b><small>Photo: Johann Jaritz · CC BY-SA 4.0 · Wikimedia Commons</small></figcaption></figure>
+          <figure class="photo"><img loading="lazy" alt="A small butcher shop with a bike outside" src="${IMG("butcher.jpg")}"><figcaption><b>B</b><small>Photo: Wilfredor · CC BY-SA 4.0 · Wikimedia Commons</small></figcaption></figure>
+          <figure class="photo"><img loading="lazy" alt="A very big bookstore with several floors" src="${IMG("bookshop.jpg")}"><figcaption><b>C</b><small>Photo: Wilfredor · CC0 · Wikimedia Commons</small></figcaption></figure>
+          <figure class="photo"><img loading="lazy" alt="Shelves of medicine boxes in a pharmacy" src="${IMG("chemist.jpg")}"><figcaption><b>D</b><small>Photo: Wilfredor · CC BY-SA 4.0 · Wikimedia Commons</small></figcaption></figure>
+        </div>
+        <ol class="qs">
+          <li>What store is it — A, B, C, D? What do people buy there?</li>
+          <li>Do you often go to a store like this? When did you last go?</li>
+          <li>Where does your family buy bread — at a bakery or at a grocery store?</li>
+          <li>Photo C: how many floors does the store have? Do you prefer big stores or small stores?</li>
+        </ol>`
+    },
+
+    /* ================= 2 · WORDS ================= */
+    { type: "part", n: "02", icon: "store", title: "Stores & shopping", text: "Vocabulary in Use Elementary · Unit 19 — in American English" },
+
+    {
+      type: "rule", label: "vocabulary · stores", sticker: "bread",
+      title: "What can you buy there?",
+      html: `
+        <div class="colloc">
+          <div><b>a butcher shop</b> — meat, sausages, chicken</div>
+          <div><b>a bakery</b> — bread, cakes, cookies</div>
+          <div><b>a pharmacy / a drugstore</b> — medicine, aspirin, toothpaste, shampoo</div>
+          <div><b>a newsstand</b> — newspapers, magazines, candy</div>
+          <div><b>a post office</b> — stamps; you mail letters and packages</div>
+          <div><b>a bookstore</b> — books, maps, dictionaries</div>
+          <div><b>a gift shop</b> — presents and souvenirs</div>
+          <div><b>a grocery store / a supermarket</b> — food, drinks and things for the house</div>
+          <div><b>a department store</b> — a big store with many floors: clothes, furniture, cosmetics, toys…</div>
+        </div>
+        <div class="note">🇺🇸 Your book is British. We use American English: <b>store</b> (UK shop) · <b>pharmacy</b> (UK chemist’s) · <b>bakery</b> (UK baker’s) · <b>bookstore</b> (UK bookshop) · <b>mail</b> a <b>package</b> (UK post a parcel).</div>
+        <h3>In a department store</h3>
+        <div class="colloc">
+          <div><b>the first floor</b> — the floor at street level 🇺🇸 (UK: ground floor)</div>
+          <div><b>the second / third floor</b> — above it</div>
+          <div><b>the lower level / the basement</b> — under the first floor</div>
+          <div><b>the checkout / the register</b> — the place where you pay · the <b>cashier</b> takes your money</div>
+          <div><b>the fitting room</b> — where you try clothes on</div>
+        </div>
+        <div class="signs"><span class="g">OPEN</span><span class="r">CLOSED</span><span>PUSH</span><span>PULL</span><span>CHECKOUT</span></div>
+        <h3>Salesperson ↔ customer</h3>
+        <div class="dlg">
+          <p class="a"><small>salesperson</small>Can I help you?</p>
+          <p class="c"><small>customer</small>Yes. Can I try this shirt on?</p>
+          <p class="c"><small>customer</small>Do you have this in a bigger / smaller size? · in a different color?</p>
+          <p class="c"><small>customer</small>How much is it? / How much does it cost?</p>
+          <p class="a"><small>salesperson</small>It’s $24. How would you like to pay?</p>
+          <p class="c"><small>customer</small>Can I pay with a credit card / debit card? · Can I pay in cash?</p>
+          <p class="a"><small>salesperson</small>Here’s your change and your receipt. Do you need a bag?</p>
+        </div>
+        <div class="colloc">
+          <div><b>cash</b> = bills and coins · a <b>bill</b> ($10) 🇺🇸 (UK note) · a <b>coin</b> (25¢)</div>
+          <div><b>change</b> = the money you get back</div>
+          <div><b>a receipt</b> = the paper that shows what you paid</div>
+          <div><b>a (shopping) bag</b> = a plastic or paper bag for your things</div>
+        </div>`
+    },
+
+    {
+      type: "gapfill", label: "vocabulary · which store?", sticker: "store",
+      title: "Where do you go?",
+      instructions: "Write the store. Use American English.",
+      items: [
+        { text: "I need some bread and two cakes. Let’s go to the [[bakery]].", why: "bread and cakes → the bakery." },
+        { text: "Mom wants some sausages and a chicken from the [[butcher shop|butcher|butcher’s|butchers]].", why: "meat → the butcher shop." },
+        { text: "I have a headache. Can you get me some aspirin at the [[pharmacy|drugstore]]?", why: "medicine → the pharmacy / drugstore." },
+        { text: "Dad buys a newspaper and a magazine at the [[newsstand]] every morning.", why: "newspapers, magazines → the newsstand." },
+        { text: "I want to mail this package to my aunt. Where’s the [[post office]]?", why: "letters, packages, stamps → the post office." },
+        { text: "We need a new English dictionary. Is there a [[bookstore]] near here?", why: "books, maps, dictionaries → a bookstore." },
+        { text: "Tourists buy souvenirs and presents in a [[gift shop]].", why: "presents and souvenirs → a gift shop." },
+        { text: "You can buy furniture, clothes and toys in one building — in a [[department store]].", why: "a big store with many floors → a department store." },
+        { text: "I go to the [[grocery store|supermarket]] on Saturdays for milk, pasta and dish soap.", why: "food and things for the house → a grocery store / supermarket." },
+        { text: "You pay for your things at the [[checkout|register]].", why: "the checkout / register = where you pay." }
+      ]
+    },
+
+    {
+      type: "dragwords", label: "vocabulary · in the store", sticker: "tshirt",
+      title: "At the clothing store",
+      instructions: "Put the words in the gaps. <b>Two words are extra.</b>",
+      extra: ["check", "basement"],
+      items: [
+        "SALESPERSON: Good morning. Can I [[help]] you?",
+        "MASHA: Yes, please. Can I [[try]] this jacket on?",
+        "MASHA: Hmm, it’s too small. Do you have it in a bigger [[size]]?",
+        "MASHA: Great. And do you have it in a different [[color]]? I don’t like gray.",
+        "MASHA: I like the blue one. How much does it [[cost]]?",
+        "SALESPERSON: It’s $35. You can pay at the [[register]] over there.",
+        "MASHA: Can I pay with a credit [[card]]?",
+        "CASHIER: Sorry, the card machine doesn’t work today. Can you pay in [[cash]]?",
+        "CASHIER: OK, here’s your [[change]] — $5 — and your receipt.",
+        "CASHIER: Do you need a [[bag]]? — No, thanks. I have one."
+      ]
+    },
+
+    {
+      type: "tf2", label: "reading · store directory", sticker: "label",
+      title: "Brownsfield department store",
+      instructions: "Read the store directory. True or false? If it’s false, choose the correct sentence.",
+      text: `<div class="guide">
+          <div class="gh">BROWNSFIELD<small>store directory · open 9 a.m.–8 p.m., Sunday 10 a.m.–5 p.m.</small></div>
+          <div class="fl"><b>5th floor</b><span>café · restrooms · customer service</span></div>
+          <div class="fl"><b>4th floor</b><span>toys · books · gift shop</span></div>
+          <div class="fl"><b>3rd floor</b><span>men’s clothing · sportswear and sneakers</span></div>
+          <div class="fl"><b>2nd floor</b><span>women’s clothing · kids’ clothing · shoes</span></div>
+          <div class="fl"><b>1st floor</b><span>cosmetics · pharmacy · newsstand · main checkouts</span></div>
+          <div class="fl"><b>lower level</b><span>grocery store · kitchenware · post office</span></div>
+          <div class="gf">You can pay in cash or with a credit or debit card. Keep your receipt: you can return things within 30 days. Paper bags cost 10¢.</div>
+        </div>`,
+      items: [
+        { q: "The store opens later on Sundays.", answer: true, fix: [], fixAnswer: 0 },
+        { q: "You can buy a magazine on the first floor.", answer: true, fix: [], fixAnswer: 0 },
+        { q: "The post office is on the fifth floor.", answer: false, fix: ["It’s on the first floor.", "It’s on the lower level.", "There isn’t a post office."], fixAnswer: 1 },
+        { q: "Women’s clothing is on the third floor.", answer: false, fix: ["It’s on the second floor.", "It’s on the lower level.", "It’s on the fourth floor."], fixAnswer: 0 },
+        { q: "If you want a present, you go to the fourth floor.", answer: true, fix: [], fixAnswer: 0 },
+        { q: "Sneakers are on the second floor.", answer: false, fix: ["They’re on the first floor.", "They’re on the third floor.", "The store doesn’t sell them."], fixAnswer: 1 },
+        { q: "You can get aspirin in this store.", answer: true, fix: [], fixAnswer: 0 },
+        { q: "The store only takes cash.", answer: false, fix: ["It only takes credit cards.", "You can pay in cash or with a card.", "You pay by check."], fixAnswer: 1 },
+        { q: "Bags are free.", answer: false, fix: ["Paper bags cost 10¢.", "They cost $2.", "There are no bags."], fixAnswer: 0 },
+        { q: "You need your receipt if you want to return something.", answer: true, fix: [], fixAnswer: 0 }
+      ]
+    },
+
+    /* ================= 3 · GRAMMAR ================= */
+    { type: "part", n: "03", icon: "question", title: "Questions", text: "Essential Grammar in Use · Units 7 and 44" },
+
+    {
+      type: "rule", label: "grammar · do / does questions", sticker: "question",
+      title: "One extra card in front",
+      html: `
+        <p>A sentence has <b>no helper</b>. A question takes <b>one extra card</b> — the helper — and puts it <b>in front of the subject</b>.</p>
+        <div class="legend">
+          <div class="lg c-who"><b>Who?</b><span>She</span></div>
+          <div class="lg c-does"><b>Does what?</b><span>works</span></div>
+          <div class="lg c-where"><b>Where?</b><span>at a bookstore.</span></div>
+        </div>
+        <div class="arrow">↓ question: add the helper in front — the verb loses its -s</div>
+        <div class="legend">
+          <div class="lg c-aux"><b>Helper</b><span>Does</span></div>
+          <div class="lg c-who"><b>Who?</b><span>she</span></div>
+          <div class="lg c-does"><b>Does what?</b><span>work</span></div>
+          <div class="lg c-where"><b>Where?</b><span>at a bookstore?</span></div>
+        </div>
+        <table class="qtable">
+          <tr><th>helper</th><th>subject</th><th>verb (no -s!)</th><th></th></tr>
+          <tr><td><b>Do</b></td><td>I / you / we / they</td><td>work?</td><td>Do you like shopping?</td></tr>
+          <tr><td><b>Does</b></td><td>he / she / it</td><td>work?</td><td>Does she work here?</td></tr>
+        </table>
+        <div class="note">⚠️ The <b>-s</b> moves to the helper: <s>Does she works?</s> → <b>Does she work?</b> · <s>Do he like?</s> → <b>Does he like?</b></div>
+        <h3>Question word + helper</h3>
+        <div class="legend">
+          <div class="lg c-qw"><b>Question word</b><span>Where</span></div>
+          <div class="lg c-aux"><b>Helper</b><span>does</span></div>
+          <div class="lg c-who"><b>Who?</b><span>your mom</span></div>
+          <div class="lg c-does"><b>Does what?</b><span>buy</span></div>
+          <div class="lg c-what"><b>What?</b><span>bread?</span></div>
+        </div>
+        <div class="colloc">
+          <div><b>What do you do?</b> = What’s your job?</div>
+          <div><b>How often do you</b> go shopping?</div>
+          <div><b>How much does</b> it cost?</div>
+          <div><b>What time does</b> the store open?</div>
+        </div>
+        <h3>Short answers</h3>
+        <div class="colloc">
+          <div>Do you like it? — Yes, I <b>do</b>. / No, I <b>don’t</b>.</div>
+          <div>Does she work here? — Yes, she <b>does</b>. / No, she <b>doesn’t</b>.</div>
+        </div>
+        <h3>Which helper? The first verb decides (Unit 44)</h3>
+        <div class="rcard">
+          <div><b>be</b><span>She <u>is</u> tired. → <b>Is</b> she tired? · They <u>are</u> at home. → <b>Are</b> they at home?</span></div>
+          <div><b>can</b><span>I <u>can</u> pay with a card. → <b>Can</b> I pay with a card?</span></div>
+          <div><b>have</b><span>You have a bag. → <b>Do</b> you have a bag? 🇺🇸 <i>(UK: Have you got…?)</i></span></div>
+          <div><b>present</b><span>He works here. → <b>Does</b> he work here?</span></div>
+          <div><b>past</b><span>You bought it. → <b>Did</b> you buy it?</span></div>
+        </div>
+        <div class="note">⚠️ Never two helpers: <s>Do you are…?</s> <s>Does she can…?</s> <s>Is she work…?</s> · Negative questions: <b>Why don’t you</b> pay with a card? · <b>Why isn’t</b> the store open?</div>`
+    },
+
+    {
+      type: "build", label: "grammar · build the question", sticker: "shop",
+      title: "Put the helper in front",
+      instructions: "Tap a card, then tap a slot. <b>One card is wrong</b> — leave it out.",
+      items: [
+        { aux: "Do", who: "you", does: "like", wrong: "likes", what: "shopping", end: "?" },
+        { aux: "Does", who: "your mom", does: "buy", wrong: "buys", what: "bread", where: "at the bakery", end: "?" },
+        { aux: "Does", who: "the store", does: "open", wrong: "opens", when: "on Sundays", end: "?" },
+        { qw: "Where", aux: "do", who: "you", does: "buy", what: "your clothes", wrong: "does", end: "?" },
+        { qw: "What time", aux: "does", who: "the grocery store", does: "close", wrong: "closes", end: "?" },
+        { qw: "How often", aux: "do", who: "your parents", does: "go", where: "to the supermarket", wrong: "does", end: "?" },
+        { qw: "How much", aux: "does", who: "this jacket", does: "cost", wrong: "costs", end: "?" },
+        { aux: "Does", who: "your brother", does: "work", where: "at a department store", wrong: "works", end: "?" },
+        { qw: "What", aux: "does", who: "your sister", does: "read", wrong: "reads", when: "in the evening", end: "?" },
+        { aux: "Do", who: "they", does: "sell", what: "stamps", where: "at the pharmacy", wrong: "Does", end: "?" }
+      ]
+    },
+
+    {
+      type: "gapfill", label: "grammar · do / does + short answers", sticker: "receipt",
+      title: "Do or does?",
+      instructions: "Write <b>do, does, don’t</b> or <b>doesn’t</b>.",
+      items: [
+        { text: "“[[Do]] you often go to the bookstore?” “Yes, I [[do]].”", why: "you → do; short answer: Yes, I do." },
+        { text: "“[[Does]] your dad like shopping?” “No, he [[doesn’t|doesnt|does not]]. He hates it.”", why: "he → does; No, he doesn’t." },
+        { text: "What time [[does]] the post office open?", why: "the post office = it → does." },
+        { text: "“[[Do]] your friends buy clothes online?” “Yes, they [[do]].”", why: "your friends = they → do." },
+        { text: "How much [[does]] a stamp cost?", why: "a stamp = it → does." },
+        { text: "“[[Does]] this store sell newspapers?” “No, it [[doesn’t|doesnt|does not]]. Try the newsstand.”", why: "this store = it → does / doesn’t." },
+        { text: "Where [[do]] you and your mom usually buy meat?", why: "you and your mom = plural → do." },
+        { text: "Why [[don’t|dont|do not]] you pay with your phone? It’s faster.", why: "Why don’t you…? = a suggestion." },
+        { text: "“[[Does]] Masha’s sister work at the pharmacy?” “Yes, she [[does]].”", why: "Masha’s sister = she → does." },
+        { text: "How often [[do]] people in your family go to the grocery store?", why: "people → do." }
+      ]
+    },
+
+    {
+      type: "mcq", label: "grammar · which helper? (Unit 44)", sticker: "coin",
+      title: "Look at the first verb",
+      instructions: "Choose the right word to start the question. Look at the verb in the sentence first!",
+      items: [
+        { q: "___ the store open on Sundays? — Yes, from 10 to 5.", options: ["Does", "Is", "Do"], answer: 1 },
+        { q: "___ the store open at 9 on Sundays? — No, at 10.", options: ["Does", "Is", "Are"], answer: 0 },
+        { q: "___ I pay with a debit card, please?", options: ["Do", "Am", "Can"], answer: 2 },
+        { q: "___ you have this T-shirt in a smaller size?", options: ["Do", "Have", "Are"], answer: 0 },
+        { q: "___ you buy anything at the gift shop yesterday?", options: ["Do", "Did", "Were"], answer: 1 },
+        { q: "___ these sneakers on sale? They look cheap.", options: ["Do", "Does", "Are"], answer: 2 },
+        { q: "___ your parents shop at the market or at the grocery store?", options: ["Do", "Are", "Does"], answer: 0 },
+        { q: "Why ___ the checkout open? There’s nobody here!", options: ["doesn’t", "isn’t", "don’t"], answer: 1 },
+        { q: "How much ___ these apples cost?", options: ["is", "does", "do"], answer: 2 },
+        { q: "___ she working at the bakery today?", options: ["Does", "Is", "Do"], answer: 1 }
+      ]
+    },
+
+    {
+      type: "correct", label: "fix it · questions", sticker: "detective",
+      title: "Find and fix the mistake",
+      instructions: "Each question has <b>one</b> mistake. Write the correct question.",
+      items: [
+        { wrong: "Does she works at a grocery store?", answers: ["Does she work at a grocery store?"] },
+        { wrong: "Do your brother like shopping?", answers: ["Does your brother like shopping?"] },
+        { wrong: "Where you buy your sneakers?", answers: ["Where do you buy your sneakers?"] },
+        { wrong: "How much this bag costs?", answers: ["How much does this bag cost?", "How much is this bag?"] },
+        { wrong: "What time the store closes?", answers: ["What time does the store close?"] },
+        { wrong: "Do you are tired after shopping?", answers: ["Are you tired after shopping?"] },
+        { wrong: "Does she can pay in cash?", answers: ["Can she pay in cash?"] }
+      ]
+    },
+
+    {
+      type: "rephrase", label: "grammar · ask about the dark box", sticker: "moneybag",
+      title: "Ask the question",
+      instructions: "Write a question with the word in the dark box. Use <b>do</b> or <b>does</b>.",
+      items: [
+        { prompt: "Masha’s mom works at the pharmacy.", key: "WHERE", answers: ["Where does Masha's mom work?"] },
+        { prompt: "The bookstore closes at 8 o’clock.", key: "WHAT TIME", answers: ["What time does the bookstore close?", "When does the bookstore close?"] },
+        { prompt: "I go to the grocery store twice a week.", key: "HOW OFTEN", answers: ["How often do you go to the grocery store?"] },
+        { prompt: "This dress costs $40.", key: "HOW MUCH", answers: ["How much does this dress cost?", "How much is this dress?"] },
+        { prompt: "My grandparents buy meat at the butcher shop.", key: "WHAT", answers: ["What do your grandparents buy at the butcher shop?"] },
+        { prompt: "She pays with a credit card because it’s easy.", key: "WHY", answers: ["Why does she pay with a credit card?"] }
+      ]
+    },
+
+    /* ================= 4 · AUTOMATICITY ================= */
+    { type: "part", n: "04", icon: "cart", title: "Speed", text: "Make it automatic." },
+
+    {
+      type: "drill", label: "automaticity · speed drill", sticker: "stopwatch",
+      title: "Twelve questions, twice each",
+      instructions: "Write the full question and press <b>Enter</b>. Each one must be right <b>twice</b>. A mistake sends it back.",
+      items: [
+        { cue: "do / does?", prompt: "you / like / shopping", answers: ["Do you like shopping?"] },
+        { cue: "do / does?", prompt: "she / work / here", answers: ["Does she work here?"] },
+        { cue: "do / does?", prompt: "the store / open / on Sundays", answers: ["Does the store open on Sundays?"] },
+        { cue: "where?", prompt: "where / you / buy / bread", answers: ["Where do you buy bread?"] },
+        { cue: "how much?", prompt: "how much / it / cost", answers: ["How much does it cost?"] },
+        { cue: "what time?", prompt: "what time / the bank / close", answers: ["What time does the bank close?"] },
+        { cue: "how often?", prompt: "how often / your mom / go / shopping", answers: ["How often does your mom go shopping?"] },
+        { cue: "can?", prompt: "I / pay / with a card", answers: ["Can I pay with a card?"] },
+        { cue: "do / does?", prompt: "you / have / this / in a bigger size", answers: ["Do you have this in a bigger size?"] },
+        { cue: "be?", prompt: "the pharmacy / open / now", answers: ["Is the pharmacy open now?"] },
+        { cue: "can?", prompt: "I / try / this jacket / on", answers: ["Can I try this jacket on?"] },
+        { cue: "short answer −", prompt: "Does he like it? No, …", answers: ["No, he doesn't.", "No, he doesn’t.", "He doesn't.", "He doesn’t."] }
+      ]
+    },
+
+    /* ================= 5 · WRITING ================= */
+    { type: "part", n: "05", icon: "pencil", title: "Writing", text: "Your own shopping survey." },
+
+    {
+      type: "write", label: "writing · shopping survey", sticker: "notepad",
+      title: "Shopping survey",
+      instructions: "Write <b>6 questions</b> to ask me about shopping. Use <b>do / does</b> and question words. Then I answer, and you ask one more question about my answer.",
+      words: ["bakery", "butcher", "pharmacy", "drugstore", "newsstand", "post office", "bookstore", "gift shop", "grocery store", "supermarket", "department store", "floor", "checkout", "register", "cash", "card", "change", "receipt", "bag", "size", "color", "try on", "cost"],
+      checks: [
+        { label: "6 questions (each ends with ?)", pattern: "\\?", min: 6 },
+        { label: "do / does after a question word — 3 times", pattern: "\\b(where|what|when|how often|how much|why|who|which)\\s+(time\\s+)?(do|does)\\b", min: 3 },
+        { label: "one question with Can / Is / Are", pattern: "(^|[.?!]\\s*)(can|is|are)\\b", min: 1 },
+        { label: "4+ shopping words (they light up above)", words: 4 }
+      ],
+      sample: "Where do you usually buy your clothes? How often do you go to the grocery store? Does your family buy bread at a bakery? How much do you usually spend on a present? Do you pay with a card or in cash? Is there a department store near your home?"
+    },
+
+    /* ================= 6 · SELF-CHECK ================= */
+    { type: "part", n: "06", icon: "star", title: "Self-check", text: "What to look at again." },
+
+    { type: "review", label: "self-check", title: "My mistakes today" }
+  ]
+};
+</script>
+<script>
+/* =====================================================================
+   ENGINE — no need to edit below this line
+   ===================================================================== */
+(function(){
+"use strict";
+
+function h(tag, props){
+  const el = document.createElement(tag);
+  if (props) for (const k in props){
+    const v = props[k];
+    if (v == null || v === false) continue;
+    if (k === "class") el.className = v;
+    else if (k === "html") el.innerHTML = v;
+    else if (k === "style") el.style.cssText = v;
+    else if (k.slice(0,2) === "on") el.addEventListener(k.slice(2), v);
+    else el.setAttribute(k, v === true ? "" : v);
+  }
+  for (let i = 2; i < arguments.length; i++){
+    const kids = [].concat(arguments[i]);
+    for (const kid of kids){
+      if (kid == null || kid === false || kid === "") continue;
+      el.append(kid.nodeType ? kid : document.createTextNode(kid));
+    }
+  }
+  return el;
+}
+function clear(obj){ for (const k of Object.keys(obj)) delete obj[k]; }
+function emo(x){
+  if (!x) return "";
+  if (/^[a-z0-9-]+$/.test(x)) return h("img", { src: "assets/emoji/" + x + ".png", alt: "", draggable: "false" });
+  return document.createTextNode(x);
+}
+function norm(s, dWord){
+  s = String(s || "").toLowerCase().replace(/[’‘`´]/g, "'").replace(/[“”"«»]/g, "");
+  s = s.replace(/\bwon't\b/g, "will not").replace(/\bcan't\b/g, "cannot")
+       .replace(/n't\b/g, " not").replace(/'m\b/g, " am").replace(/'re\b/g, " are")
+       .replace(/'ve\b/g, " have").replace(/'ll\b/g, " will").replace(/'d\b/g, " " + (dWord || "had"));
+  s = s.replace(/[.,!?;:()\[\]–—-]/g, " ").replace(/\s+/g, " ").trim();
+  return s;
+}
+function matches(value, answers){
+  const a = answers.map(x => norm(x)); const v1 = norm(value, "had"), v2 = norm(value, "would");
+  return v1 !== "" && (a.includes(v1) || a.includes(v2));
+}
+function parseGaps(str){
+  const parts = []; const re = /\[\[(.+?)\]\]/g; let last = 0, m;
+  while ((m = re.exec(str))){
+    if (m.index > last) parts.push({ text: str.slice(last, m.index) });
+    const [ans, hint] = m[1].split(" // ");
+    parts.push({ answers: ans.split("|").map(s => s.trim()), hint: hint ? hint.trim() : null });
+    last = re.lastIndex;
+  }
+  if (last < str.length) parts.push({ text: str.slice(last) });
+  return parts;
+}
+function hashStr(s){ let h1 = 1779033703 ^ s.length; for (let i = 0; i < s.length; i++){ h1 = Math.imul(h1 ^ s.charCodeAt(i), 3432918353); h1 = h1 << 13 | h1 >>> 19; } return h1 >>> 0; }
+function shuffle(arr, seedStr){
+  let seed = hashStr(seedStr);
+  const rnd = () => { seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--){ const j = Math.floor(rnd() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
+  if (a.length > 1 && a.every((x, i) => x === arr[i])) a.push(a.shift());
+  return a;
+}
+function fire(el){ el.dispatchEvent(new Event("input", { bubbles: true })); }
+const pad = i => String(i + 1).padStart(2, "0");
+
+/* ---------- storage ---------- */
+const KEY = "lesson:" + LESSON.id;
+let SAVE = {};
+try { SAVE = JSON.parse(localStorage.getItem(KEY) || "{}") || {}; } catch (e) { SAVE = {}; }
+function persist(){ try { localStorage.setItem(KEY, JSON.stringify(SAVE)); } catch (e) {} }
+
+/* ---------- header ---------- */
+const root = document.documentElement;
+for (const k in (LESSON.theme || {})) root.style.setProperty("--" + k, LESSON.theme[k]);
+document.title = LESSON.title;
+document.getElementById("kicker").textContent = LESSON.kicker || "";
+const tEl = document.getElementById("title");
+if (LESSON.titleHTML) tEl.innerHTML = LESSON.titleHTML; else tEl.textContent = LESSON.title;
+document.getElementById("sub").textContent = LESSON.subtitle || "";
+const st = LESSON.stickers || [];
+document.getElementById("sticker1").append(emo(st[0]));
+document.getElementById("sticker2").append(emo(st[1]));
+
+function burst(fromEl){
+  if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const r = fromEl.getBoundingClientRect(); const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+  const set = LESSON.confetti && LESSON.confetti.length ? LESSON.confetti : ["⭐"];
+  for (let i = 0; i < 16; i++){
+    const s = h("span", { class: "confetti" }, emo(set[i % set.length]));
+    document.body.append(s);
+    const dx = (Math.random() - .5) * 360, dy = -60 - Math.random() * 230, rot = (Math.random() - .5) * 540;
+    const anim = s.animate([
+      { transform: `translate(${cx}px, ${cy}px) scale(.5)`, opacity: 1 },
+      { transform: `translate(${cx + dx * .6}px, ${cy + dy}px) rotate(${rot / 2}deg) scale(1.1)`, opacity: 1, offset: .55 },
+      { transform: `translate(${cx + dx}px, ${cy + dy + 170}px) rotate(${rot}deg) scale(.9)`, opacity: 0 }
+    ], { duration: 1150 + Math.random() * 400, easing: "cubic-bezier(.2,.7,.4,1)" });
+    anim.onfinish = () => s.remove();
+  }
+}
+
+/* ---------- drag & drop board (mouse + touch + tap) ---------- */
+function Board(scope, v){
+  const zones = {}, chips = {}; let selected = null;
+  const bank = h("div", { class: "bank" });
+  register(bank, bank, "bank", false);
+  function register(clickEl, dropEl, id, single){
+    clickEl.dataset.zone = id; zones[id] = { el: dropEl, box: clickEl, single };
+    clickEl.addEventListener("click", () => { if (selected) place(selected, id); });
+  }
+  function zoneOf(c){ for (const id in zones){ if (zones[id].el === c.parentElement) return id; } return "bank"; }
+  function unselect(){ if (selected) selected.classList.remove("selected"); selected = null; }
+  function clearMarks(){ scope.querySelectorAll(".ok,.bad").forEach(n => n.classList.remove("ok", "bad")); }
+  function place(c, zid, silent){
+    const z = zones[zid]; if (!z) return;
+    if (z.single) z.el.querySelectorAll(".chip").forEach(o => { if (o !== c) bank.append(o); });
+    z.el.append(c); unselect();
+    if (!silent){ clearMarks(); for (const id in chips){ const zz = zoneOf(chips[id]); if (zz === "bank") delete v[id]; else v[id] = zz; } persist(); fire(scope); }
+  }
+  function tap(c){
+    if (zoneOf(c) !== "bank"){ place(c, "bank"); return; }
+    if (selected === c){ unselect(); return; }
+    unselect(); selected = c; c.classList.add("selected");
+  }
+  function zoneAt(x, y){
+    const el = document.elementFromPoint(x, y); const z = el && el.closest("[data-zone]");
+    return z && scope.contains(z) ? z : null;
+  }
+  let overEl = null;
+  function setOver(z){ if (overEl === z) return; if (overEl) overEl.classList.remove("over"); overEl = z; if (z) z.classList.add("over"); }
+  function chip(id, label, value){
+    const c = h("button", { class: "chip", type: "button", html: label });
+    c.dataset.id = id; c.dataset.value = value; chips[id] = c;
+    let d = null;
+    c.addEventListener("pointerdown", e => {
+      if (e.pointerType === "mouse" && e.button !== 0) return;
+      d = { x: e.clientX, y: e.clientY, moved: false, ghost: null };
+      try { c.setPointerCapture(e.pointerId); } catch (_) {}
+    });
+    c.addEventListener("pointermove", e => {
+      if (!d) return;
+      if (!d.moved && Math.hypot(e.clientX - d.x, e.clientY - d.y) > 6){
+        d.moved = true; unselect();
+        const r = c.getBoundingClientRect(); d.ox = d.x - r.left; d.oy = d.y - r.top;
+        d.ghost = c.cloneNode(true); d.ghost.classList.add("ghost"); d.ghost.classList.remove("ok", "bad");
+        d.ghost.style.width = r.width + "px"; document.body.append(d.ghost); c.classList.add("dragging");
+      }
+      if (d.moved){
+        e.preventDefault();
+        d.ghost.style.left = (e.clientX - d.ox) + "px"; d.ghost.style.top = (e.clientY - d.oy) + "px";
+        setOver(zoneAt(e.clientX, e.clientY));
+      }
+    });
+    const end = e => {
+      if (!d) return; const was = d; d = null;
+      if (!was.moved) return;
+      was.ghost.remove(); c.classList.remove("dragging"); setOver(null); c._suppress = true;
+      if (e.type === "pointerup"){ const z = zoneAt(e.clientX, e.clientY); if (z) place(c, z.dataset.zone); }
+    };
+    c.addEventListener("pointerup", end);
+    c.addEventListener("pointercancel", end);
+    c.addEventListener("click", e => { e.stopPropagation(); if (c._suppress){ c._suppress = false; return; } tap(c); });
+    bank.append(c);
+    return c;
+  }
+  function restore(){ for (const id in v){ if (chips[id] && zones[v[id]]) place(chips[id], v[id], true); } }
+  function resetAll(){ for (const id in chips) bank.append(chips[id]); clear(v); clearMarks(); unselect(); }
+  return { bank, register, chip, place, restore, resetAll, chips, zones, zoneOf };
+}
+
+/* ---------- renderers: check() returns one value per item: true / false / null (not answered) ---------- */
+const RENDER = {};
+const LABEL = { mcq: "multiple choice", match: "match", dragwords: "drag & drop", correct: "correct the mistakes", rephrase: "rewrite", write: "writing", drill: "speed drill", rule: "theory", build: "word order", gapfill: "gap fill", tf2: "true / false", slotwrite: "writing", review: "self-check" };
+const ROLES = [
+  ["qw", "Question word"], ["aux", "Helper"], ["who", "Who?"], ["freq", "How often?"], ["does", "Does what?"], ["what", "What? Whom?"], ["where", "Where?"], ["when", "When?"]
+];
+
+RENDER.rule = (sec, s, body) => { body.append(h("div", { class: "rule", html: sec.html })); return null; };
+
+RENDER.build = (sec, s, body) => {
+  const v = s.v || (s.v = {}); const items = [];
+  sec.items.forEach((it, i) => {
+    const vi = v[i] || (v[i] = {});
+    const wrap = h("div", { class: "bitem" });
+    const state = h("span", { class: "bstate" });
+    wrap.append(h("div", { class: "bhead" }, h("span", { class: "bnum" }, pad(i)), state));
+    const B = Board(wrap, vi);
+    const row = h("div", { class: "brow" }); const slots = [];
+    ROLES.forEach(([role, q]) => {
+      if (it[role] == null) return;
+      const zone = h("div", { class: "bz" });
+      const box = h("div", { class: "bslot c-" + role, role: "button", "aria-label": q }, h("span", { class: "bq" }, q), zone);
+      B.register(box, zone, "z-" + role, true);
+      row.append(box); slots.push({ role, box, zone });
+    });
+    row.append(h("span", { class: "bdot" }, it.end || "."));
+    const chipsData = ROLES.filter(([r]) => it[r] != null).map(([r]) => ({ id: r, label: it[r], value: r }));
+    if (it.wrong) chipsData.push({ id: "x", label: it.wrong, value: "x" });
+    shuffle(chipsData, LESSON.id + sec.title + i).forEach(c => B.chip(c.id, c.label, c.value));
+    wrap.append(B.bank, row); body.append(wrap);
+    B.restore();
+    items.push({ B, slots, state });
+  });
+  return {
+    total: items.length,
+    check(){ return items.map(({ slots, state }) => {
+      let filled = 0, ok = true;
+      slots.forEach(o => {
+        const c = o.zone.querySelector(".chip"); if (c) filled++;
+        const good = !!c && c.dataset.value === o.role;
+        o.box.classList.toggle("ok", good); o.box.classList.toggle("bad", !good);
+        if (!good) ok = false;
+      });
+      if (!filled){ slots.forEach(o => o.box.classList.remove("ok", "bad")); state.textContent = ""; return null; }
+      state.className = "bstate " + (ok ? "ok" : "bad"); state.textContent = ok ? "✓" : "Try again — fix the red slot.";
+      return ok;
+    }); },
+    reveal(){ items.forEach(({ B, slots }) => { B.resetAll(); slots.forEach(o => B.place(B.chips[o.role], "z-" + o.role)); }); },
+    reset(){ items.forEach(({ B, state }) => { B.resetAll(); state.textContent = ""; }); persist(); }
+  };
+};
+
+RENDER.gapfill = (sec, s, body) => {
+  const v = s.v || (s.v = {}); const lines = [];
+  const list = h("ol", { class: "lines" });
+  sec.items.forEach((raw, i) => {
+    const it = typeof raw === "string" ? { text: raw } : raw;
+    const li = h("li", {}); const line = h("div", { class: "line" }); const gaps = [];
+    parseGaps(it.text).forEach((p, j) => {
+      if (p.text != null){ line.append(h("span", { html: p.text })); return; }
+      const key = i + "-" + j;
+      const w = Math.max(5, ...p.answers.map(a => a.length)) + 2;
+      const input = h("input", { class: "gap", type: "text", autocomplete: "off", autocapitalize: "off", autocorrect: "off", spellcheck: "false", "aria-label": p.hint ? "gap: " + p.hint : "gap", style: `width:${w}ch` });
+      input.value = v[key] || "";
+      input.addEventListener("input", () => { v[key] = input.value; persist(); input.classList.remove("ok", "bad"); const y = li.querySelector(".why"); if (y) y.remove(); });
+      input.addEventListener("keydown", e => {
+        if (e.key !== "Enter") return; e.preventDefault();
+        const all = Array.from(body.querySelectorAll("input.gap")); const n = all[all.indexOf(input) + 1];
+        if (n) n.focus(); else input.blur();
+      });
+      const wrap = h("span", { class: "gapwrap" }, input);
+      if (p.hint) wrap.append(h("span", { class: "hint" }, "(" + p.hint + ")"));
+      line.append(wrap); gaps.push({ input, answers: p.answers, wrap });
+    });
+    li.append(line); list.append(li); lines.push({ it, li, gaps });
+  });
+  body.append(list);
+  return {
+    total: lines.length,
+    check(){ return lines.map(({ it, li, gaps }) => {
+      const old = li.querySelector(".why"); if (old) old.remove();
+      if (gaps.every(g => !g.input.value.trim())){ gaps.forEach(g => g.input.classList.remove("ok", "bad")); return null; }
+      let ok = true;
+      gaps.forEach(g => { const good = matches(g.input.value, g.answers); g.input.classList.toggle("ok", good); g.input.classList.toggle("bad", !good); if (!good) ok = false; });
+      if (it.why) li.append(h("span", { class: "why " + (ok ? "ok" : "bad") }, (ok ? "✓ " : "✗ ") + it.why));
+      return ok;
+    }); },
+    reveal(){ lines.forEach(({ gaps }) => gaps.forEach(g => { if (!g.input.classList.contains("ok") && !g.wrap.querySelector(".reveal")) g.wrap.append(h("span", { class: "reveal" }, "→ " + g.answers[0])); })); },
+    reset(){ clear(v); lines.forEach(({ li, gaps }) => { gaps.forEach(g => { g.input.value = ""; g.input.classList.remove("ok", "bad"); }); const y = li.querySelector(".why"); if (y) y.remove(); }); }
+  };
+};
+
+RENDER.tf2 = (sec, s, body) => {
+  const v = s.v || (s.v = {}); const qs = [];
+  body.classList.add("tf2");
+  if (sec.text) body.append(h("div", { class: "story", html: sec.text }));
+  sec.items.forEach((it, i) => {
+    const st = v[i] || (v[i] = {});
+    const q = h("div", { class: "q" });
+    const tfo = h("div", { class: "opts tfo" });
+    const bT = h("button", { class: "opt", type: "button" }, "True");
+    const bF = h("button", { class: "opt", type: "button" }, "False");
+    tfo.append(bT, bF);
+    q.append(h("div", { class: "q-top" }, h("div", { class: "q-text" }, h("span", { class: "q-num" }, pad(i)), h("span", { html: it.q })), tfo));
+    const fixOpts = h("div", { class: "opts" });
+    const fixBtns = it.fix.map((f, j) => { const b = h("button", { class: "opt", type: "button", html: f }); b.addEventListener("click", () => { st.fix = j; persist(); paint(); fire(body); }); fixOpts.append(b); return b; });
+    const fixbox = h("div", { class: "fixbox", hidden: true }, h("div", { class: "fl" }, "Correct it:"), fixOpts);
+    const warn = h("div", { class: "warnline", hidden: true }, "Choose the correct sentence.");
+    q.append(fixbox, warn);
+    bT.addEventListener("click", () => { st.tf = true; delete st.fix; persist(); paint(); fire(body); });
+    bF.addEventListener("click", () => { st.tf = false; persist(); paint(); fire(body); });
+    function paint(){
+      [bT, bF, ...fixBtns].forEach(b => b.classList.remove("ok", "bad", "answer"));
+      bT.classList.toggle("sel", st.tf === true); bF.classList.toggle("sel", st.tf === false);
+      fixbox.hidden = st.tf !== false; warn.hidden = true;
+      fixBtns.forEach((b, j) => b.classList.toggle("sel", st.fix === j));
+    }
+    paint(); body.append(q);
+    qs.push({ it, st, bT, bF, fixBtns, fixbox, warn, paint });
+  });
+  return {
+    total: qs.length,
+    check(){ return qs.map(o => {
+      const { it, st } = o; o.paint();
+      if (st.tf === undefined) return null;
+      const tfOk = st.tf === it.answer;
+      (st.tf ? o.bT : o.bF).classList.add(tfOk ? "ok" : "bad");
+      if (st.tf === false && tfOk){
+        if (st.fix === undefined){ o.warn.hidden = false; return null; }
+        const fixOk = st.fix === it.fixAnswer; o.fixBtns[st.fix].classList.add(fixOk ? "ok" : "bad");
+        return fixOk;
+      }
+      return tfOk;
+    }); },
+    reveal(){ qs.forEach(o => { const { it, st } = o;
+      if (st.tf !== it.answer) (it.answer ? o.bT : o.bF).classList.add("answer");
+      if (!it.answer){ o.fixbox.hidden = false; o.fixBtns[it.fixAnswer].classList.add("answer"); }
+    }); },
+    reset(){ qs.forEach(o => { clear(o.st); o.paint(); }); }
+  };
+};
+
+RENDER.slotwrite = (sec, s, body) => {
+  const v = s.v || (s.v = {}); const rows = [];
+  sec.items.forEach((it, i) => {
+    const input = h("input", { class: "full", type: "text", autocomplete: "off", autocapitalize: "sentences", spellcheck: "true", placeholder: it.who.split(" / ")[0] + " …", "aria-label": "sentence about " + it.who });
+    input.value = v[i] || "";
+    const tags = h("div", { class: "sp-tags" },
+      h("span", { class: "c-who fill" }, "Who? " + it.who),
+      h("span", { class: "c-does" }, "Does what?"), h("span", { class: "c-what" }, "What?"),
+      h("span", { class: "c-where" }, "Where?"), h("span", { class: "c-when" }, "When?"));
+    const row = h("div", { class: "row" }, h("div", { class: "prompt" }, h("span", { class: "num" }, pad(i))), tags, input);
+    row.querySelector(".prompt").append(h("span", {}, ""));
+    input.addEventListener("input", () => { v[i] = input.value; persist(); input.classList.remove("ok", "bad"); const m = row.querySelector(".model"); if (m) m.remove(); });
+    body.append(row); rows.push({ it, input, row });
+  });
+  return {
+    total: rows.length, revealLabel: "👀 Show examples",
+    check(){ return rows.map(r => {
+      const old = r.row.querySelector(".model"); if (old) old.remove();
+      const txt = r.input.value.trim(); if (!txt){ r.input.classList.remove("ok", "bad"); return null; }
+      const words = txt.split(/\s+/).filter(Boolean);
+      const verbOk = /^\s*(\S+\s+){1,3}\w*(s)\b/i.test(txt);
+      const ok = words.length >= 5 && verbOk;
+      r.input.classList.toggle("ok", ok); r.input.classList.toggle("bad", !ok);
+      if (!ok) r.row.append(h("div", { class: "model warn" }, !verbOk ? "Check the verb: he / she / it → -s." : "Add more slots: what? where? when?"));
+      return ok;
+    }); },
+    reveal(){ rows.forEach(r => { const old = r.row.querySelector(".model"); if (old) old.remove(); r.row.append(h("div", { class: "model" }, "Example: " + r.it.sample)); }); },
+    reset(){ clear(v); rows.forEach(r => { r.input.value = ""; r.input.classList.remove("ok", "bad"); }); }
+  };
+};
+
+function similarity(a, b){
+  const A = norm(a).split(" ").filter(Boolean), B = norm(b).split(" ").filter(Boolean);
+  if (!A.length || !B.length) return 0;
+  const pool = B.slice(); let hit = 0;
+  for (const w of A){ const i = pool.indexOf(w); if (i > -1){ hit++; pool.splice(i, 1); } }
+  return hit / Math.max(A.length, B.length);
+}
+
+RENDER.mcq = (sec, s, body) => {
+  const v = s.v || (s.v = {}); const qs = [];
+  sec.items.forEach((it, i) => {
+    const q = h("div", { class: "q" });
+    const text = h("div", { class: "q-text" }, h("span", { class: "q-num" }, pad(i)));
+    it.q.split("___").forEach((part, k) => { if (k) text.append(h("span", { class: "blank" })); text.append(h("span", { html: part })); });
+    const opts = h("div", { class: "opts", role: "radiogroup" });
+    const btns = it.options.map((o, j) => {
+      const b = h("button", { class: "opt", type: "button", role: "radio", html: o });
+      b.addEventListener("click", () => { v[i] = j; persist(); paint(); fire(body); });
+      opts.append(b); return b;
+    });
+    function paint(){ btns.forEach((b, j) => { b.classList.toggle("sel", v[i] === j); b.classList.remove("ok", "bad", "answer"); b.setAttribute("aria-checked", v[i] === j); }); }
+    paint(); q.append(text, opts); body.append(q); qs.push({ it, btns, i, paint });
+  });
+  return {
+    total: qs.length,
+    check(){ return qs.map(({ it, btns, i, paint }) => { paint(); if (v[i] === undefined) return null; const ok = v[i] === it.answer; btns[v[i]].classList.add(ok ? "ok" : "bad"); return ok; }); },
+    reveal(){ qs.forEach(({ it, btns, i }) => { if (v[i] !== it.answer) btns[it.answer].classList.add("answer"); }); },
+    reset(){ clear(v); qs.forEach(({ paint }) => paint()); }
+  };
+};
+
+RENDER.match = (sec, s, body) => {
+  const v = s.v || (s.v = {}); const B = Board(body, v); const rows = [];
+  const grid = h("div", { class: "match" });
+  sec.pairs.forEach((p, i) => {
+    const slot = h("div", { class: "slot", role: "button", "aria-label": "drop zone" });
+    B.register(slot, slot, "m" + i, true);
+    grid.append(h("div", { class: "mrow" }, h("div", { class: "left", "data-n": pad(i), html: p[0] }), slot));
+    rows.push(slot);
+  });
+  shuffle(sec.pairs.map((p, i) => i), LESSON.id + sec.title).forEach(i => B.chip("r" + i, sec.pairs[i][1], String(i)));
+  body.append(B.bank, grid); B.restore();
+  return {
+    total: rows.length,
+    check(){ return rows.map((slot, i) => { const c = slot.querySelector(".chip");
+      if (!c){ slot.classList.remove("ok", "bad"); return null; }
+      const ok = c.dataset.value === String(i); slot.classList.toggle("ok", ok); slot.classList.toggle("bad", !ok); return ok; }); },
+    reveal(){ B.resetAll(); rows.forEach((slot, i) => B.place(B.chips["r" + i], "m" + i)); },
+    reset(){ B.resetAll(); persist(); }
+  };
+};
+
+RENDER.dragwords = (sec, s, body) => {
+  const v = s.v || (s.v = {}); const B = Board(body, v); const slots = []; const words = [];
+  const list = h("ol", { class: "lines" });
+  sec.items.forEach((it, i) => {
+    const line = h("li", { class: "line" });
+    parseGaps(it).forEach((p, j) => {
+      if (p.text != null){ line.append(h("span", { html: p.text })); return; }
+      const slot = h("span", { class: "slot", role: "button", "aria-label": "drop zone" });
+      B.register(slot, slot, "g" + i + "-" + j, true);
+      slots.push({ slot, answers: p.answers }); words.push(p.answers[0]); line.append(slot);
+    });
+    list.append(line);
+  });
+  (sec.extra || []).forEach(w => words.push(w));
+  shuffle(words.map((w, k) => ({ id: "c" + k, w })), LESSON.id + sec.title).forEach(o => B.chip(o.id, o.w, o.w));
+  if (sec.text) body.append(h("div", { class: "story", html: sec.text }));
+  body.append(B.bank, list); B.restore();
+  return {
+    total: slots.length,
+    check(){ return slots.map(o => {
+      const c = o.slot.querySelector(".chip"); if (!c){ o.slot.classList.remove("ok", "bad"); return null; }
+      const ok = matches(c.dataset.value, o.answers); o.slot.classList.toggle("ok", ok); o.slot.classList.toggle("bad", !ok); return ok;
+    }); },
+    reveal(){
+      B.resetAll(); const used = new Set();
+      slots.forEach(o => { const c = Object.values(B.chips).find(ch => !used.has(ch) && matches(ch.dataset.value, o.answers));
+        if (c){ used.add(c); B.place(c, o.slot.dataset.zone); } });
+    },
+    reset(){ B.resetAll(); persist(); }
+  };
+};
+
+RENDER.correct = (sec, s, body) => {
+  const v = s.v || (s.v = {}); const rows = [];
+  sec.items.forEach((it, i) => {
+    const input = h("input", { class: "full", type: "text", autocomplete: "off", autocapitalize: "sentences", spellcheck: "false", "aria-label": "corrected sentence " + (i + 1) });
+    input.value = v[i] != null ? v[i] : it.wrong;
+    input.addEventListener("input", () => { v[i] = input.value; persist(); input.classList.remove("ok", "bad"); });
+    const row = h("div", { class: "row" }, h("div", { class: "row-label" }, h("span", { class: "q-num" }, pad(i)), h("s", {}, it.wrong)), input);
+    body.append(row); rows.push({ it, input, row });
+  });
+  return {
+    total: rows.length,
+    check(){ return rows.map(r => {
+      if (norm(r.input.value) === norm(r.it.wrong) || !r.input.value.trim()){ r.input.classList.remove("ok", "bad"); return null; }
+      const ok = matches(r.input.value, r.it.answers); r.input.classList.toggle("ok", ok); r.input.classList.toggle("bad", !ok); return ok; }); },
+    reveal(){ rows.forEach(r => { if (!r.input.classList.contains("ok") && !r.row.querySelector(".model")) r.row.append(h("div", { class: "model" }, "✓ " + r.it.answers[0])); }); },
+    reset(){ clear(v); rows.forEach(r => { r.input.value = r.it.wrong; r.input.classList.remove("ok", "bad"); }); }
+  };
+};
+
+RENDER.rephrase = (sec, s, body) => {
+  const v = s.v || (s.v = {}); const rows = [];
+  sec.items.forEach((it, i) => {
+    const input = h("input", { class: "full", type: "text", autocomplete: "off", autocapitalize: "sentences", spellcheck: "false", placeholder: "Type the full sentence…", "aria-label": "answer " + (i + 1) });
+    input.value = v[i] || "";
+    const prompt = h("div", { class: "prompt" }, h("span", { class: "num" }, pad(i)), h("span", { html: it.prompt }));
+    if (it.key) prompt.append(h("span", { class: "key" }, it.key));
+    const row = h("div", { class: "row" }, prompt, input);
+    input.addEventListener("input", () => { v[i] = input.value; persist(); input.classList.remove("ok", "bad", "close"); const m = row.querySelector(".model"); if (m) m.remove(); });
+    body.append(row); rows.push({ it, input, row });
+  });
+  return {
+    total: rows.length,
+    check(){ return rows.map(r => {
+      const old = r.row.querySelector(".model"); if (old) old.remove();
+      r.input.classList.remove("ok", "bad", "close");
+      if (!r.input.value.trim()) return null;
+      if (matches(r.input.value, r.it.answers)){ r.input.classList.add("ok"); return true; }
+      const best = Math.max(...r.it.answers.map(a => similarity(r.input.value, a)));
+      if (best >= .7){ r.input.classList.add("close"); r.row.append(h("div", { class: "model close" }, "Almost! Check the form of the words.")); }
+      else r.input.classList.add("bad");
+      return false;
+    }); },
+    reveal(){ rows.forEach(r => { const old = r.row.querySelector(".model"); if (old) old.remove(); if (!r.input.classList.contains("ok")) r.row.append(h("div", { class: "model" }, "✓ " + r.it.answers[0])); }); },
+    reset(){ clear(v); rows.forEach(r => { r.input.value = ""; r.input.classList.remove("ok", "bad", "close"); }); }
+  };
+};
+
+RENDER.write = (sec, s, body) => {
+  const v = s.v || (s.v = {});
+  let box = null;
+  if (sec.words){ box = h("div", { class: "wordbox" }); sec.words.forEach(w => box.append(h("span", { "data-w": w }, w))); body.append(box); }
+  const ta = h("textarea", { class: "full", rows: 8, spellcheck: "true", placeholder: "Write here…", "aria-label": "your text" });
+  ta.value = v.text || "";
+  const ul = h("ul", { class: "checks" });
+  const lis = (sec.checks || []).map(c => { const li = h("li", {}, c.label); ul.append(li); return { c, li }; });
+  body.append(ta, ul);
+  function usedWords(t){ return (sec.words || []).filter(w => new RegExp("\\b" + w.replace(/\s+/g, "\\s+(?:\\w+\\s+)?"), "i").test(t)); }
+  function run(){ const tx = ta.value.replace(/[’‘]/g, "'");
+    const used = usedWords(tx);
+    if (box) box.querySelectorAll("span").forEach(sp => sp.classList.toggle("used", used.includes(sp.dataset.w)));
+    lis.forEach(({ c, li }) => {
+      let ok = false;
+      if (c.pattern){ const n = (tx.match(new RegExp(c.pattern, "gi")) || []).length; ok = n >= (c.min || 1); }
+      if (c.words) ok = used.length >= c.words;
+      if (c.sentences) ok = tx.split(/[.!?]+|\n+/).filter(x => x.trim().split(/\s+/).length >= 3).length >= c.sentences;
+      li.classList.toggle("done", ok);
+    });
+  }
+  ta.addEventListener("input", () => { v.text = ta.value; persist(); run(); });
+  run();
+  return {
+    total: 0, revealLabel: "👀 See an example", alwaysShow: true,
+    check(){ run(); return []; },
+    reveal(){ if (!body.querySelector(".model")) body.append(h("div", { class: "model" }, "Example: " + sec.sample)); },
+    reset(){ clear(v); ta.value = ""; run(); }
+  };
+};
+
+/* automaticity drill: every item must be typed correctly twice; mistakes come back */
+RENDER.drill = (sec, s, body) => {
+  const items = sec.items; const NEED = sec.need || 2;
+  const box = h("div", { class: "drill" }); body.append(box);
+  let q, hits, cur, t0, tick, mistakes;
+  function fmt(ms){ const t = Math.floor(ms / 1000); return Math.floor(t / 60) + ":" + String(t % 60).padStart(2, "0"); }
+  function intro(){
+    clearInterval(tick); box.innerHTML = "";
+    box.append(h("div", { class: "dtop" }, h("span", {}, items.length + " phrases × " + NEED), h("span", {}, s.best ? "best time " + fmt(s.best) : "no best time yet")));
+    box.append(h("div", { class: "dprompt" }, h("small", {}, "how it works"), "Type each answer fast. Mistakes come back until you get them right twice."));
+    const go = h("button", { class: "start", type: "button" }, "Start the dive ↓"); go.addEventListener("click", start); box.append(go);
+  }
+  function start(){
+    q = shuffle(items.map((_, i) => i), "d" + Date.now()); hits = items.map(() => 0); mistakes = 0; t0 = Date.now();
+    box.innerHTML = "";
+    const dots = h("div", { class: "dots" }, items.map(() => h("i")));
+    const timer = h("span", { class: "timer" }, "0:00");
+    const prompt = h("div", { class: "dprompt" });
+    const input = h("input", { type: "text", autocomplete: "off", autocapitalize: "sentences", spellcheck: "false", "aria-label": "your answer" });
+    const go = h("button", { class: "go", type: "button" }, "↵");
+    const fb = h("div", { class: "dfb" });
+    box.append(h("div", { class: "dtop" }, dots, timer), prompt, h("div", { class: "drow" }, input, go), fb);
+    tick = setInterval(() => { timer.textContent = fmt(Date.now() - t0); }, 250);
+    function paintDots(){ [...dots.children].forEach((d, i) => { d.className = hits[i] >= NEED ? "full" : hits[i] > 0 ? "half" : ""; }); }
+    function next(){
+      if (!q.length){ finish(); return; }
+      cur = q.shift(); const it = items[cur];
+      prompt.innerHTML = ""; prompt.append(h("small", {}, it.cue), h("span", { html: it.prompt }));
+      input.value = ""; input.focus({ preventScroll: true });
+    }
+    function submit(){
+      if (cur == null || !input.value.trim()) return;
+      const it = items[cur]; const ok = matches(input.value, it.answers);
+      box.classList.remove("flash-ok", "flash-bad"); void box.offsetWidth; box.classList.add(ok ? "flash-ok" : "flash-bad");
+      if (ok){ hits[cur]++; fb.className = "dfb ok"; fb.textContent = "✓ " + it.answers[0]; if (hits[cur] < NEED) q.splice(Math.min(q.length, 3 + Math.floor(Math.random() * 3)), 0, cur); }
+      else { mistakes++; hits[cur] = 0; fb.className = "dfb bad"; fb.textContent = "✗ " + it.answers[0]; q.splice(Math.min(q.length, 2), 0, cur); }
+      paintDots(); next();
+    }
+    go.addEventListener("click", submit);
+    input.addEventListener("keydown", e => { if (e.key === "Enter"){ e.preventDefault(); submit(); } });
+    paintDots(); next();
+  }
+  function finish(){
+    clearInterval(tick); const ms = Date.now() - t0; const best = !s.best || ms < s.best;
+    if (best){ s.best = ms; persist(); }
+    box.innerHTML = "";
+    const again = h("button", { class: "start", type: "button" }, "Dive again");
+    again.addEventListener("click", start);
+    box.append(h("div", { class: "done" }, h("small", {}, "your time"), h("b", {}, fmt(ms)),
+      h("div", {}, (best ? "New best time! " : "Best: " + fmt(s.best) + ". ") + (mistakes ? mistakes + " slip" + (mistakes > 1 ? "s" : "") + " on the way." : "No mistakes at all!"))), again);
+    burst(again);
+  }
+  intro();
+  return { noFoot: true, total: 0 };
+};
+
+RENDER.sort = (sec, s, body) => {
+  const v = s.v || (s.v = {}); const B = Board(body, v);
+  const wrap = h("div", { class: "buckets" }); const all = [];
+  sec.categories.forEach((cat, ci) => {
+    const zone = h("div", { class: "bucket-zone" }); B.register(zone, zone, "b" + ci, false);
+    wrap.append(h("div", { class: "bucket" }, h("h3", { html: cat.name }), zone));
+    cat.words.forEach((w, wi) => all.push({ id: "w" + ci + "-" + wi, w, ci }));
+  });
+  shuffle(all, LESSON.id + sec.title).forEach(o => B.chip(o.id, o.w, String(o.ci)));
+  body.append(B.bank, wrap); B.restore();
+  const order = all.map(o => o.id);
+  return {
+    total: all.length,
+    check(){ return order.map(id => { const c = B.chips[id]; const z = B.zoneOf(c);
+      c.classList.remove("ok", "bad"); if (z === "bank") return null;
+      const ok = z === "b" + c.dataset.value; c.classList.add(ok ? "ok" : "bad"); return ok; }); },
+    reveal(){ order.forEach(id => { const c = B.chips[id]; if (B.zoneOf(c) !== "b" + c.dataset.value) B.place(c, "b" + c.dataset.value); }); },
+    reset(){ B.resetAll(); persist(); }
+  };
+};
+LABEL.sort = "sort";
+
+/* ---------- build page ---------- */
+const main = document.getElementById("lesson");
+const graded = []; let reviewBox = null; let n = 0;
+
+LESSON.sections.forEach((sec, idx) => {
+  if (sec.type === "part"){
+    main.append(h("div", { class: "part", style: sec.color ? "--pc:" + sec.color : "" },
+      h("div", { class: "pi" }, emo(sec.icon)),
+      h("div", {}, h("div", { class: "pn" }, "PART " + sec.n), h("h2", {}, sec.title), sec.text ? h("p", {}, sec.text) : null)));
+    return;
+  }
+  const sid = "s" + idx; const s = SAVE[sid] || (SAVE[sid] = {});
+  const exercise = sec.type !== "rule" && sec.type !== "review";
+  const card = h("section", { class: "card", id: sid });
+  card.append(h("div", { class: "winbar", "aria-hidden": "true" }, h("i"), h("i"), h("i"), h("span", {}, sec.label || LABEL[sec.type] || "")));
+  if (sec.sticker) card.append(h("div", { class: "deco", "aria-hidden": "true" }, emo(sec.sticker)));
+  const inner = h("div", { class: "card-in" }); card.append(inner);
+  const num = exercise ? pad(n++) : (sec.type === "review" ? "★" : "i");
+  inner.append(h("div", { class: "card-head" }, h("div", { class: "ticket" + (exercise ? "" : " alt") }, num), h("div", {}, h("h2", { class: "t", html: sec.title || "" }))));
+  if (sec.instructions) inner.append(h("p", { class: "instr", html: sec.instructions }));
+  else inner.append(h("div", { style: "height:14px" }));
+  const body = h("div", { class: "card-body" }); inner.append(body);
+  main.append(card);
+
+  if (sec.type === "review"){ reviewBox = body; return; }
+  const api = RENDER[sec.type] ? RENDER[sec.type](sec, s, body) : null;
+  if (!api || api.noFoot) return;
+
+  const score = h("span", { class: "score" });
+  const btnCheck = h("button", { class: "btn btn-check", type: "button" }, "Check");
+  const btnShow = h("button", { class: "btn btn-soft", type: "button", hidden: !api.alwaysShow }, api.revealLabel || "👀 Show answers");
+  const btnReset = h("button", { class: "btn", type: "button" }, "Reset");
+  inner.append(h("div", { class: "card-foot" }, btnCheck, btnShow, btnReset, score));
+  const g = { sec, s, api, card, num, title: sec.title };
+  graded.push(g);
+
+  function showScore(){
+    if (s.score == null || !api.total){ score.textContent = ""; score.classList.remove("perfect"); return; }
+    score.textContent = s.score + "/" + api.total + (s.score === api.total ? " ✓" : "");
+    score.classList.toggle("perfect", s.score === api.total);
+  }
+  function doCheck(silent){
+    const res = api.check(); const sc = res.filter(x => x === true).length;
+    s.score = sc; s.checked = true;
+    if (!silent){
+      s.tries = (s.tries || 0) + 1;
+      s.first = s.first || [];
+      s.fixed = s.fixed || [];
+      res.forEach((r, i) => {
+        if (s.first[i] == null){ if (r !== null) s.first[i] = r; }
+        else if (s.first[i] === false && r === true && !s.revealed) s.fixed[i] = true;
+      });
+    }
+    btnShow.hidden = !api.alwaysShow && !((s.tries || 0) >= 2 && sc < api.total);
+    persist(); showScore(); updateAll();
+    if (!silent && api.total && sc === api.total){ burst(btnCheck); btnCheck.classList.remove("wiggle"); void btnCheck.offsetWidth; btnCheck.classList.add("wiggle"); }
+  }
+  g.doCheck = doCheck;
+  btnCheck.addEventListener("click", () => doCheck(false));
+  btnShow.addEventListener("click", () => { s.revealed = true; persist(); api.reveal(); updateAll(); });
+  btnReset.addEventListener("click", () => {
+    api.reset(); body.querySelectorAll(".reveal,.model,.why").forEach(x => x.remove());
+    delete s.score; delete s.checked; persist(); btnShow.hidden = !api.alwaysShow; showScore(); updateAll();
+  });
+  body.addEventListener("input", () => { if (s.score != null){ delete s.score; delete s.checked; persist(); showScore(); updateAll(); } });
+  if (s.checked) doCheck(true);
+});
+
+/* ---------- progress + self-check ---------- */
+function updateAll(){
+  let sc = 0, tot = 0, fixed = 0;
+  graded.forEach(({ s, api }) => { tot += api.total; if (s.score != null) sc += s.score; (s.fixed || []).forEach(f => { if (f) fixed++; }); });
+  document.getElementById("pScore").textContent = sc;
+  document.getElementById("pTotal").textContent = tot;
+  document.getElementById("pBar").style.width = tot ? (sc / tot * 100) + "%" : "0";
+  document.getElementById("pFix").textContent = fixed;
+  if (!reviewBox) return;
+  reviewBox.innerHTML = "";
+  reviewBox.append(h("div", { class: "fixcount" }, emo("star"),
+    h("div", {}, h("div", { class: "big" }, "+" + fixed), h("div", { class: "lbl" }, "mistakes you fixed yourself"))));
+  const list = h("div", { class: "rv-list" }); let any = false, checkedAny = false;
+  graded.forEach(g => {
+    const first = g.s.first || []; if (first.length) checkedAny = true;
+    const wrong = [], done = [];
+    first.forEach((f, i) => { if (f === false){ (g.s.fixed && g.s.fixed[i] ? done : wrong).push(i + 1); } });
+    if (!wrong.length && !done.length) return;
+    any = true;
+    const btn = h("button", { class: "btn", type: "button" }, wrong.length ? "Fix →" : "See →");
+    btn.addEventListener("click", () => { g.card.scrollIntoView({ behavior: "smooth", block: "start" }); g.card.classList.remove("flash"); void g.card.offsetWidth; g.card.classList.add("flash"); });
+    list.append(h("div", { class: "rv-item" + (wrong.length ? "" : " done") },
+      h("div", {}, h("div", { class: "rv-t" }, g.num + " · " + g.title.replace(/<[^>]+>/g, "")),
+        h("div", { class: "rv-n" }, wrong.length ? "to fix: " + wrong.join(", ") + (g.s.revealed ? " (answers shown)" : "") : "all fixed ✓")),
+      btn));
+  });
+  if (!any) list.append(h("div", { class: "rv-empty" }, checkedAny ? "No mistakes — wow! 🎉" : "Check some exercises first. Your mistakes will appear here."));
+  reviewBox.append(list);
+}
+updateAll();
+
+document.getElementById("resetAll").addEventListener("click", () => {
+  if (!confirm("Clear all your answers in this lesson?")) return;
+  SAVE = {}; try { localStorage.removeItem(KEY); } catch (e) {}
+  location.reload();
+});
+})();
+</script>
+</body>
+</html>
