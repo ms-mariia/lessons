@@ -1,0 +1,1580 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Podium</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Teko:wght@400;500;600&family=Manrope:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<!-- LESSON TEMPLATE: edit only the LESSON object. Emoji names → assets/emoji/<name>.png -->
+<style>
+  /* ===== Deep Dive · ocean theme ===== */
+  :root{
+    --surface:#0F6A86; --mid:#0A3556; --abyss:#041325;
+    --paper:#F4FBFA; --ink:#0B2236; --muted:#5A7083; --line:rgba(11,34,54,.14);
+    --accent:#FF6B57; --accent2:#13B5A8; --sand:#F2D49B; --soft:#E1F3F0;
+    --light:#EAF8F6; --lightmuted:#A9C9D2;
+    --ok:#0E9E7A; --ok-bg:#DDF6EE; --bad:#E2483D; --bad-bg:#FDE6E3; --close:#A46B00; --close-bg:#FFF1D2;
+    --head:"Gloock",Georgia,serif; --mono:"Martian Mono",ui-monospace,Menlo,monospace; --body:"Schibsted Grotesk",system-ui,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%;background:var(--abyss)}
+  body{margin:0;color:var(--ink);font:17px/1.6 var(--body);
+    background:linear-gradient(180deg,var(--surface) 0,#0C4C6E 520px,var(--mid) 1400px,#06223B 3200px,var(--abyss) 6000px);min-height:100vh;position:relative;overflow-x:hidden}
+  body::before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.22;mix-blend-mode:screen;
+    background:radial-gradient(ellipse 40px 14px at 20% 10%,#fff 0,transparent 70%),radial-gradient(ellipse 60px 18px at 70% 6%,#fff 0,transparent 70%),radial-gradient(ellipse 30px 10px at 45% 16%,#fff 0,transparent 70%);
+    animation:caustic 9s ease-in-out infinite alternate}
+  @keyframes caustic{to{transform:translate(-30px,12px) scale(1.1)}}
+  .wrap{max-width:820px;margin:0 auto;padding:0 18px;position:relative;z-index:1}
+  button{font:inherit}
+  img.emo{width:1.15em;height:1.15em;vertical-align:-.2em}
+  .bubbles{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+  .bubbles i{position:absolute;bottom:-30px;border:1.5px solid rgba(255,255,255,.45);border-radius:50%;animation:rise linear infinite}
+  @keyframes rise{to{transform:translate(var(--dx,20px),-110vh)}}
+
+  /* hero */
+  .hero{position:relative;padding:52px 0 18px;color:var(--light)}
+  .kicker{display:inline-block;font:500 11.5px/1.5 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--sand);border:1px solid rgba(242,212,155,.5);padding:5px 12px;border-radius:99px;max-width:calc(100% - 90px)}
+  h1{font-family:var(--head);font-weight:400;font-size:clamp(56px,13vw,112px);line-height:.9;margin:16px 0 0;letter-spacing:-.02em;color:#fff}
+  h1 em{font-style:normal;color:var(--sand)}
+  .sub{color:var(--lightmuted);margin:16px 0 0;max-width:46ch;font-size:18px}
+  .depthline{margin-top:20px;display:flex;gap:10px;align-items:center;font:500 11px var(--mono);color:var(--lightmuted);letter-spacing:.08em}
+  .depthline::before{content:"";flex:none;width:46px;height:1px;background:var(--lightmuted)}
+  .sticker{position:absolute;user-select:none;animation:bob 6s ease-in-out infinite;filter:drop-shadow(0 12px 16px rgba(0,0,0,.35))}
+  .sticker img{width:100%;height:100%;display:block}
+  .s1{right:0;top:40px;width:110px;height:110px;rotate:-8deg}
+  .s2{right:110px;top:150px;width:58px;height:58px;rotate:12deg;animation-delay:-3s}
+  @keyframes bob{0%,100%{translate:0 0}50%{translate:0 -10px}}
+
+  /* progress = depth gauge */
+  .progress{position:sticky;top:10px;z-index:30;display:flex;align-items:center;gap:12px;margin:0 -6px;padding:10px 18px;border-radius:99px;font:500 12px var(--mono);color:var(--light);background:rgba(6,34,59,.86);border:1px solid rgba(255,255,255,.16);box-shadow:0 10px 26px rgba(0,0,0,.3);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+  .progress .lbl{color:var(--lightmuted);text-transform:uppercase;letter-spacing:.08em}
+  .bar{flex:1;height:10px;border-radius:99px;overflow:hidden;background:rgba(255,255,255,.12)}
+  .bar i{display:block;height:100%;width:0;border-radius:99px;background:linear-gradient(90deg,var(--accent2),var(--sand),var(--accent));transition:width .6s cubic-bezier(.3,1.4,.5,1)}
+  .progress .fx{display:flex;align-items:center;gap:5px;white-space:nowrap}
+  .progress .fx img{width:18px;height:18px}
+
+  /* parts = depth markers */
+  .part{display:flex;align-items:center;gap:16px;margin:64px 0 8px;color:var(--light)}
+  .part .pi{width:58px;height:58px;flex:none;display:grid;place-items:center;border-radius:50%;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18)}
+  .part .pi img{width:40px;height:40px}
+  .part .pn{font:500 11px var(--mono);letter-spacing:.1em;color:var(--sand)}
+  .part h2{font-family:var(--head);font-weight:400;font-size:36px;line-height:1.05;margin:2px 0 0}
+  .part p{margin:3px 0 0;color:var(--lightmuted);font-size:15.5px}
+
+  /* cards */
+  .card{position:relative;background:var(--paper);border-radius:24px;margin:26px 0;box-shadow:0 18px 40px rgba(0,0,0,.28),0 0 0 1px rgba(255,255,255,.06)}
+  .winbar{display:flex;align-items:center;gap:8px;padding:14px 22px 0}
+  .winbar i{display:none}
+  .winbar span{font:500 10.5px var(--mono);letter-spacing:.12em;color:var(--accent2);text-transform:uppercase}
+  .card-in{padding:8px 24px 20px}
+  .deco{position:absolute;right:18px;top:-28px;width:56px;height:56px;rotate:8deg;user-select:none;filter:drop-shadow(0 8px 10px rgba(0,0,0,.25))}
+  .deco img{width:100%;height:100%}
+  .card-head{display:flex;align-items:center;gap:14px}
+  .ticket{flex:none;width:44px;height:44px;display:grid;place-items:center;border-radius:50%;background:var(--ink);color:#fff;font:500 13px var(--mono);box-shadow:0 0 0 4px var(--paper),0 0 0 6px var(--accent2)}
+  .ticket.alt{background:var(--accent);box-shadow:0 0 0 4px var(--paper),0 0 0 6px var(--sand)}
+  h2.t{font-family:var(--head);font-weight:400;font-size:27px;line-height:1.1;margin:0}
+  .instr{color:var(--muted);margin:10px 0 18px;font-size:15.5px}
+  .instr b{color:var(--ink)}
+  .card-foot{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:18px;padding-top:14px;border-top:1px solid var(--line)}
+  .btn{font-weight:600;font-size:15px;border-radius:99px;padding:9px 20px;cursor:pointer;border:1.5px solid var(--ink);background:transparent;color:var(--ink);transition:transform .12s,background .15s}
+  .btn:hover{transform:translateY(-1px)}
+  .btn:active{transform:translateY(1px)}
+  .btn-check{background:var(--accent);border-color:var(--accent);color:#fff}
+  .btn-soft{background:var(--soft);border-color:transparent}
+  .score{margin-left:auto;font:500 15px var(--mono)}
+  .score.perfect{color:var(--ok)}
+  .wiggle{animation:wiggle .5s}
+  @keyframes wiggle{25%{rotate:-4deg}50%{rotate:4deg}75%{rotate:-2deg}}
+
+  /* theory */
+  .rule p{margin:0 0 12px}
+  .rule h3{font-family:var(--head);font-weight:400;font-size:21px;margin:22px 0 8px}
+  .rule h3:first-child{margin-top:0}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:14px 0}
+  .box{border-radius:16px;padding:12px 14px;background:var(--soft)}
+  .box.pink{background:#FFE9E4}
+  .box.sand{background:#FBF0D9}
+  .box h4{margin:0 0 4px;font:500 10.5px var(--mono);text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}
+  .box p{margin:0;font-size:15.5px}
+  table.form{width:100%;border-collapse:collapse;font-size:15.5px;margin:10px 0 4px}
+  table.form th,table.form td{border-bottom:1px solid var(--line);padding:8px;text-align:left;vertical-align:top}
+  table.form th{font:500 10.5px var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+  .note{margin-top:14px;font-size:15px;background:var(--close-bg);border-radius:14px;padding:10px 14px}
+  .notes-tip{display:flex;gap:10px;align-items:flex-start;margin-top:14px;font-size:15px;background:var(--soft);border-radius:14px;padding:10px 14px}
+  .notes-tip img{width:30px;height:30px;flex:none}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
+  .chips span{font:500 12.5px var(--mono);border:1px solid var(--ink);border-radius:99px;padding:3px 11px;background:#fff}
+  .colloc{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px;margin:10px 0}
+  .colloc div{background:#fff;border:1px solid var(--line);border-radius:12px;padding:8px 12px;font-size:15.5px}
+  .colloc b{color:var(--accent)}
+  .story{font-size:17px;line-height:1.75;background:#fff;border-left:4px solid var(--accent2);border-radius:0 14px 14px 0;padding:14px 18px;margin:8px 0 14px}
+  ol.qs{margin:0 0 6px;padding-left:1.4em}
+  ol.qs li{margin:0 0 6px}
+  details{margin-top:12px;border:1px solid var(--line);border-radius:14px;background:#fff}
+  details summary{cursor:pointer;padding:10px 14px;font-weight:600;list-style:none}
+  details summary::-webkit-details-marker{display:none}
+  details summary::before{content:"▸ ";color:var(--accent)}
+  details[open] summary::before{content:"▾ "}
+  details > div{padding:0 14px 12px}
+  .hl{background:#FFE0D9;border-radius:4px;padding:0 3px;font-weight:600}
+  .hl2{background:#D3F1EC;border-radius:4px;padding:0 3px;font-weight:600}
+  @media (max-width:600px){.grid2{grid-template-columns:1fr}}
+
+  /* photos */
+  .photos{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:6px 0 14px}
+  .photo{margin:0;border-radius:16px;overflow:hidden;background:#0A3556;position:relative}
+  .photo img{display:block;width:100%;height:100%;aspect-ratio:4/3;object-fit:cover}
+  .photo figcaption{position:absolute;left:0;right:0;bottom:0;padding:22px 12px 8px;font-size:13.5px;color:#fff;background:linear-gradient(transparent,rgba(4,19,37,.85))}
+  .photo figcaption small{display:block;font:400 9.5px var(--mono);opacity:.7;margin-top:2px}
+  .photo.wide{grid-column:1/-1}
+  .photo.wide img{aspect-ratio:16/8}
+  @media (max-width:560px){.photos{grid-template-columns:1fr}}
+
+  /* timeline */
+  .tl{position:relative;height:104px;margin:10px 4px 6px}
+  .tl::before{content:"";position:absolute;left:0;right:12px;top:52px;height:2px;background:var(--ink)}
+  .tl::after{content:"";position:absolute;right:0;top:46px;border-left:13px solid var(--ink);border-top:7px solid transparent;border-bottom:7px solid transparent}
+  .tl .now{position:absolute;right:30px;top:44px;width:2px;height:18px;background:var(--muted)}
+  .tl .now::after{content:"now";position:absolute;top:22px;left:50%;translate:-50% 0;font:500 10.5px var(--mono);color:var(--muted)}
+  .tl .pt{position:absolute;left:var(--x);top:42px;width:20px;height:20px;margin-left:-10px;border-radius:50%;background:var(--accent2);box-shadow:0 0 0 3px var(--paper),0 0 0 4.5px var(--ink)}
+  .tl .pt.e{background:var(--accent)}
+  .tl .pt b,.tl .sp b{position:absolute;left:50%;translate:-50% 0;white-space:nowrap;font:500 12px var(--mono);bottom:30px}
+  .tl .pt i,.tl .sp i{position:absolute;left:50%;translate:-50% 0;white-space:nowrap;font:400 11px var(--mono);color:var(--muted);font-style:normal;top:30px}
+  .tl .sp{position:absolute;left:var(--x);width:var(--w);top:46px;height:13px;border-radius:7px;background:repeating-linear-gradient(90deg,var(--accent2) 0 14px,transparent 14px 22px)}
+  .tl .sp b{color:var(--accent2)}
+  .tl .stop{position:absolute;left:var(--x);top:34px;height:36px;border-left:2px dashed var(--accent)}
+  .tl .stop b{position:absolute;top:-18px;left:4px;white-space:nowrap;font:500 11px var(--mono);color:var(--accent)}
+
+  /* inputs: gaps */
+  .lines{margin:0;padding-left:1.7em}
+  .lines li::marker{color:var(--accent2);font:500 12px var(--mono)}
+  .line{margin:0 0 4px;line-height:2.2}
+  .gapwrap{white-space:nowrap}
+  .gap{font:inherit;font-size:16.5px;color:var(--ink);border:0;border-bottom:2px solid var(--accent2);background:var(--soft);border-radius:8px 8px 2px 2px;padding:1px 8px;min-width:5ch;max-width:100%;text-align:center;outline:none;transition:background .15s,box-shadow .15s}
+  .gap:focus{background:#fff;box-shadow:0 0 0 3px rgba(19,181,168,.25)}
+  .hint{color:var(--muted);font:400 .78em var(--mono);margin-left:5px}
+  input.ok,textarea.ok{background:var(--ok-bg);border-color:var(--ok);color:#0b5e49}
+  input.bad{background:var(--bad-bg);border-color:var(--bad);text-decoration:underline wavy var(--bad);text-underline-offset:4px}
+  input.close{background:var(--close-bg);border-color:var(--close)}
+  .reveal{display:inline-block;margin-left:6px;font-size:.84em;font-weight:600;color:#0b5e49;background:var(--ok-bg);padding:0 9px;border-radius:99px;line-height:1.9;white-space:nowrap}
+  .why{display:block;margin:-2px 0 10px;font-size:14.5px;line-height:1.45;border-radius:10px;padding:6px 10px}
+  .why.ok{background:var(--ok-bg);color:#0b5e49}
+  .why.bad{background:var(--bad-bg);color:#8a2b2e}
+
+  /* multiple choice */
+  .q{margin:0 0 18px}
+  .q-text{margin-bottom:8px}
+  .q-num{font:500 12px var(--mono);color:var(--accent2);margin-right:8px}
+  .blank{display:inline-block;width:60px;border-bottom:2px solid var(--muted);margin:0 3px;translate:0 -4px}
+  .opts{display:flex;flex-wrap:wrap;gap:8px}
+  .opt{font-size:15.5px;border:1.5px solid var(--line);background:#fff;color:var(--ink);border-radius:99px;padding:6px 15px;cursor:pointer;transition:transform .12s,background .15s,border-color .15s;text-align:left}
+  .opt:hover{border-color:var(--ink)}
+  .opt.sel{background:var(--ink);border-color:var(--ink);color:#fff}
+  .opt.ok{background:var(--ok);border-color:var(--ok);color:#fff}
+  .opt.bad{background:var(--bad);border-color:var(--bad);color:#fff}
+  .opt.answer{box-shadow:0 0 0 3px var(--ok)}
+  .tf2 .q{padding:12px 0;margin:0;border-bottom:1px solid var(--line)}
+  .tf2 .q-top{display:flex;gap:14px;align-items:center;justify-content:space-between}
+  .tf2 .q-text{margin:0}
+  .tf2 .opts.tfo{flex:none;flex-wrap:nowrap}
+  .fixbox{margin:10px 0 0 30px;padding:10px 12px;border-left:3px solid var(--accent);background:#FFF3EF;border-radius:0 12px 12px 0}
+  .fixbox .fl{font:500 10.5px var(--mono);color:var(--accent);margin-bottom:6px;text-transform:uppercase;letter-spacing:.08em}
+  .fixbox .opts{flex-direction:column;align-items:flex-start}
+  .warnline{font-size:14px;color:#8a2b2e;margin-top:6px}
+  @media (max-width:560px){.tf2 .q-top{flex-direction:column;align-items:flex-start;gap:8px}.fixbox{margin-left:0}}
+
+  /* drag & drop */
+  .bank{display:flex;flex-wrap:wrap;gap:9px;padding:12px;min-height:60px;margin-bottom:18px;border:1.5px dashed rgba(11,34,54,.25);border-radius:16px;background:var(--soft);transition:background .15s}
+  .bank:empty::before{content:"All placed";color:var(--muted);font-size:14px;align-self:center}
+  .bank.over{background:#d0ece7}
+  .chip{font-size:15px;font-weight:600;line-height:1.35;background:#fff;color:var(--ink);border:1.5px solid var(--ink);border-radius:12px;padding:5px 12px;box-shadow:0 3px 0 var(--accent2);cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;text-align:left}
+  .chip.selected{outline:3px solid var(--accent);outline-offset:2px;rotate:-2deg}
+  .chip.dragging{opacity:.28}
+  .chip.ghost{position:fixed;z-index:1000;pointer-events:none;margin:0;rotate:-4deg;scale:1.05;box-shadow:0 10px 18px rgba(0,0,0,.25)}
+  .chip.ok{background:var(--ok-bg);border-color:var(--ok);box-shadow:none}
+  .chip.bad{background:var(--bad-bg);border-color:var(--bad);box-shadow:none}
+  .slot{display:inline-flex;align-items:center;justify-content:center;min-width:110px;min-height:40px;padding:2px;margin:0 4px;vertical-align:middle;border:1.5px dashed rgba(11,34,54,.35);border-radius:12px;cursor:pointer;transition:background .15s,border-color .15s}
+  .slot .chip{box-shadow:none}
+  .slot.over{background:var(--soft);border-color:var(--accent2)}
+  .slot.ok{border-style:solid;border-color:var(--ok);background:var(--ok-bg)}
+  .slot.bad{border-style:solid;border-color:var(--bad);background:var(--bad-bg)}
+  .slot.ok .chip,.slot.bad .chip{background:transparent;border-color:transparent}
+  .match{display:grid;gap:10px}
+  .mrow{display:grid;grid-template-columns:.8fr 1.4fr;gap:10px;align-items:center}
+  .mrow .left{font-weight:600}
+  .mrow .left::before{content:attr(data-n);font:500 12px var(--mono);color:var(--accent2);margin-right:8px}
+  .mrow .slot{display:flex;justify-content:flex-start;width:100%;min-height:46px;margin:0}
+  @media (max-width:560px){.mrow{grid-template-columns:1fr;gap:6px}.mrow+.mrow{margin-top:8px}}
+
+  /* full inputs */
+  .row{margin:0 0 16px}
+  .row-label{font-size:14.5px;color:var(--muted);margin-bottom:5px}
+  .row-label s{text-decoration-color:var(--bad);text-decoration-thickness:2px}
+  .prompt{font-weight:500;margin-bottom:6px}
+  .prompt .num{font:500 12px var(--mono);color:var(--accent2);margin-right:8px}
+  .key{display:inline-block;font:500 11.5px var(--mono);background:var(--ink);color:#fff;border-radius:99px;padding:2px 10px;margin-left:6px}
+  .full{display:block;width:100%;font:inherit;font-size:16.5px;color:var(--ink);padding:10px 14px;border:1.5px solid rgba(11,34,54,.22);border-radius:14px;background:#fff;outline:none;transition:border-color .15s,background .15s}
+  .full:focus{border-color:var(--accent2)}
+  textarea.full{resize:vertical;min-height:160px;line-height:1.55}
+  .model{margin-top:7px;font-size:15px;color:#0b5e49;background:var(--ok-bg);padding:7px 12px;border-radius:12px}
+  .model.close{color:#7a5300;background:var(--close-bg)}
+  .model.warn{color:#8a2b2e;background:var(--bad-bg)}
+  .checks{list-style:none;padding:0;margin:12px 0 0;display:grid;gap:6px;font-size:15px}
+  .checks li::before{content:"○";display:inline-block;width:1.4em;font-weight:800;color:var(--muted)}
+  .checks li.done::before{content:"✓";color:var(--ok)}
+  .checks li.done{color:#0b5e49}
+  .wordbox{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 12px}
+  .wordbox span{font:500 12px var(--mono);background:var(--soft);border-radius:99px;padding:3px 10px}
+  .wordbox span.used{background:var(--ok-bg);color:#0b5e49;text-decoration:line-through}
+
+  /* drill (automaticity) */
+  .drill{background:var(--ink);color:#fff;border-radius:20px;padding:18px;position:relative;overflow:hidden}
+  .drill .dtop{display:flex;justify-content:space-between;align-items:center;gap:10px;font:500 12px var(--mono);color:var(--lightmuted);flex-wrap:wrap}
+  .drill .dots{display:flex;gap:5px;flex-wrap:wrap}
+  .drill .dots i{width:12px;height:12px;border-radius:50%;border:1.5px solid rgba(255,255,255,.4)}
+  .drill .dots i.half{background:linear-gradient(90deg,var(--sand) 50%,transparent 50%);border-color:var(--sand)}
+  .drill .dots i.full{background:var(--accent2);border-color:var(--accent2)}
+  .drill .timer{font:500 22px var(--mono);color:var(--sand)}
+  .drill .dprompt{font-family:var(--head);font-size:clamp(22px,4.6vw,30px);line-height:1.2;margin:22px 0 14px;min-height:2.4em}
+  .drill .dprompt small{display:block;font:400 12px var(--mono);color:var(--lightmuted);margin-bottom:6px;letter-spacing:.06em;text-transform:uppercase}
+  .drill .drow{display:flex;gap:8px}
+  .drill input{flex:1;min-width:0;font:inherit;font-size:18px;padding:12px 14px;border-radius:14px;border:2px solid rgba(255,255,255,.25);background:rgba(255,255,255,.06);color:#fff;outline:none}
+  .drill input:focus{border-color:var(--accent2)}
+  .drill .go{background:var(--accent);border:0;color:#fff;border-radius:14px;padding:0 18px;font-weight:700;cursor:pointer}
+  .drill .dfb{min-height:26px;margin-top:10px;font-size:15px}
+  .drill .dfb.ok{color:#7CF0CF} .drill .dfb.bad{color:#FFB3A8}
+  .drill.flash-ok{box-shadow:inset 0 0 0 3px #7CF0CF}
+  .drill.flash-bad{animation:shake .35s;box-shadow:inset 0 0 0 3px #FFB3A8}
+  .drill .start{display:block;margin:26px auto 8px;background:var(--accent);color:#fff;border:0;border-radius:99px;padding:14px 30px;font-weight:700;font-size:17px;cursor:pointer}
+  .drill .done{text-align:center;padding:16px 0 4px}
+  .drill .done b{display:block;font:500 40px var(--mono);color:var(--sand)}
+  @keyframes shake{25%{translate:-4px 0}50%{translate:4px 0}75%{translate:-2px 0}}
+
+  /* review */
+  .fixcount{display:flex;align-items:center;gap:14px;padding:14px 16px;border-radius:16px;background:#FBF0D9;margin-bottom:14px}
+  .fixcount img{width:54px;height:54px}
+  .fixcount .big{font:500 32px var(--mono);line-height:1}
+  .fixcount .lbl{font-size:14.5px;color:var(--muted)}
+  .rv-list{display:grid;gap:10px}
+  .rv-item{display:flex;align-items:center;gap:12px;justify-content:space-between;border:1px solid var(--line);border-radius:14px;padding:10px 12px;background:#fff}
+  .rv-item .rv-t{font-weight:600}
+  .rv-item .rv-n{font:400 12px var(--mono);color:var(--bad)}
+  .rv-item.done .rv-n{color:var(--ok)}
+  .rv-empty{color:var(--muted);font-size:15px}
+  .flash{animation:flash 1.2s}
+  @keyframes flash{30%{box-shadow:0 0 0 6px var(--sand),0 18px 40px rgba(0,0,0,.28)}}
+
+  .page-foot{text-align:center;padding:30px 0 80px;color:var(--lightmuted);font-size:14px}
+  .page-foot .btn{margin-bottom:14px;color:var(--light);border-color:rgba(255,255,255,.4)}
+  .page-foot small{display:block;margin-top:8px;font-size:11.5px;opacity:.85;line-height:1.5}
+  .page-foot a{color:var(--lightmuted)}
+  .confetti{position:fixed;z-index:999;pointer-events:none;left:0;top:0;width:30px;height:30px}
+  .confetti img{width:100%;height:100%}
+
+  @media (max-width:560px){
+    body{font-size:16.5px}
+    .card-in{padding:6px 16px 16px}
+    .winbar{padding:12px 16px 0}
+    .s1{width:78px;height:78px;top:30px}
+    .s2{display:none}
+    .score{width:100%;margin-left:0;order:-1}
+    .deco{width:46px;height:46px;top:-22px}
+    .gapwrap{white-space:normal}
+    .part h2{font-size:30px}
+  }
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+  /* ---- word-order slots (fixed colours for the whole lesson) ---- */
+  :root{
+    --paper:#FFFFFF; --ink:#14171F; --muted:#5A6070; --line:rgba(20,23,31,.13);
+    --accent:#C8102E; --accent2:#B08D2A; --sand:#E6C25A; --soft:#FBF6E6; --ice:#E9EDF2;
+    --light:#14171F; --lightmuted:#5A6070;
+    --head:"Teko",Impact,sans-serif; --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace; --body:"Manrope",system-ui,sans-serif;
+  }
+  .c-qw{--c:#55627A} .c-aux{--c:#1E9BD7} .c-who{--c:#7A5AF8} .c-does{--c:#FF5A1F}
+  html{background:#F2EFE7}
+  body{background-color:#F2EFE7;background-image:repeating-linear-gradient(90deg,rgba(176,141,42,.07) 0 2px,transparent 2px 120px)}
+  body::before{display:none}
+  .bubbles{display:none}
+  h1{font-family:var(--head);font-weight:600;font-size:clamp(64px,17vw,140px);line-height:.85;text-transform:uppercase;color:var(--ink);letter-spacing:-.02em}
+  h1 em{font-style:normal;color:var(--accent2)}
+  .kicker{color:#fff;background:var(--ink);border-color:var(--ink);font-family:var(--mono)}
+  .sub{color:var(--muted)}
+  .progress{color:var(--ink);background:#fff;border:1.5px solid var(--ink);border-radius:12px}
+  .progress .lbl{color:var(--accent);font-weight:700}
+  .bar{background:#E4EAF1} .bar i{background:linear-gradient(90deg,#B08D2A,#E6C25A,#C0C6CF,#B4703A)}
+  .part .pi{background:#fff;border:1.5px solid var(--ink);border-radius:12px}
+  .part .pn{color:var(--accent2);font-family:var(--mono)} .part h2{font-family:var(--head);font-weight:600;font-size:38px;text-transform:uppercase}
+  .part p{color:var(--muted)}
+  .card{border-radius:14px;box-shadow:0 16px 34px rgba(20,23,31,.12);border-left:6px solid var(--accent2)}
+  .card:nth-of-type(even){border-left-color:var(--accent)}
+  h2.t{font-family:var(--head);font-weight:600;font-size:32px;text-transform:uppercase;letter-spacing:.01em}
+  .winbar span{color:var(--accent);font-weight:700}
+  .ticket{border-radius:10px;background:var(--ink);box-shadow:none;font-family:var(--mono)}
+  .ticket.alt{background:var(--accent)}
+  .opt.sel{background:var(--ink);border-color:var(--ink)}
+  .chip{box-shadow:0 3px 0 var(--accent2)}
+  .photo{border-radius:12px}
+  .photo figcaption{background:linear-gradient(transparent,rgba(20,23,31,.85))}
+  .drill{background:var(--ink)} .drill .dtop,.drill .dprompt small{color:#AFC0D6} .drill .timer,.drill .done b{color:var(--sand)}
+  .page-foot{color:var(--muted)} .page-foot .btn{color:var(--ink);border-color:var(--ink)} .page-foot a{color:var(--muted)}
+  .gauge{position:relative;height:14px;border-radius:7px;background:linear-gradient(90deg,#1E9BD7,#BDE8FA 40%,#FFC23D 70%,#FF5A1F);margin:26px 0 30px}
+  .gauge span{position:absolute;top:-22px;transform:translateX(-50%);font:600 11.5px var(--mono);white-space:nowrap}
+  .gauge span.b{top:18px}
+  .article{background:#fff;border:1.5px solid var(--line);border-radius:12px;padding:14px 16px;margin:6px 0 14px;font-size:15.5px;line-height:1.65}
+  .article h4{margin:0 0 6px;font:600 18px var(--head)}
+  .article p{margin:0 0 10px}
+  .article .tag{display:inline-block;font:600 11px var(--mono);text-transform:uppercase;color:#fff;background:var(--accent2);border-radius:6px;padding:2px 8px;margin-bottom:6px}
+  .buckets{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+  .bucket{border:1.5px solid var(--ink);border-radius:12px;background:#fff;overflow:hidden}
+  .bucket h3{margin:0;padding:8px 12px;font:600 14px var(--head);color:#fff;background:var(--accent2)}
+  .bucket:nth-child(2) h3{background:var(--accent)} .bucket:nth-child(3) h3{background:#7A5AF8}
+  .bucket-zone{min-height:90px;padding:8px;display:flex;flex-wrap:wrap;gap:6px;align-content:flex-start;cursor:pointer}
+  .bucket-zone.over{background:var(--soft)} .bucket .chip{box-shadow:none}
+  .wheel-wrap{display:grid;grid-template-columns:minmax(220px,300px) 1fr;gap:18px;align-items:center}
+  .wheel{position:relative;width:100%;aspect-ratio:1} .wheel-rot{width:100%;height:100%}
+  .wheel-svg{width:100%;height:100%;display:block;filter:drop-shadow(0 10px 18px rgba(20,23,31,.18))}
+  .wheel-pin{position:absolute;left:50%;top:-6px;margin-left:-13px;border-left:13px solid transparent;border-right:13px solid transparent;border-top:24px solid var(--ink);z-index:2}
+  .wheel-side{display:flex;flex-direction:column;gap:12px;align-items:flex-start}
+  .wheel-q{background:var(--soft);border-radius:12px;padding:14px 16px;width:100%;min-height:110px}
+  .wq-n{font:600 11px var(--mono);text-transform:uppercase;color:var(--accent);margin-bottom:6px}
+  .wq{font:500 24px/1.2 var(--head)} .wq b{color:var(--accent)}
+  .wq-tip{color:var(--muted);font-size:14px;margin-top:6px}
+  .wheel-done{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+  .wd{font:500 12.5px var(--mono);background:#fff;border:1.5px solid var(--line);border-radius:999px;padding:3px 10px}
+  .bt{position:fixed;left:12px;bottom:12px;z-index:60;background:#fff;border:1.5px solid var(--ink);border-radius:12px;padding:6px 8px;display:flex;align-items:center;gap:6px;box-shadow:0 6px 16px rgba(20,23,31,.18);
+    background-image:linear-gradient(90deg,rgba(255,90,31,.16) calc(var(--p,0)*100%),transparent 0)}
+  .bt .bt-face{font:600 14px var(--mono);cursor:pointer;border:0;background:none;padding:2px 4px;color:inherit}
+  .bt-presets{display:none;gap:4px} .bt.open .bt-presets{display:flex}
+  .bt button{border:1.5px solid var(--line);background:#fff;border-radius:8px;padding:3px 6px;font:500 11.5px var(--mono);cursor:pointer}
+  .bt.low{border-color:var(--accent)} .bt.low .bt-face{color:var(--accent)}
+  .bt.ring{animation:ring .25s linear 10} @keyframes ring{25%{transform:rotate(-4deg)}75%{transform:rotate(4deg)}}
+  @media (max-width:600px){.wheel-wrap{grid-template-columns:1fr}.wheel{max-width:290px;margin:0 auto}body::before{display:none}}
+  .gauge span:first-child{transform:none} .gauge span:last-child{transform:translateX(-100%)}
+  .video{position:relative;aspect-ratio:16/9;border-radius:12px;overflow:hidden;background:#0E1A2B;margin:8px 0 10px}
+  .video iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+  .yt{display:inline-flex;align-items:center;gap:6px;font:600 14px var(--body);color:var(--ink);border:1.5px solid var(--ink);border-radius:999px;padding:6px 14px;text-decoration:none;margin-bottom:6px}
+  .tfo{margin:6px 0 10px;padding-left:22px}
+  .tfo li{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 0;border-bottom:1px dashed var(--line);font-size:15.5px}
+  .tfo-b{display:flex;gap:6px;flex-shrink:0}
+  .tfo-b .opt{min-width:44px}
+  .podium{display:grid;grid-template-columns:1fr 1fr 1fr;align-items:end;gap:6px;margin:6px 0 14px;text-align:center}
+  .podium div{border-radius:10px 10px 0 0;color:#fff;padding:8px 6px;font:500 20px/1 var(--head);text-transform:uppercase}
+  .podium .g{background:#B08D2A;height:110px} .podium .s{background:#8D96A3;height:80px} .podium .b{background:#A8622F;height:60px}
+  .podium small{display:block;font:500 12px var(--body);text-transform:none;margin-top:6px;line-height:1.3}
+  .tline2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:8px 0 14px}
+  .tline2>div{border-radius:10px;padding:12px 14px} .tline2 .pp{background:var(--soft);border:1.5px solid var(--accent2)} .tline2 .ps{background:#F1F3F6;border:1.5px solid #8D96A3}
+  .tline2 h4{margin:0 0 6px;font:500 24px var(--head);text-transform:uppercase}
+  .tline2 p{margin:0 0 6px;font-size:15px}
+  @media (max-width:560px){.tline2{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="bubbles" aria-hidden="true"><i style="left:6%;width:2px;height:28px;animation-duration:14s;animation-delay:-3s;--dx:30px"></i><i style="left:14%;width:2px;height:20px;animation-duration:11s;animation-delay:-8s;--dx:-20px"></i><i style="left:27%;width:2px;height:36px;animation-duration:18s;animation-delay:-2s;--dx:40px"></i><i style="left:41%;width:2px;height:24px;animation-duration:13s;animation-delay:-10s;--dx:-30px"></i><i style="left:55%;width:2px;height:18px;animation-duration:9s;animation-delay:-4s;--dx:20px"></i><i style="left:66%;width:2px;height:32px;animation-duration:16s;animation-delay:-12s;--dx:-40px"></i><i style="left:78%;width:2px;height:22px;animation-duration:12s;animation-delay:-6s;--dx:25px"></i><i style="left:88%;width:2px;height:40px;animation-duration:20s;animation-delay:-1s;--dx:-25px"></i><i style="left:94%;width:2px;height:20px;animation-duration:10s;animation-delay:-9s;--dx:15px"></i><i style="left:35%;width:2px;height:26px;animation-duration:15s;animation-delay:-14s;--dx:35px"></i></div>
+
+<div class="wrap">
+  <header class="hero">
+    <div class="sticker s1" id="sticker1" aria-hidden="true"></div>
+    <div class="sticker s2" id="sticker2" aria-hidden="true"></div>
+    <span class="kicker" id="kicker"></span>
+    <h1 id="title"></h1>
+    <p class="sub" id="sub"></p>
+  </header>
+
+  <div class="progress" aria-live="polite">
+    <span class="lbl">score</span><span><b id="pScore">0</b>/<b id="pTotal">0</b></span>
+    <div class="bar"><i id="pBar"></i></div>
+    <span class="fx" title="Mistakes you fixed yourself"><img src="assets/emoji/star.png" alt=""> <b id="pFix">0</b></span>
+  </div>
+
+  <main id="lesson"></main>
+
+  <footer class="page-foot">
+    <button class="btn btn-soft" id="resetAll" type="button">↺ Reset all answers</button>
+    <div>Your answers are saved on this device.</div>
+    <small>Emoji: Microsoft Fluent Emoji (MIT licence)</small>
+  </footer>
+</div>
+
+<script>
+/* =====================================================================
+   LESSON CONTENT — edit this object to make a new lesson
+   ---------------------------------------------------------------------
+   build:   { who, freq, does, what, where, when, wrong }  (wrong = extra wrong chip)
+   gapfill: items as "text [[answer // hint]]" or { text, why }
+   tf2:     { q, answer: true/false, fix: [options], fixAnswer }
+   ===================================================================== */
+const IMG = f => "assets/img/" + f;
+const H = v => ` <span class=hint>(${v})</span>`;
+const LESSON = {
+  id: "podium-egu13-14-evu42",
+  kicker: "present perfect or past · competitive sport",
+  titleHTML: '<em>Podium</em>',
+  title: "Podium",
+  subtitle: "Who has won, who won, who lost — and when exactly did it happen?",
+  stickers: ["gold", "ball"],
+  confetti: ["gold", "medal", "star", "sparkles", "check"],
+
+  sections: [
+
+    /* ================= 1 · WARM-UP ================= */
+    { type: "part", n: "01", icon: "medal", title: "Warm-up", text: "Winners and losers." },
+
+    {
+      type: "rule", label: "warm-up · look and talk", sticker: "gold",
+      title: "Have you ever won anything?",
+      html: `
+        <div class="photos">
+          <figure class="photo"><img loading="lazy" alt="A big silver cup with red ribbons in a stadium" src="${IMG("facup.jpg")}"><figcaption><b>A · a cup</b><small>Photo: Carlos yo · CC BY-SA 4.0 · Wikimedia Commons</small></figcaption></figure>
+          <figure class="photo"><img loading="lazy" alt="An old scoreboard above an empty stadium" src="${IMG("scoreboard.jpg")}"><figcaption><b>B · a scoreboard</b><small>Photo: DXR · CC BY-SA 4.0 · Wikimedia Commons</small></figcaption></figure>
+        </div>
+        <ol class="qs">
+          <li>Have you ever taken part in a sports competition? When was it? How did it go?</li>
+          <li>Have you ever won anything — a medal, a prize, a game? What did you win?</li>
+          <li>Have you ever been captain of a team?</li>
+          <li>Have you ever watched a final at a stadium or on TV? Who won?</li>
+        </ol>`
+    },
+
+    /* ================= 2 · VOCABULARY ================= */
+    { type: "part", n: "02", icon: "ball", title: "Competitive sport", text: "Vocabulary in Use Pre-int & Int · Unit 42" },
+
+    {
+      type: "rule", label: "vocabulary · winning and losing", sticker: "ball",
+      title: "Win, beat, lose, draw",
+      html: `
+        <div class="podium"><div class="s">2nd<small>the losers of the final</small></div><div class="g">1st<small>the winners, the champions</small></div><div class="b">3rd<small>third place</small></div></div>
+        <div class="colloc">
+          <div>Spain played Poland. Spain <b>won</b> (the game) 2–0 (“two to nothing”). = Poland <b>lost</b> 2–0.</div>
+          <div>Spain <b>beat</b> Poland 2–0. (not <s>won Poland</s>) · Spain <b>defeated</b> Poland. = Poland <b>were defeated</b> by Spain / <b>lost to</b> Spain.</div>
+          <div>Spain and Italy <b>tied / drew</b> 1–1. = It was <b>a 1–1 tie / draw</b>.</div>
+          <div><b>the score</b> = goals or points during or after a game · <b>the result</b> = only at the end: The score at half-time was 1–0. The final result was 2–0.</div>
+          <div><b>a competition</b> · <b>a tournament</b> (tennis, golf) · <b>a league</b> (every team plays every other team) · <b>a cup</b> · <b>a final</b> · <b>take part in</b> · <b>enter</b> a tournament</div>
+          <div><b>the winner / the loser</b> · <b>the champions</b> · <b>the captain</b> · <b>a victory</b> (≠ a defeat) · <b>break a world record</b> · <b>lead</b>: At half-time, Milan are <b>leading</b> 1–0. · <b>give up</b> = stop doing a sport</div>
+          <div>Very good: <b>superb · incredible · outstanding</b> — Pelé was a superb soccer player.</div>
+        </div>
+        <div class="note">🇺🇸 American English: <b>soccer</b> (UK football) · <b>tie</b> (UK draw) · 2–0 = “two to nothing” (UK “two nil”)</div>`
+    },
+
+    {
+      type: "mcq", label: "vocabulary · choose", sticker: "medal",
+      title: "Pick the right word",
+      instructions: "Choose the word that fits. Watch the grammar after it!",
+      items: [
+        { q: "Croatia ___ Germany 3–2.", options: ["beat", "won", "drew"], answer: 0 },
+        { q: "We ___ the game 4–1.", options: ["beat", "won", "defeated"], answer: 1 },
+        { q: "At half-time, the ___ was 1–0 to Arsenal.", options: ["result", "score", "victory"], answer: 1 },
+        { q: "The French Open is a famous tennis ___.", options: ["league", "tournament", "captain"], answer: 1 },
+        { q: "There are 20 teams in the ___, and each team plays the others twice.", options: ["league", "final", "record"], answer: 0 },
+        { q: "It was a fantastic ___ for the team: they won 5–0!", options: ["defeat", "victory", "loser"], answer: 1 },
+        { q: "She ___ the world record by two seconds.", options: ["broke", "beat", "won"], answer: 0 },
+        { q: "Brazil and Argentina ___ 1–1 last night.", options: ["beat", "tied", "defeated"], answer: 1 },
+        { q: "He ___ tennis in 2020 to study medicine.", options: ["gave up", "took part", "led"], answer: 0 },
+        { q: "Messi was ___ in the final — the best player on the field.", options: ["outstanding", "defeated", "leading"], answer: 0 }
+      ]
+    },
+
+    {
+      type: "gapfill", label: "vocabulary · complete", sticker: "net",
+      title: "Sports desk",
+      instructions: "Complete with one word from the unit.",
+      items: [
+        { text: "It was a good game, but unfortunately we [[lost]] 3–2.", why: "lose → lost." },
+        { text: "The [[score]] at half-time was 2–1, but the final [[result]] was a tie.", why: "score = during the game; result = at the end." },
+        { text: "Holland [[beat|defeated]] England 2–1, so they are in the semi-final.", why: "beat / defeated + the other team." },
+        { text: "Serena Williams has won the Wimbledon [[tournament|championship|title]] seven times.", why: "Wimbledon is a tennis tournament / championship." },
+        { text: "She broke the heptathlon world [[record]] again last night.", why: "break a world record." },
+        { text: "Bradley Wiggins took [[part]] in the Tour de France in 2009 and finished fourth.", why: "take part in." },
+        { text: "I think Djokovic is going to win. He’s [[leading]] 5–2 in the final set.", why: "lead → leading = in front." },
+        { text: "Argentina are playing [[against]] Brazil next week.", why: "play against a team." },
+        { text: "The [[captain]] of the winning team lifted the cup.", why: "captain = leader of a team." },
+        { text: "Germany became World Cup [[champions]] in 2014.", why: "champions = winners of a competition." }
+      ]
+    },
+
+    {
+      type: "match", label: "vocabulary · definitions", sticker: "flag",
+      title: "Match the clue",
+      instructions: "Match each word with its meaning.",
+      pairs: [
+        ["race", "a competition to be the fastest"], ["team", "a group of people who play together"],
+        ["superb", "a synonym for outstanding"], ["give up", "stop doing a regular activity"],
+        ["victory", "when you win a competition"], ["final", "the last game of a competition"],
+        ["loser", "the opposite of winner"], ["tournament", "a type of sports competition (tennis, golf)"],
+        ["lead", "be in front during a game"], ["tie", "the same score for both teams"]
+      ]
+    },
+
+    /* ================= 3 · PERFECT OR PAST 1 ================= */
+    { type: "part", n: "03", icon: "news", title: "News now or story then?", text: "English Grammar in Use · Unit 13" },
+
+    {
+      type: "rule", label: "grammar · present perfect and past 1", sticker: "news",
+      title: "Has lost or lost?",
+      html: `
+        <div class="tline2">
+          <div class="pp"><h4>present perfect</h4>
+            <p>tells us about <b>now</b>: Tom <b>has lost</b> his key. (he doesn’t have it now)</p>
+            <p>new / recent news: Our team <b>has won</b> the cup! · Hannah <b>has had</b> a baby!</p>
+            <p>They<b>’ve gone</b> away. They’ll be back on Friday. (they are away now)</p></div>
+          <div class="ps"><h4>past simple</h4>
+            <p>tells us <b>only about the past</b>: Tom <b>lost</b> his key (but now he has found it).</p>
+            <p>old facts, history: Mozart <b>wrote</b> 600 pieces. Who <b>invented</b> the telephone?</p>
+            <p>It <b>stopped</b> raining for a while, but now it’s raining again.</p></div>
+        </div>
+        <h3>News first — then the details</h3>
+        <div class="colloc">
+          <div>A: Ow! I<b>’ve burnt</b> myself! (news) — B: How <b>did</b> you <b>do</b> that? — A: I <b>picked</b> up a hot dish. (details → past)</div>
+          <div>Real news: Our team <b>has won</b> the league! They <b>beat</b> the champions 2–1 on Saturday and <b>scored</b> in the last minute.</div>
+        </div>`
+    },
+
+    {
+      type: "mcq", label: "grammar · now or then?", sticker: "news",
+      title: "Is it true now?",
+      instructions: "Read the whole line. Does it tell us about now — or only about the past?",
+      items: [
+        { q: "I can’t find my phone. I think I ___ it.", options: ["’ve lost", "lost", "was losing"], answer: 0 },
+        { q: "I ___ my phone last week, but my brother found it in the car.", options: ["’ve lost", "lost", "have been losing"], answer: 1 },
+        { q: "The coach ___ away. He’ll be back on Monday.", options: ["has gone", "went", "goes"], answer: 0 },
+        { q: "It ___ snowing for an hour, but now it’s snowing again.", options: ["has stopped", "stopped", "stops"], answer: 1 },
+        { q: "Who ___ basketball? — James Naismith, in 1891.", options: ["has invented", "invented", "was inventing"], answer: 1 },
+        { q: "Breaking news! Ukraine ___ the semi-final!", options: ["have reached", "reached", "were reaching"], answer: 0 },
+        { q: "“Ow! I’ve hurt my knee!” “How ___ that?”", options: ["have you done", "did you do", "do you do"], answer: 1 },
+        { q: "Pelé ___ more than 1,000 goals in his career.", options: ["has scored", "scored", "scores"], answer: 1 },
+        { q: "Look! Somebody ___ the window of the gym.", options: ["has broken", "broke", "breaks"], answer: 0 },
+        { q: "“Somebody has spilled water on the floor.” “It wasn’t me. I ___ it.”", options: ["haven’t done", "didn’t do", "don’t do"], answer: 1 }
+      ]
+    },
+
+    {
+      type: "gapfill", label: "grammar · news + details", sticker: "mega",
+      title: "Breaking news",
+      instructions: "Present perfect for the <b>news</b>, past simple for the <b>details</b>.",
+      items: [
+        { text: "Great news! Our school team [[has won|'s won]]" + H("win") + " the city cup!", why: "news, result now → has won." },
+        { text: "They [[beat]]" + H("beat") + " Lyceum 17 in the final yesterday.", why: "yesterday → past." },
+        { text: "Dasha [[scored]]" + H("score") + " two goals in the second half.", why: "detail → past." },
+        { text: "Oh no — Max [[has broken|'s broken]]" + H("break") + " his arm!", why: "news → has broken." },
+        { text: "“How [[did]] he [[do]]" + H("do") + " that?”", why: "a question about details → did." },
+        { text: "“He [[fell]]" + H("fall") + " during training on Tuesday.”", why: "detail → fell." },
+        { text: "The coach [[has decided|'s decided]]" + H("decide") + " to choose a new captain.", why: "news → has decided." },
+        { text: "When [[did]] you [[hear]]" + H("hear") + " about it?", why: "When…? → past simple." },
+        { text: "I [[read]]" + H("read") + " about it on the school website this morning — it’s afternoon now.", why: "this morning is finished → past." },
+        { text: "Everybody [[has been|'s been]]" + H("be") + " so happy since the final!", why: "since … until now → has been." }
+      ]
+    },
+
+    /* ================= 4 · PERFECT OR PAST 2 ================= */
+    { type: "part", n: "04", icon: "flag", title: "Finished time?", text: "English Grammar in Use · Unit 14" },
+
+    {
+      type: "rule", label: "grammar · present perfect and past 2", sticker: "flag",
+      title: "Unfinished period or finished time",
+      html: `
+        <div class="tline2">
+          <div class="pp"><h4>until now</h4>
+            <p>today · this week · this year · since 2020 · recently · ever / never · yet</p>
+            <p>I<b>’ve done</b> a lot of work today. · It <b>hasn’t rained</b> this week.</p>
+            <p><b>Have</b> you <b>seen</b> Anna this morning? (it’s still morning)</p>
+            <p>I<b>’ve worked</b> here since 2020. (I still work here)</p></div>
+          <div class="ps"><h4>finished</h4>
+            <p>yesterday · last week · in 2014 · ten minutes ago · when I was a child · from 2010 to 2014</p>
+            <p>I <b>did</b> a lot of work yesterday. · It <b>didn’t rain</b> last week.</p>
+            <p><b>Did</b> you <b>see</b> Anna this morning? (it’s now evening)</p>
+            <p>I <b>worked</b> there from 2010 to 2014. (not now)</p></div>
+        </div>
+        <div class="note">⚠️ <s>It has been very cold yesterday.</s> · <s>When have they arrived?</s> · <s>Have you eaten a lot of candy when you were a child?</s></div>`
+    },
+
+    {
+      type: "sort", label: "grammar · time words", sticker: "flag",
+      title: "Which tense do they take?",
+      instructions: "Put each time expression where it belongs.",
+      categories: [
+        { name: "present perfect", words: ["this week", "since 2020", "recently", "ever", "yet", "so far this season"] },
+        { name: "past simple", words: ["yesterday", "last week", "in 2014", "ten minutes ago", "when I was a child", "from 2010 to 2014"] }
+      ]
+    },
+
+    {
+      type: "correct", label: "grammar · fix it", sticker: "tools",
+      title: "Find and fix the mistake",
+      instructions: "Each sentence has <b>one</b> mistake. Write the correct sentence.",
+      items: [
+        { wrong: "It has been very cold yesterday.", answers: ["It was very cold yesterday."] },
+        { wrong: "When have your friends arrived?", answers: ["When did your friends arrive?"] },
+        { wrong: "Did you eat anything today? I'm worried — it's only 10 a.m.", answers: ["Have you eaten anything today? I'm worried — it's only 10 a.m.", "Have you eaten anything today? I'm worried - it's only 10 a.m.", "Have you eaten anything today? I'm worried, it's only 10 a.m."] },
+        { wrong: "I have worked there from 2010 to 2014.", answers: ["I worked there from 2010 to 2014."] },
+        { wrong: "Jack lives in Los Angeles. He lived there for seven years.", answers: ["Jack lives in Los Angeles. He has lived there for seven years.", "Jack lives in Los Angeles. He's lived there for seven years."] },
+        { wrong: "Our team won three games this season so far.", answers: ["Our team has won three games this season so far.", "Our team has won three games so far this season."] },
+        { wrong: "Mozart has written more than 600 pieces of music.", answers: ["Mozart wrote more than 600 pieces of music."] },
+        { wrong: "I didn't see Ben recently. Is he OK?", answers: ["I haven't seen Ben recently. Is he OK?"] }
+      ]
+    },
+
+    {
+      type: "tf2", label: "reading · a sports report", sticker: "news",
+      title: "One incredible season",
+      instructions: "Read the report. True or false? If it’s false, choose the correct sentence.",
+      text: `<div class="article"><span class="tag">school sports</span>
+          <h4>Kyiv Wolves are champions!</h4>
+          <p>The Kyiv Wolves girls’ volleyball team have won the city league for the first time. On Saturday they beat last year’s champions 3–1 in an incredible final. The captain, Sofia, played superbly: she won 14 points and led the team when they were losing in the second set.</p>
+          <p>It hasn’t been an easy season. In October two players gave up volleyball, and the team lost their first three games. “We’ve worked so hard since then,” Sofia says. “We’ve trained four times a week since November.”</p>
+          <p>The Wolves have now won eleven games in a row. Next month they are taking part in the national tournament in Lviv. “We’ve never played there,” says coach Ms. Hrytsenko, “but I think we’ll surprise a lot of people.”</p></div>`,
+      items: [
+        { q: "The Wolves have won the city league before.", answer: false, fix: ["It’s the first time they have won it.", "They won it last year.", "They have won it three times."], fixAnswer: 0 },
+        { q: "They beat last year’s champions in the final.", answer: true, fix: [], fixAnswer: 0 },
+        { q: "The final result was 3–1.", answer: true, fix: [], fixAnswer: 0 },
+        { q: "Sofia is the team’s coach.", answer: false, fix: ["She is the captain.", "She gave up volleyball.", "She is a fan."], fixAnswer: 0 },
+        { q: "The team was losing in the second set.", answer: true, fix: [], fixAnswer: 0 },
+        { q: "The season started very well.", answer: false, fix: ["They lost their first three games.", "They won their first three games.", "They didn’t play in October."], fixAnswer: 0 },
+        { q: "Two players gave up volleyball in October.", answer: true, fix: [], fixAnswer: 0 },
+        { q: "They have trained four times a week since November.", answer: true, fix: [], fixAnswer: 0 },
+        { q: "They have lost their last two games.", answer: false, fix: ["They have won eleven games in a row.", "They have tied their last game.", "They haven’t played recently."], fixAnswer: 0 },
+        { q: "The team has played in Lviv many times.", answer: false, fix: ["They have never played there.", "They played there last month.", "They are not going to Lviv."], fixAnswer: 0 }
+      ]
+    },
+
+    /* ================= 5 · TALK ================= */
+    { type: "part", n: "05", icon: "mega", title: "Your sports news", text: "I ask, you answer — watch the tense!" },
+
+    {
+      type: "wheel", label: "speaking · over to you", sticker: "mega",
+      title: "Spin the scoreboard",
+      start: "Spin. Start with the present perfect (Have you ever…? / I’ve…), then give details in the past simple.",
+      colors: ["#B08D2A", "#8D96A3", "#A8622F", "#C8102E"],
+      items: [
+        { icon: "🏅", short: "won", q: "Have you ever <b>won</b> anything? What was it? When did you win it?" },
+        { icon: "🏃‍♀️", short: "race", q: "Have you ever <b>come</b> first, second or third in a race? Tell me the story." },
+        { icon: "🧢", short: "captain", q: "Have you ever <b>been</b> captain of a team — or the leader of a group? How did it go?" },
+        { icon: "🏟️", short: "final", q: "Have you ever <b>watched</b> a final at a stadium or on TV? Who won? What was the score?" },
+        { icon: "🛑", short: "give up", q: "Have you ever <b>given up</b> a sport or hobby? Why did you stop?" },
+        { icon: "📅", short: "this week", q: "What sport have you done <b>this week</b>? What did you do <b>last week</b>?" },
+        { icon: "⭐", short: "superb", q: "Who is the most <b>outstanding</b> athlete you know about? What have they achieved?" },
+        { icon: "📰", short: "news", q: "Tell me one piece of news (sport or school) — then I’ll ask for the details!" }
+      ]
+    },
+
+    /* ================= 6 · SPEED ================= */
+    { type: "part", n: "06", icon: "stopwatch", title: "Speed", text: "Make it automatic." },
+
+    {
+      type: "drill", label: "automaticity · speed drill", sticker: "stopwatch",
+      title: "Twelve quick answers, twice each",
+      instructions: "Type the answer and press <b>Enter</b>. Each one must be right <b>twice</b>.",
+      items: [
+        { cue: "past · V3", prompt: "win", answers: ["won won", "won, won", "won / won"] },
+        { cue: "past · V3", prompt: "lose", answers: ["lost lost", "lost, lost", "lost / lost"] },
+        { cue: "past · V3", prompt: "beat", answers: ["beat beaten", "beat, beaten", "beat / beaten"] },
+        { cue: "past · V3", prompt: "break", answers: ["broke broken", "broke, broken", "broke / broken"] },
+        { cue: "past · V3", prompt: "lead", answers: ["led led", "led, led", "led / led"] },
+        { cue: "past · V3", prompt: "give up", answers: ["gave up given up", "gave up, given up", "gave up / given up"] },
+        { cue: "PP or past?", prompt: "yesterday", answers: ["past", "past simple"] },
+        { cue: "PP or past?", prompt: "since 2020", answers: ["PP", "present perfect"] },
+        { cue: "PP or past?", prompt: "ten minutes ago", answers: ["past", "past simple"] },
+        { cue: "PP or past?", prompt: "this week", answers: ["PP", "present perfect"] },
+        { cue: "news!", prompt: "our team / win / the cup", answers: ["Our team has won the cup!", "Our team has won the cup.", "Our team's won the cup!"] },
+        { cue: "detail", prompt: "when / they / win / it?", answers: ["When did they win it?"] }
+      ]
+    },
+
+    /* ================= 7 · WRITING ================= */
+    { type: "part", n: "07", icon: "pencil", title: "Writing", text: "Your sports news report." },
+
+    {
+      type: "write", label: "writing · a sports report", sticker: "news",
+      title: "Write the report",
+      instructions: "Write a short news report (8–10 sentences) about a real or invented game. Start with the <b>news</b> (present perfect), then the <b>details</b> (past simple), then what has happened since then.",
+      words: ["won", "beat", "lost", "tied", "score", "result", "final", "league", "tournament", "captain", "champions", "victory", "record", "leading", "superb", "incredible", "outstanding"],
+      checks: [
+        { label: "present perfect — 3 times", pattern: "\\b(have|has|['’]ve|['’]s|haven['’]?t|hasn['’]?t)\\s+(never\\s+|already\\s+|just\\s+|now\\s+)?(won|lost|beaten|been|played|scored|trained|reached|become|broken|had|tied|given|taken|led|made)\\b", min: 3 },
+        { label: "past simple with a finished time (yesterday / last… / on Saturday / ago)", pattern: "\\b(yesterday|last|ago|on (monday|tuesday|wednesday|thursday|friday|saturday|sunday)|in (19|20)\\d\\d)\\b" },
+        { label: "6+ sport words (they light up)", words: 6 },
+        { label: "at least 8 sentences", sentences: 8 }
+      ],
+      sample: "Kyiv Lions have won the city cup! They beat the Dnipro Eagles 3–1 in the final on Sunday. The score at half-time was 1–1. Then the captain, Andriy, scored two superb goals. It was an incredible victory, because the Lions lost their first two games this season. They have trained every day since September. They have now won nine games in a row. Next month they are taking part in the national tournament."
+    },
+
+    /* ================= 8 · SELF-CHECK ================= */
+    { type: "part", n: "08", icon: "star", title: "Self-check", text: "Add today’s mistakes to your error log." },
+
+    { type: "review", label: "self-check", title: "My mistakes today" }
+  ]
+};
+</script>
+<script>
+/* =====================================================================
+   ENGINE — no need to edit below this line
+   ===================================================================== */
+(function(){
+"use strict";
+
+function h(tag, props){
+  const el = document.createElement(tag);
+  if (props) for (const k in props){
+    const v = props[k];
+    if (v == null || v === false) continue;
+    if (k === "class") el.className = v;
+    else if (k === "html") el.innerHTML = v;
+    else if (k === "style") el.style.cssText = v;
+    else if (k.slice(0,2) === "on") el.addEventListener(k.slice(2), v);
+    else el.setAttribute(k, v === true ? "" : v);
+  }
+  for (let i = 2; i < arguments.length; i++){
+    const kids = [].concat(arguments[i]);
+    for (const kid of kids){
+      if (kid == null || kid === false || kid === "") continue;
+      el.append(kid.nodeType ? kid : document.createTextNode(kid));
+    }
+  }
+  return el;
+}
+function clear(obj){ for (const k of Object.keys(obj)) delete obj[k]; }
+function emo(x){
+  if (!x) return "";
+  if (/^[a-z0-9-]+$/.test(x)) return h("img", { src: "assets/emoji/" + x + ".png", alt: "", draggable: "false" });
+  return document.createTextNode(x);
+}
+function norm(s, dWord){
+  s = String(s || "").toLowerCase().replace(/[’‘`´]/g, "'").replace(/[“”"«»]/g, "");
+  s = s.replace(/\bwon't\b/g, "will not").replace(/\bcan't\b/g, "cannot")
+       .replace(/n't\b/g, " not").replace(/'m\b/g, " am").replace(/'re\b/g, " are")
+       .replace(/'ve\b/g, " have").replace(/'ll\b/g, " will").replace(/'d\b/g, " " + (dWord || "had"));
+  s = s.replace(/[.,!?;:()\[\]–—-]/g, " ").replace(/\s+/g, " ").trim();
+  return s;
+}
+function matches(value, answers){
+  const a = answers.map(x => norm(x)); const v1 = norm(value, "had"), v2 = norm(value, "would");
+  return v1 !== "" && (a.includes(v1) || a.includes(v2));
+}
+function parseGaps(str){
+  const parts = []; const re = /\[\[(.+?)\]\]/g; let last = 0, m;
+  while ((m = re.exec(str))){
+    if (m.index > last) parts.push({ text: str.slice(last, m.index) });
+    const [ans, hint] = m[1].split(" // ");
+    parts.push({ answers: ans.split("|").map(s => s.trim()), hint: hint ? hint.trim() : null });
+    last = re.lastIndex;
+  }
+  if (last < str.length) parts.push({ text: str.slice(last) });
+  return parts;
+}
+function hashStr(s){ let h1 = 1779033703 ^ s.length; for (let i = 0; i < s.length; i++){ h1 = Math.imul(h1 ^ s.charCodeAt(i), 3432918353); h1 = h1 << 13 | h1 >>> 19; } return h1 >>> 0; }
+function shuffle(arr, seedStr){
+  let seed = hashStr(seedStr);
+  const rnd = () => { seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--){ const j = Math.floor(rnd() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
+  if (a.length > 1 && a.every((x, i) => x === arr[i])) a.push(a.shift());
+  return a;
+}
+function fire(el){ el.dispatchEvent(new Event("input", { bubbles: true })); }
+const pad = i => String(i + 1).padStart(2, "0");
+
+/* ---------- storage ---------- */
+const KEY = "lesson:" + LESSON.id;
+let SAVE = {};
+try { SAVE = JSON.parse(localStorage.getItem(KEY) || "{}") || {}; } catch (e) { SAVE = {}; }
+function persist(){ try { localStorage.setItem(KEY, JSON.stringify(SAVE)); } catch (e) {} }
+
+/* ---------- header ---------- */
+const root = document.documentElement;
+for (const k in (LESSON.theme || {})) root.style.setProperty("--" + k, LESSON.theme[k]);
+document.title = LESSON.title;
+document.getElementById("kicker").textContent = LESSON.kicker || "";
+const tEl = document.getElementById("title");
+if (LESSON.titleHTML) tEl.innerHTML = LESSON.titleHTML; else tEl.textContent = LESSON.title;
+document.getElementById("sub").textContent = LESSON.subtitle || "";
+const st = LESSON.stickers || [];
+document.getElementById("sticker1").append(emo(st[0]));
+document.getElementById("sticker2").append(emo(st[1]));
+
+function burst(fromEl){
+  if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const r = fromEl.getBoundingClientRect(); const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+  const set = LESSON.confetti && LESSON.confetti.length ? LESSON.confetti : ["⭐"];
+  for (let i = 0; i < 16; i++){
+    const s = h("span", { class: "confetti" }, emo(set[i % set.length]));
+    document.body.append(s);
+    const dx = (Math.random() - .5) * 360, dy = -60 - Math.random() * 230, rot = (Math.random() - .5) * 540;
+    const anim = s.animate([
+      { transform: `translate(${cx}px, ${cy}px) scale(.5)`, opacity: 1 },
+      { transform: `translate(${cx + dx * .6}px, ${cy + dy}px) rotate(${rot / 2}deg) scale(1.1)`, opacity: 1, offset: .55 },
+      { transform: `translate(${cx + dx}px, ${cy + dy + 170}px) rotate(${rot}deg) scale(.9)`, opacity: 0 }
+    ], { duration: 1150 + Math.random() * 400, easing: "cubic-bezier(.2,.7,.4,1)" });
+    anim.onfinish = () => s.remove();
+  }
+}
+
+/* ---------- drag & drop board (mouse + touch + tap) ---------- */
+function Board(scope, v){
+  const zones = {}, chips = {}; let selected = null;
+  const bank = h("div", { class: "bank" });
+  register(bank, bank, "bank", false);
+  function register(clickEl, dropEl, id, single){
+    clickEl.dataset.zone = id; zones[id] = { el: dropEl, box: clickEl, single };
+    clickEl.addEventListener("click", () => { if (selected) place(selected, id); });
+  }
+  function zoneOf(c){ for (const id in zones){ if (zones[id].el === c.parentElement) return id; } return "bank"; }
+  function unselect(){ if (selected) selected.classList.remove("selected"); selected = null; }
+  function clearMarks(){ scope.querySelectorAll(".ok,.bad").forEach(n => n.classList.remove("ok", "bad")); }
+  function place(c, zid, silent){
+    const z = zones[zid]; if (!z) return;
+    if (z.single) z.el.querySelectorAll(".chip").forEach(o => { if (o !== c) bank.append(o); });
+    z.el.append(c); unselect();
+    if (!silent){ clearMarks(); for (const id in chips){ const zz = zoneOf(chips[id]); if (zz === "bank") delete v[id]; else v[id] = zz; } persist(); fire(scope); }
+  }
+  function tap(c){
+    if (zoneOf(c) !== "bank"){ place(c, "bank"); return; }
+    if (selected === c){ unselect(); return; }
+    unselect(); selected = c; c.classList.add("selected");
+  }
+  function zoneAt(x, y){
+    const el = document.elementFromPoint(x, y); const z = el && el.closest("[data-zone]");
+    return z && scope.contains(z) ? z : null;
+  }
+  let overEl = null;
+  function setOver(z){ if (overEl === z) return; if (overEl) overEl.classList.remove("over"); overEl = z; if (z) z.classList.add("over"); }
+  function chip(id, label, value){
+    const c = h("button", { class: "chip", type: "button", html: label });
+    c.dataset.id = id; c.dataset.value = value; chips[id] = c;
+    let d = null;
+    c.addEventListener("pointerdown", e => {
+      if (e.pointerType === "mouse" && e.button !== 0) return;
+      d = { x: e.clientX, y: e.clientY, moved: false, ghost: null };
+      try { c.setPointerCapture(e.pointerId); } catch (_) {}
+    });
+    c.addEventListener("pointermove", e => {
+      if (!d) return;
+      if (!d.moved && Math.hypot(e.clientX - d.x, e.clientY - d.y) > 6){
+        d.moved = true; unselect();
+        const r = c.getBoundingClientRect(); d.ox = d.x - r.left; d.oy = d.y - r.top;
+        d.ghost = c.cloneNode(true); d.ghost.classList.add("ghost"); d.ghost.classList.remove("ok", "bad");
+        d.ghost.style.width = r.width + "px"; document.body.append(d.ghost); c.classList.add("dragging");
+      }
+      if (d.moved){
+        e.preventDefault();
+        d.ghost.style.left = (e.clientX - d.ox) + "px"; d.ghost.style.top = (e.clientY - d.oy) + "px";
+        setOver(zoneAt(e.clientX, e.clientY));
+      }
+    });
+    const end = e => {
+      if (!d) return; const was = d; d = null;
+      if (!was.moved) return;
+      was.ghost.remove(); c.classList.remove("dragging"); setOver(null); c._suppress = true;
+      if (e.type === "pointerup"){ const z = zoneAt(e.clientX, e.clientY); if (z) place(c, z.dataset.zone); }
+    };
+    c.addEventListener("pointerup", end);
+    c.addEventListener("pointercancel", end);
+    c.addEventListener("click", e => { e.stopPropagation(); if (c._suppress){ c._suppress = false; return; } tap(c); });
+    bank.append(c);
+    return c;
+  }
+  function restore(){ for (const id in v){ if (chips[id] && zones[v[id]]) place(chips[id], v[id], true); } }
+  function resetAll(){ for (const id in chips) bank.append(chips[id]); clear(v); clearMarks(); unselect(); }
+  return { bank, register, chip, place, restore, resetAll, chips, zones, zoneOf };
+}
+
+/* ---------- renderers: check() returns one value per item: true / false / null (not answered) ---------- */
+const RENDER = {};
+const LABEL = { mcq: "multiple choice", match: "match", dragwords: "drag & drop", correct: "correct the mistakes", rephrase: "rewrite", write: "writing", drill: "speed drill", rule: "theory", build: "word order", gapfill: "gap fill", tf2: "true / false", slotwrite: "writing", review: "self-check" };
+const ROLES = [
+  ["qw", "Question word"], ["aux", "have / has"], ["who", "Who?"], ["freq", "How often?"], ["does", "Verb (V3)"], ["what", "What? Whom?"], ["where", "Where?"], ["when", "When?"]
+];
+
+RENDER.rule = (sec, s, body) => { body.append(h("div", { class: "rule", html: sec.html })); return null; };
+
+RENDER.build = (sec, s, body) => {
+  const v = s.v || (s.v = {}); const items = [];
+  sec.items.forEach((it, i) => {
+    const vi = v[i] || (v[i] = {});
+    const wrap = h("div", { class: "bitem" });
+    const state = h("span", { class: "bstate" });
+    wrap.append(h("div", { class: "bhead" }, h("span", { class: "bnum" }, pad(i)), state));
+    const B = Board(wrap, vi);
+    const row = h("div", { class: "brow" }); const slots = [];
+    ROLES.forEach(([role, q]) => {
+      if (it[role] == null) return;
+      const zone = h("div", { class: "bz" });
+      const box = h("div", { class: "bslot c-" + role, role: "button", "aria-label": q }, h("span", { class: "bq" }, q), zone);
+      B.register(box, zone, "z-" + role, true);
+      row.append(box); slots.push({ role, box, zone });
+    });
+    row.append(h("span", { class: "bdot" }, "."));
+    const chipsData = ROLES.filter(([r]) => it[r] != null).map(([r]) => ({ id: r, label: it[r], value: r }));
+    if (it.wrong) chipsData.push({ id: "x", label: it.wrong, value: "x" });
+    shuffle(chipsData, LESSON.id + sec.title + i).forEach(c => B.chip(c.id, c.label, c.value));
+    wrap.append(B.bank, row); body.append(wrap);
+    B.restore();
+    items.push({ B, slots, state });
+  });
+  return {
+    total: items.length,
+    check(){ return items.map(({ slots, state }) => {
+      let filled = 0, ok = true;
+      slots.forEach(o => {
+        const c = o.zone.querySelector(".chip"); if (c) filled++;
+        const good = !!c && c.dataset.value === o.role;
+        o.box.classList.toggle("ok", good); o.box.classList.toggle("bad", !good);
+        if (!good) ok = false;
+      });
+      if (!filled){ slots.forEach(o => o.box.classList.remove("ok", "bad")); state.textContent = ""; return null; }
+      state.className = "bstate " + (ok ? "ok" : "bad"); state.textContent = ok ? "✓" : "Try again — fix the red slot.";
+      return ok;
+    }); },
+    reveal(){ items.forEach(({ B, slots }) => { B.resetAll(); slots.forEach(o => B.place(B.chips[o.role], "z-" + o.role)); }); },
+    reset(){ items.forEach(({ B, state }) => { B.resetAll(); state.textContent = ""; }); persist(); }
+  };
+};
+
+RENDER.gapfill = (sec, s, body) => {
+  const v = s.v || (s.v = {}); const lines = [];
+  const list = h("ol", { class: "lines" }); if (sec.text) body.append(h("div", { class: "story", html: sec.text }));
+  sec.items.forEach((raw, i) => {
+    const it = typeof raw === "string" ? { text: raw } : raw;
+    const li = h("li", {}); const line = h("div", { class: "line" }); const gaps = [];
+    parseGaps(it.text).forEach((p, j) => {
+      if (p.text != null){ line.append(h("span", { html: p.text })); return; }
+      const key = i + "-" + j;
+      const w = Math.max(5, ...p.answers.map(a => a.length)) + 2;
+      const input = h("input", { class: "gap", type: "text", autocomplete: "off", autocapitalize: "off", autocorrect: "off", spellcheck: "false", "aria-label": p.hint ? "gap: " + p.hint : "gap", style: `width:${w}ch` });
+      input.value = v[key] || "";
+      input.addEventListener("input", () => { v[key] = input.value; persist(); input.classList.remove("ok", "bad"); const y = li.querySelector(".why"); if (y) y.remove(); });
+      input.addEventListener("keydown", e => {
+        if (e.key !== "Enter") return; e.preventDefault();
+        const all = Array.from(body.querySelectorAll("input.gap")); const n = all[all.indexOf(input) + 1];
+        if (n) n.focus(); else input.blur();
+      });
+      const wrap = h("span", { class: "gapwrap" }, input);
+      if (p.hint) wrap.append(h("span", { class: "hint" }, "(" + p.hint + ")"));
+      line.append(wrap); gaps.push({ input, answers: p.answers, wrap });
+    });
+    li.append(line); list.append(li); lines.push({ it, li, gaps });
+  });
+  body.append(list);
+  return {
+    total: lines.length,
+    check(){ return lines.map(({ it, li, gaps }) => {
+      const old = li.querySelector(".why"); if (old) old.remove();
+      if (gaps.every(g => !g.input.value.trim())){ gaps.forEach(g => g.input.classList.remove("ok", "bad")); return null; }
+      let ok = true;
+      gaps.forEach(g => { const good = matches(g.input.value, g.answers); g.input.classList.toggle("ok", good); g.input.classList.toggle("bad", !good); if (!good) ok = false; });
+      if (it.why) li.append(h("span", { class: "why " + (ok ? "ok" : "bad") }, (ok ? "✓ " : "✗ ") + it.why));
+      return ok;
+    }); },
+    reveal(){ lines.forEach(({ gaps }) => gaps.forEach(g => { if (!g.input.classList.contains("ok") && !g.wrap.querySelector(".reveal")) g.wrap.append(h("span", { class: "reveal" }, "→ " + g.answers[0])); })); },
+    reset(){ clear(v); lines.forEach(({ li, gaps }) => { gaps.forEach(g => { g.input.value = ""; g.input.classList.remove("ok", "bad"); }); const y = li.querySelector(".why"); if (y) y.remove(); }); }
+  };
+};
+
+RENDER.tf2 = (sec, s, body) => {
+  const v = s.v || (s.v = {}); const qs = [];
+  body.classList.add("tf2");
+  if (sec.text) body.append(h("div", { class: "story", html: sec.text }));
+  sec.items.forEach((it, i) => {
+    const st = v[i] || (v[i] = {});
+    const q = h("div", { class: "q" });
+    const tfo = h("div", { class: "opts tfo" });
+    const bT = h("button", { class: "opt", type: "button" }, "True");
+    const bF = h("button", { class: "opt", type: "button" }, "False");
+    tfo.append(bT, bF);
+    q.append(h("div", { class: "q-top" }, h("div", { class: "q-text" }, h("span", { class: "q-num" }, pad(i)), h("span", { html: it.q })), tfo));
+    const fixOpts = h("div", { class: "opts" });
+    const fixBtns = it.fix.map((f, j) => { const b = h("button", { class: "opt", type: "button", html: f }); b.addEventListener("click", () => { st.fix = j; persist(); paint(); fire(body); }); fixOpts.append(b); return b; });
+    const fixbox = h("div", { class: "fixbox", hidden: true }, h("div", { class: "fl" }, "Correct it:"), fixOpts);
+    const warn = h("div", { class: "warnline", hidden: true }, "Choose the correct sentence.");
+    q.append(fixbox, warn);
+    bT.addEventListener("click", () => { st.tf = true; delete st.fix; persist(); paint(); fire(body); });
+    bF.addEventListener("click", () => { st.tf = false; persist(); paint(); fire(body); });
+    function paint(){
+      [bT, bF, ...fixBtns].forEach(b => b.classList.remove("ok", "bad", "answer"));
+      bT.classList.toggle("sel", st.tf === true); bF.classList.toggle("sel", st.tf === false);
+      fixbox.hidden = st.tf !== false; warn.hidden = true;
+      fixBtns.forEach((b, j) => b.classList.toggle("sel", st.fix === j));
+    }
+    paint(); body.append(q);
+    qs.push({ it, st, bT, bF, fixBtns, fixbox, warn, paint });
+  });
+  return {
+    total: qs.length,
+    check(){ return qs.map(o => {
+      const { it, st } = o; o.paint();
+      if (st.tf === undefined) return null;
+      const tfOk = st.tf === it.answer;
+      (st.tf ? o.bT : o.bF).classList.add(tfOk ? "ok" : "bad");
+      if (st.tf === false && tfOk){
+        if (st.fix === undefined){ o.warn.hidden = false; return null; }
+        const fixOk = st.fix === it.fixAnswer; o.fixBtns[st.fix].classList.add(fixOk ? "ok" : "bad");
+        return fixOk;
+      }
+      return tfOk;
+    }); },
+    reveal(){ qs.forEach(o => { const { it, st } = o;
+      if (st.tf !== it.answer) (it.answer ? o.bT : o.bF).classList.add("answer");
+      if (!it.answer){ o.fixbox.hidden = false; o.fixBtns[it.fixAnswer].classList.add("answer"); }
+    }); },
+    reset(){ qs.forEach(o => { clear(o.st); o.paint(); }); }
+  };
+};
+
+RENDER.slotwrite = (sec, s, body) => {
+  const v = s.v || (s.v = {}); const rows = [];
+  sec.items.forEach((it, i) => {
+    const input = h("input", { class: "full", type: "text", autocomplete: "off", autocapitalize: "sentences", spellcheck: "true", placeholder: it.who.split(" / ")[0] + " …", "aria-label": "sentence about " + it.who });
+    input.value = v[i] || "";
+    const tags = h("div", { class: "sp-tags" },
+      h("span", { class: "c-who fill" }, "Who? " + it.who),
+      h("span", { class: "c-does" }, "Does what?"), h("span", { class: "c-what" }, "What?"),
+      h("span", { class: "c-where" }, "Where?"), h("span", { class: "c-when" }, "When?"));
+    const row = h("div", { class: "row" }, h("div", { class: "prompt" }, h("span", { class: "num" }, pad(i))), tags, input);
+    row.querySelector(".prompt").append(h("span", {}, ""));
+    input.addEventListener("input", () => { v[i] = input.value; persist(); input.classList.remove("ok", "bad"); const m = row.querySelector(".model"); if (m) m.remove(); });
+    body.append(row); rows.push({ it, input, row });
+  });
+  return {
+    total: rows.length, revealLabel: "👀 Show examples",
+    check(){ return rows.map(r => {
+      const old = r.row.querySelector(".model"); if (old) old.remove();
+      const txt = r.input.value.trim(); if (!txt){ r.input.classList.remove("ok", "bad"); return null; }
+      const words = txt.split(/\s+/).filter(Boolean);
+      const verbOk = /^\s*(\S+\s+){1,3}\w*(s)\b/i.test(txt);
+      const ok = words.length >= 5 && verbOk;
+      r.input.classList.toggle("ok", ok); r.input.classList.toggle("bad", !ok);
+      if (!ok) r.row.append(h("div", { class: "model warn" }, !verbOk ? "Check the verb: he / she / it → -s." : "Add more slots: what? where? when?"));
+      return ok;
+    }); },
+    reveal(){ rows.forEach(r => { const old = r.row.querySelector(".model"); if (old) old.remove(); r.row.append(h("div", { class: "model" }, "Example: " + r.it.sample)); }); },
+    reset(){ clear(v); rows.forEach(r => { r.input.value = ""; r.input.classList.remove("ok", "bad"); }); }
+  };
+};
+
+function similarity(a, b){
+  const A = norm(a).split(" ").filter(Boolean), B = norm(b).split(" ").filter(Boolean);
+  if (!A.length || !B.length) return 0;
+  const pool = B.slice(); let hit = 0;
+  for (const w of A){ const i = pool.indexOf(w); if (i > -1){ hit++; pool.splice(i, 1); } }
+  return hit / Math.max(A.length, B.length);
+}
+
+RENDER.mcq = (sec, s, body) => {
+  const v = s.v || (s.v = {}); const qs = [];
+  sec.items.forEach((it, i) => {
+    const q = h("div", { class: "q" });
+    const text = h("div", { class: "q-text" }, h("span", { class: "q-num" }, pad(i)));
+    it.q.split("___").forEach((part, k) => { if (k) text.append(h("span", { class: "blank" })); text.append(h("span", { html: part })); });
+    const opts = h("div", { class: "opts", role: "radiogroup" });
+    const btns = it.options.map((o, j) => {
+      const b = h("button", { class: "opt", type: "button", role: "radio", html: o });
+      b.addEventListener("click", () => { v[i] = j; persist(); paint(); fire(body); });
+      opts.append(b); return b;
+    });
+    function paint(){ btns.forEach((b, j) => { b.classList.toggle("sel", v[i] === j); b.classList.remove("ok", "bad", "answer"); b.setAttribute("aria-checked", v[i] === j); }); }
+    paint(); q.append(text, opts); body.append(q); qs.push({ it, btns, i, paint });
+  });
+  return {
+    total: qs.length,
+    check(){ return qs.map(({ it, btns, i, paint }) => { paint(); if (v[i] === undefined) return null; const ok = v[i] === it.answer; btns[v[i]].classList.add(ok ? "ok" : "bad"); return ok; }); },
+    reveal(){ qs.forEach(({ it, btns, i }) => { if (v[i] !== it.answer) btns[it.answer].classList.add("answer"); }); },
+    reset(){ clear(v); qs.forEach(({ paint }) => paint()); }
+  };
+};
+
+RENDER.match = (sec, s, body) => {
+  const v = s.v || (s.v = {}); const B = Board(body, v); const rows = [];
+  const grid = h("div", { class: "match" });
+  sec.pairs.forEach((p, i) => {
+    const slot = h("div", { class: "slot", role: "button", "aria-label": "drop zone" });
+    B.register(slot, slot, "m" + i, true);
+    grid.append(h("div", { class: "mrow" }, h("div", { class: "left", "data-n": pad(i), html: p[0] }), slot));
+    rows.push(slot);
+  });
+  shuffle(sec.pairs.map((p, i) => i), LESSON.id + sec.title).forEach(i => B.chip("r" + i, sec.pairs[i][1], String(i)));
+  body.append(B.bank, grid); B.restore();
+  return {
+    total: rows.length,
+    check(){ return rows.map((slot, i) => { const c = slot.querySelector(".chip");
+      if (!c){ slot.classList.remove("ok", "bad"); return null; }
+      const ok = c.dataset.value === String(i); slot.classList.toggle("ok", ok); slot.classList.toggle("bad", !ok); return ok; }); },
+    reveal(){ B.resetAll(); rows.forEach((slot, i) => B.place(B.chips["r" + i], "m" + i)); },
+    reset(){ B.resetAll(); persist(); }
+  };
+};
+
+RENDER.dragwords = (sec, s, body) => {
+  const v = s.v || (s.v = {}); const B = Board(body, v); const slots = []; const words = [];
+  const list = h("ol", { class: "lines" });
+  sec.items.forEach((it, i) => {
+    const line = h("li", { class: "line" });
+    parseGaps(it).forEach((p, j) => {
+      if (p.text != null){ line.append(h("span", { html: p.text })); return; }
+      const slot = h("span", { class: "slot", role: "button", "aria-label": "drop zone" });
+      B.register(slot, slot, "g" + i + "-" + j, true);
+      slots.push({ slot, answers: p.answers }); words.push(p.answers[0]); line.append(slot);
+    });
+    list.append(line);
+  });
+  (sec.extra || []).forEach(w => words.push(w));
+  shuffle(words.map((w, k) => ({ id: "c" + k, w })), LESSON.id + sec.title).forEach(o => B.chip(o.id, o.w, o.w));
+  if (sec.text) body.append(h("div", { class: "story", html: sec.text }));
+  body.append(B.bank, list); B.restore();
+  return {
+    total: slots.length,
+    check(){ return slots.map(o => {
+      const c = o.slot.querySelector(".chip"); if (!c){ o.slot.classList.remove("ok", "bad"); return null; }
+      const ok = matches(c.dataset.value, o.answers); o.slot.classList.toggle("ok", ok); o.slot.classList.toggle("bad", !ok); return ok;
+    }); },
+    reveal(){
+      B.resetAll(); const used = new Set();
+      slots.forEach(o => { const c = Object.values(B.chips).find(ch => !used.has(ch) && matches(ch.dataset.value, o.answers));
+        if (c){ used.add(c); B.place(c, o.slot.dataset.zone); } });
+    },
+    reset(){ B.resetAll(); persist(); }
+  };
+};
+
+RENDER.correct = (sec, s, body) => {
+  const v = s.v || (s.v = {}); const rows = [];
+  sec.items.forEach((it, i) => {
+    const input = h("input", { class: "full", type: "text", autocomplete: "off", autocapitalize: "sentences", spellcheck: "false", "aria-label": "corrected sentence " + (i + 1) });
+    input.value = v[i] != null ? v[i] : it.wrong;
+    input.addEventListener("input", () => { v[i] = input.value; persist(); input.classList.remove("ok", "bad"); });
+    const row = h("div", { class: "row" }, h("div", { class: "row-label" }, h("span", { class: "q-num" }, pad(i)), h("s", {}, it.wrong)), input);
+    body.append(row); rows.push({ it, input, row });
+  });
+  return {
+    total: rows.length,
+    check(){ return rows.map(r => {
+      if (norm(r.input.value) === norm(r.it.wrong) || !r.input.value.trim()){ r.input.classList.remove("ok", "bad"); return null; }
+      const ok = matches(r.input.value, r.it.answers); r.input.classList.toggle("ok", ok); r.input.classList.toggle("bad", !ok); return ok; }); },
+    reveal(){ rows.forEach(r => { if (!r.input.classList.contains("ok") && !r.row.querySelector(".model")) r.row.append(h("div", { class: "model" }, "✓ " + r.it.answers[0])); }); },
+    reset(){ clear(v); rows.forEach(r => { r.input.value = r.it.wrong; r.input.classList.remove("ok", "bad"); }); }
+  };
+};
+
+RENDER.rephrase = (sec, s, body) => {
+  const v = s.v || (s.v = {}); const rows = [];
+  sec.items.forEach((it, i) => {
+    const input = h("input", { class: "full", type: "text", autocomplete: "off", autocapitalize: "sentences", spellcheck: "false", placeholder: "Type the full sentence…", "aria-label": "answer " + (i + 1) });
+    input.value = v[i] || "";
+    const prompt = h("div", { class: "prompt" }, h("span", { class: "num" }, pad(i)), h("span", { html: it.prompt }));
+    if (it.key) prompt.append(h("span", { class: "key" }, it.key));
+    const row = h("div", { class: "row" }, prompt, input);
+    input.addEventListener("input", () => { v[i] = input.value; persist(); input.classList.remove("ok", "bad", "close"); const m = row.querySelector(".model"); if (m) m.remove(); });
+    body.append(row); rows.push({ it, input, row });
+  });
+  return {
+    total: rows.length,
+    check(){ return rows.map(r => {
+      const old = r.row.querySelector(".model"); if (old) old.remove();
+      r.input.classList.remove("ok", "bad", "close");
+      if (!r.input.value.trim()) return null;
+      if (matches(r.input.value, r.it.answers)){ r.input.classList.add("ok"); return true; }
+      const best = Math.max(...r.it.answers.map(a => similarity(r.input.value, a)));
+      if (best >= .7){ r.input.classList.add("close"); r.row.append(h("div", { class: "model close" }, "Almost! Check the form of the words.")); }
+      else r.input.classList.add("bad");
+      return false;
+    }); },
+    reveal(){ rows.forEach(r => { const old = r.row.querySelector(".model"); if (old) old.remove(); if (!r.input.classList.contains("ok")) r.row.append(h("div", { class: "model" }, "✓ " + r.it.answers[0])); }); },
+    reset(){ clear(v); rows.forEach(r => { r.input.value = ""; r.input.classList.remove("ok", "bad", "close"); }); }
+  };
+};
+
+RENDER.write = (sec, s, body) => {
+  const v = s.v || (s.v = {});
+  let box = null;
+  if (sec.words){ box = h("div", { class: "wordbox" }); sec.words.forEach(w => box.append(h("span", { "data-w": w }, w))); body.append(box); }
+  const ta = h("textarea", { class: "full", rows: 8, spellcheck: "true", placeholder: "Write here…", "aria-label": "your text" });
+  ta.value = v.text || "";
+  const ul = h("ul", { class: "checks" });
+  const lis = (sec.checks || []).map(c => { const li = h("li", {}, c.label); ul.append(li); return { c, li }; });
+  body.append(ta, ul);
+  function usedWords(t){ return (sec.words || []).filter(w => new RegExp("\\b" + w.replace(/\s+/g, "\\s+(?:\\w+\\s+)?"), "i").test(t)); }
+  function run(){ const tx = ta.value.replace(/[’‘]/g, "'");
+    const used = usedWords(tx);
+    if (box) box.querySelectorAll("span").forEach(sp => sp.classList.toggle("used", used.includes(sp.dataset.w)));
+    lis.forEach(({ c, li }) => {
+      let ok = false;
+      if (c.pattern){ const n = (tx.match(new RegExp(c.pattern, "gi")) || []).length; ok = n >= (c.min || 1); }
+      if (c.words) ok = used.length >= c.words;
+      if (c.sentences) ok = tx.split(/[.!?]+|\n+/).filter(x => x.trim().split(/\s+/).length >= 3).length >= c.sentences;
+      li.classList.toggle("done", ok);
+    });
+  }
+  ta.addEventListener("input", () => { v.text = ta.value; persist(); run(); });
+  run();
+  return {
+    total: 0, revealLabel: "👀 See an example", alwaysShow: true,
+    check(){ run(); return []; },
+    reveal(){ if (!body.querySelector(".model")) body.append(h("div", { class: "model" }, "Example: " + sec.sample)); },
+    reset(){ clear(v); ta.value = ""; run(); }
+  };
+};
+
+/* automaticity drill: every item must be typed correctly twice; mistakes come back */
+RENDER.drill = (sec, s, body) => {
+  const items = sec.items; const NEED = sec.need || 2;
+  const box = h("div", { class: "drill" }); body.append(box);
+  let q, hits, cur, t0, tick, mistakes;
+  function fmt(ms){ const t = Math.floor(ms / 1000); return Math.floor(t / 60) + ":" + String(t % 60).padStart(2, "0"); }
+  function intro(){
+    clearInterval(tick); box.innerHTML = "";
+    box.append(h("div", { class: "dtop" }, h("span", {}, items.length + " phrases × " + NEED), h("span", {}, s.best ? "best time " + fmt(s.best) : "no best time yet")));
+    box.append(h("div", { class: "dprompt" }, h("small", {}, "how it works"), "Type each answer fast. Mistakes come back until you get them right twice."));
+    const go = h("button", { class: "start", type: "button" }, "Start the dive ↓"); go.addEventListener("click", start); box.append(go);
+  }
+  function start(){
+    q = shuffle(items.map((_, i) => i), "d" + Date.now()); hits = items.map(() => 0); mistakes = 0; t0 = Date.now();
+    box.innerHTML = "";
+    const dots = h("div", { class: "dots" }, items.map(() => h("i")));
+    const timer = h("span", { class: "timer" }, "0:00");
+    const prompt = h("div", { class: "dprompt" });
+    const input = h("input", { type: "text", autocomplete: "off", autocapitalize: "sentences", spellcheck: "false", "aria-label": "your answer" });
+    const go = h("button", { class: "go", type: "button" }, "↵");
+    const fb = h("div", { class: "dfb" });
+    box.append(h("div", { class: "dtop" }, dots, timer), prompt, h("div", { class: "drow" }, input, go), fb);
+    tick = setInterval(() => { timer.textContent = fmt(Date.now() - t0); }, 250);
+    function paintDots(){ [...dots.children].forEach((d, i) => { d.className = hits[i] >= NEED ? "full" : hits[i] > 0 ? "half" : ""; }); }
+    function next(){
+      if (!q.length){ finish(); return; }
+      cur = q.shift(); const it = items[cur];
+      prompt.innerHTML = ""; prompt.append(h("small", {}, it.cue), h("span", { html: it.prompt }));
+      input.value = ""; input.focus({ preventScroll: true });
+    }
+    function submit(){
+      if (cur == null || !input.value.trim()) return;
+      const it = items[cur]; const ok = matches(input.value, it.answers);
+      box.classList.remove("flash-ok", "flash-bad"); void box.offsetWidth; box.classList.add(ok ? "flash-ok" : "flash-bad");
+      if (ok){ hits[cur]++; fb.className = "dfb ok"; fb.textContent = "✓ " + it.answers[0]; if (hits[cur] < NEED) q.splice(Math.min(q.length, 3 + Math.floor(Math.random() * 3)), 0, cur); }
+      else { mistakes++; hits[cur] = 0; fb.className = "dfb bad"; fb.textContent = "✗ " + it.answers[0]; q.splice(Math.min(q.length, 2), 0, cur); }
+      paintDots(); next();
+    }
+    go.addEventListener("click", submit);
+    input.addEventListener("keydown", e => { if (e.key === "Enter"){ e.preventDefault(); submit(); } });
+    paintDots(); next();
+  }
+  function finish(){
+    clearInterval(tick); const ms = Date.now() - t0; const best = !s.best || ms < s.best;
+    if (best){ s.best = ms; persist(); }
+    box.innerHTML = "";
+    const again = h("button", { class: "start", type: "button" }, "Dive again");
+    again.addEventListener("click", start);
+    box.append(h("div", { class: "done" }, h("small", {}, "your time"), h("b", {}, fmt(ms)),
+      h("div", {}, (best ? "New best time! " : "Best: " + fmt(s.best) + ". ") + (mistakes ? mistakes + " slip" + (mistakes > 1 ? "s" : "") + " on the way." : "No mistakes at all!"))), again);
+    burst(again);
+  }
+  intro();
+  return { noFoot: true, total: 0 };
+};
+
+RENDER.sort = (sec, s, body) => {
+  const v = s.v || (s.v = {}); const B = Board(body, v);
+  const wrap = h("div", { class: "buckets" }); const all = [];
+  sec.categories.forEach((cat, ci) => {
+    const zone = h("div", { class: "bucket-zone" }); B.register(zone, zone, "b" + ci, false);
+    wrap.append(h("div", { class: "bucket" }, h("h3", { html: cat.name }), zone));
+    cat.words.forEach((w, wi) => all.push({ id: "w" + ci + "-" + wi, w, ci }));
+  });
+  shuffle(all, LESSON.id + sec.title).forEach(o => B.chip(o.id, o.w, String(o.ci)));
+  body.append(B.bank, wrap); B.restore();
+  const order = all.map(o => o.id);
+  return {
+    total: all.length,
+    check(){ return order.map(id => { const c = B.chips[id]; const z = B.zoneOf(c);
+      c.classList.remove("ok", "bad"); if (z === "bank") return null;
+      const ok = z === "b" + c.dataset.value; c.classList.add(ok ? "ok" : "bad"); return ok; }); },
+    reveal(){ order.forEach(id => { const c = B.chips[id]; if (B.zoneOf(c) !== "b" + c.dataset.value) B.place(c, "b" + c.dataset.value); }); },
+    reset(){ B.resetAll(); persist(); }
+  };
+};
+LABEL.sort = "sort";
+
+/* ---------- birthday widgets: cake, wheel, gifts ---------- */
+RENDER.cake = (sec, s, body) => {
+  const N = sec.candles || 16; const list = [];
+  const stage = h("div", { class: "cake-stage" });
+  const candles = h("div", { class: "candles" });
+  for (let i = 0; i < N; i++){
+    const c = h("button", { class: "candle lit", type: "button", "aria-label": "candle " + (i + 1), style: "--i:" + i }, h("i", { class: "flame" }), h("i", { class: "smoke" }));
+    c.addEventListener("click", () => { if (c.classList.contains("lit")){ c.classList.remove("lit"); after(); } });
+    candles.append(c); list.push(c);
+  }
+  stage.append(candles, h("div", { class: "cake" }, h("div", { class: "tier t2" }, h("span", {}, sec.top || "")), h("div", { class: "tier t1" }), h("div", { class: "plate" })));
+  const left = h("span", { class: "cake-left" });
+  const btnMic = h("button", { class: "btn btn-check", type: "button" }, "🎤 Blow into the mic");
+  const btnRelight = h("button", { class: "btn", type: "button" }, "🕯️ Light them again");
+  const msg = h("div", { class: "cake-msg", html: sec.done || "" }); msg.hidden = true;
+  body.append(h("div", { class: "cake-banner", html: sec.banner || "" }), stage,
+    h("p", { class: "cake-hint", html: sec.hint || "" }), h("div", { class: "cake-ctr" }, btnMic, btnRelight, left), msg);
+  const lit = () => list.filter(c => c.classList.contains("lit"));
+  function after(){
+    const n = lit().length; left.textContent = n ? n + (n === 1 ? " candle left" : " candles left") : "";
+    if (!n && msg.hidden){ msg.hidden = false; stopMic(); [0, 260, 560, 900].forEach(t => setTimeout(() => burst(stage), t)); }
+  }
+  btnRelight.addEventListener("click", () => { list.forEach(c => c.classList.add("lit")); msg.hidden = true; after(); });
+  let stream = null, raf = 0, ctx = null;
+  function stopMic(){
+    cancelAnimationFrame(raf);
+    if (stream) stream.getTracks().forEach(t => t.stop()); stream = null;
+    if (ctx){ try { ctx.close(); } catch (e) {} ctx = null; }
+    btnMic.textContent = "🎤 Blow into the mic";
+  }
+  btnMic.addEventListener("click", async () => {
+    if (stream){ stopMic(); return; }
+    try { stream = await navigator.mediaDevices.getUserMedia({ audio: true }); }
+    catch (e){ btnMic.textContent = "🎤 No mic — tap the candles"; return; }
+    ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const an = ctx.createAnalyser(); an.fftSize = 512; ctx.createMediaStreamSource(stream).connect(an);
+    const buf = new Uint8Array(an.fftSize); let hot = 0, last = 0;
+    btnMic.textContent = "⏹ Stop the mic";
+    const loop = t => {
+      an.getByteTimeDomainData(buf); let sum = 0;
+      for (const x of buf){ const d = (x - 128) / 128; sum += d * d; }
+      hot = Math.sqrt(sum / buf.length) > 0.12 ? hot + 1 : 0;
+      if (hot > 3 && t - last > 110){ last = t; const L = lit(); if (L.length){ L[Math.floor(Math.random() * L.length)].classList.remove("lit"); after(); } }
+      raf = requestAnimationFrame(loop);
+    };
+    raf = requestAnimationFrame(loop);
+  });
+  after();
+  return { noFoot: true, total: 0, check(){ return []; }, reveal(){}, reset(){} };
+};
+
+RENDER.wheel = (sec, s, body) => {
+  const qs = sec.items, n = qs.length; const used = s.used || (s.used = []);
+  const colors = sec.colors || ["#FF7FA8", "#FFC857", "#B8A1FF", "#7ED6C3"];
+  const R = 146, C = 150; let svg = '<svg viewBox="0 0 300 300" class="wheel-svg" aria-hidden="true">';
+  for (let i = 0; i < n; i++){
+    const a0 = i / n * 2 * Math.PI - Math.PI / 2, a1 = (i + 1) / n * 2 * Math.PI - Math.PI / 2, am = (a0 + a1) / 2;
+    const p = a => (C + R * Math.cos(a)).toFixed(1) + "," + (C + R * Math.sin(a)).toFixed(1);
+    const tx = (C + R * .7 * Math.cos(am)).toFixed(1), ty = (C + R * .7 * Math.sin(am)).toFixed(1);
+    svg += `<path d="M${C},${C} L${p(a0)} A${R},${R} 0 0 1 ${p(a1)} Z" fill="${colors[i % colors.length]}" stroke="#fff" stroke-width="2.5"/>`;
+    svg += `<text x="${tx}" y="${ty}" text-anchor="middle" dominant-baseline="central" font-size="22" transform="rotate(${(am * 180 / Math.PI + 90).toFixed(1)} ${tx} ${ty})">${qs[i].icon || i + 1}</text>`;
+  }
+  svg += '<circle cx="150" cy="150" r="24" fill="#fff" stroke="#3B1F3A" stroke-width="3"/></svg>';
+  const rot = h("div", { class: "wheel-rot", html: svg });
+  const btn = h("button", { class: "btn btn-check", type: "button" }, "🎡 Spin the wheel");
+  const card = h("div", { class: "wheel-q" }, h("p", { class: "wq-tip" }, sec.start || "Spin the wheel!"));
+  const done = h("div", { class: "wheel-done" });
+  body.append(h("div", { class: "wheel-wrap" }, h("div", { class: "wheel" }, h("div", { class: "wheel-pin" }), rot), h("div", { class: "wheel-side" }, btn, card)), done);
+  let angle = s.angle || 0; rot.style.transform = `rotate(${angle}deg)`;
+  function paintDone(){ done.innerHTML = ""; used.forEach(i => done.append(h("span", { class: "wd" }, (qs[i].icon || "") + " " + qs[i].short))); }
+  function show(i){
+    card.innerHTML = "";
+    card.append(h("div", { class: "wq-n" }, "question " + (used.indexOf(i) + 1) + " of " + n), h("div", { class: "wq", html: qs[i].q }));
+    if (qs[i].tip) card.append(h("div", { class: "wq-tip", html: qs[i].tip }));
+  }
+  btn.addEventListener("click", () => {
+    let free = qs.map((q, i) => i).filter(i => !used.includes(i));
+    if (!free.length){ used.length = 0; free = qs.map((q, i) => i); }
+    const i = free[Math.floor(Math.random() * free.length)];
+    const center = (i + .5) / n * 360;
+    angle = Math.ceil(angle / 360) * 360 + 1440 + (360 - center);
+    rot.style.transition = "transform 3.2s cubic-bezier(.17,.67,.2,1)"; rot.style.transform = `rotate(${angle}deg)`;
+    btn.disabled = true;
+    setTimeout(() => { used.push(i); s.angle = angle; persist(); show(i); paintDone(); btn.disabled = false; burst(card); }, 3300);
+  });
+  paintDone(); if (used.length) show(used[used.length - 1]);
+  return { noFoot: true, total: 0, check(){ return []; }, reveal(){}, reset(){} };
+};
+
+RENDER.gifts = (sec, s, body) => {
+  const v = s.v || (s.v = {}); const o = s.o || (s.o = {}); const items = [];
+  const grid = h("div", { class: "gifts" });
+  sec.items.forEach((it, i) => {
+    const box = h("div", { class: "gift" + (o[i] ? " open" : ""), style: "--g:" + i });
+    const lid = h("button", { class: "gift-closed", type: "button", "aria-label": "open present " + (i + 1) }, emo(sec.icon || "gift"), h("span", { class: "gift-n" }, pad(i)));
+    const text = h("div", { class: "q-text" }, h("span", { class: "q-num" }, pad(i)));
+    it.q.split("___").forEach((part, k) => { if (k) text.append(h("span", { class: "blank" })); text.append(h("span", { html: part })); });
+    const opts = h("div", { class: "opts" });
+    const btns = it.options.map((op, j) => { const b = h("button", { class: "opt", type: "button", html: op }); b.addEventListener("click", () => { v[i] = j; persist(); paint(); fire(body); }); opts.append(b); return b; });
+    function paint(){ btns.forEach((b, j) => { b.classList.toggle("sel", v[i] === j); b.classList.remove("ok", "bad", "answer"); }); }
+    lid.addEventListener("click", () => { o[i] = 1; persist(); box.classList.add("open"); burst(box); });
+    box.append(lid, h("div", { class: "gift-in" }, text, opts)); grid.append(box); paint();
+    items.push({ it, btns, i, paint, box });
+  });
+  body.append(grid);
+  return {
+    total: items.length,
+    check(){ return items.map(({ it, btns, i, paint }) => { paint(); if (v[i] === undefined) return null; const ok = v[i] === it.answer; btns[v[i]].classList.add(ok ? "ok" : "bad"); return ok; }); },
+    reveal(){ items.forEach(({ it, btns, i, box }) => { box.classList.add("open"); o[i] = 1; if (v[i] !== it.answer) btns[it.answer].classList.add("answer"); }); persist(); },
+    reset(){ clear(v); clear(o); items.forEach(({ paint, box }) => { paint(); box.classList.remove("open"); }); }
+  };
+};
+
+RENDER.balloons = (sec, s, body) => {
+  const items = sec.items; const popped = s.p || (s.p = {});
+  const colors = ["#FF4F8B", "#7B5CFF", "#FFC857", "#2EC4B6"];
+  const grid = h("div", { class: "balloons" }); const els = [];
+  const left = h("span", { class: "cake-left" });
+  items.forEach((q, i) => {
+    const b = h("button", { class: "bln" + (popped[i] ? " popped" : ""), type: "button", style: `--c:${colors[i % 4]};--d:${(i % 5) * .35}s`, "aria-label": "balloon " + (i + 1) },
+      h("span", { class: "bln-body" }, h("b", {}, String(i + 1))), h("span", { class: "bln-q", html: q }));
+    b.addEventListener("click", () => { if (popped[i]) return; popped[i] = 1; persist(); b.classList.add("popped"); burst(b); count(); });
+    grid.append(b); els.push(b);
+  });
+  const again = h("button", { class: "btn", type: "button" }, "🎈 Blow them up again");
+  again.addEventListener("click", () => { clear(popped); persist(); els.forEach(b => b.classList.remove("popped")); count(); });
+  function count(){ const n = items.length - Object.keys(popped).length; left.textContent = n ? n + " balloons left" : "🎉 All popped!"; }
+  body.append(h("div", { class: "cake-banner", html: sec.banner || "" }), grid, h("div", { class: "cake-ctr" }, again, left));
+  count();
+  return { noFoot: true, total: 0, check(){ return []; }, reveal(){}, reset(){} };
+};
+
+RENDER.letter = (sec, s, body) => {
+  const env = h("button", { class: "env", type: "button", "aria-label": "open the envelope" },
+    h("span", { class: "env-back" }), h("span", { class: "env-letter" }), h("span", { class: "env-front" }), h("span", { class: "env-flap" }),
+    h("span", { class: "env-seal" }, emo(sec.seal || "loveletter")), h("span", { class: "env-to", html: sec.to || "" }));
+  const letter = h("div", { class: "letter", html: sec.html }); letter.hidden = true;
+  const hint = h("p", { class: "cake-hint" }, sec.hint || "Tap the envelope to open it.");
+  env.addEventListener("click", () => {
+    if (env.classList.contains("open")) return;
+    env.classList.add("open"); hint.hidden = true;
+    setTimeout(() => { letter.hidden = false; letter.classList.add("in"); [0, 300, 650].forEach(t => setTimeout(() => burst(env), t)); }, 700);
+  });
+  body.append(h("div", { class: "env-wrap" }, env), hint, letter);
+  return { noFoot: true, total: 0, check(){ return []; }, reveal(){}, reset(){} };
+};
+
+/* ---------- block timer (visible countdown, 5/7/8 min) ---------- */
+(function blockTimer(){
+  let left = 0, total = 0, iv = 0;
+  const face = h("button", { type: "button", class: "bt-face", title: "Block timer: 5, 7 or 8 minutes" }, "⏱ Timer");
+  const presets = h("div", { class: "bt-presets" });
+  const box = h("div", { class: "bt" }, face, presets);
+  [5, 7, 8].forEach(m => { const b = h("button", { type: "button" }, m + " min"); b.addEventListener("click", () => start(m)); presets.append(b); });
+  face.addEventListener("click", () => { box.classList.toggle("open"); paint(); });
+  const stop = h("button", { type: "button", class: "bt-stop" }, "■ stop"); stop.addEventListener("click", reset); presets.append(stop);
+  function fmt(){ const m = Math.floor(left / 60), s = left % 60; return m + ":" + String(s).padStart(2, "0"); }
+  function paint(){ face.textContent = left ? "⏱ " + fmt() : (box.classList.contains("open") ? "⏱ Timer ▸" : "⏱ Timer"); box.style.setProperty("--p", total ? (1 - left / total) : 0); box.classList.toggle("run", !!left); box.classList.toggle("low", left > 0 && left <= 60); }
+  function start(m){ box.classList.remove("open"); clearInterval(iv); total = left = m * 60; paint(); iv = setInterval(() => { left--; if (left <= 0){ left = 0; clearInterval(iv); box.classList.add("ring"); setTimeout(() => box.classList.remove("ring"), 2600); burst(box); } paint(); }, 1000); }
+  function reset(){ clearInterval(iv); left = total = 0; paint(); }
+  document.body.append(box); paint();
+})();
+
+/* ---------- open T/F (checked together, no auto score) ---------- */
+RENDER.tfopen = (sec, s, body) => {
+  const v = s.v || (s.v = {});
+  const list = h("ol", { class: "tfo" });
+  sec.items.forEach((q, i) => {
+    const btns = ["T", "F"].map(L => {
+      const b = h("button", { type: "button", class: "opt" + (v[i] === L ? " sel" : "") }, L);
+      b.addEventListener("click", () => { v[i] = L; persist(); btns.forEach(x => x.classList.toggle("sel", x === b)); });
+      return b;
+    });
+    list.append(h("li", {}, h("span", { html: q }), h("span", { class: "tfo-b" }, btns[0], btns[1])));
+  });
+  body.append(list);
+  if (sec.note) body.append(h("p", { class: "wq-tip", html: sec.note }));
+  return { noFoot: true, total: 0, check(){ return []; }, reveal(){}, reset(){} };
+};
+
+/* ---------- build page ---------- */
+const main = document.getElementById("lesson");
+const graded = []; let reviewBox = null; let n = 0;
+
+LESSON.sections.forEach((sec, idx) => {
+  if (sec.type === "part"){
+    main.append(h("div", { class: "part", style: sec.color ? "--pc:" + sec.color : "" },
+      h("div", { class: "pi" }, emo(sec.icon)),
+      h("div", {}, h("div", { class: "pn" }, "PART " + sec.n), h("h2", {}, sec.title), sec.text ? h("p", {}, sec.text) : null)));
+    return;
+  }
+  const sid = "s" + idx; const s = SAVE[sid] || (SAVE[sid] = {});
+  const exercise = sec.type !== "rule" && sec.type !== "review";
+  const card = h("section", { class: "card", id: sid });
+  card.append(h("div", { class: "winbar", "aria-hidden": "true" }, h("i"), h("i"), h("i"), h("span", {}, sec.label || LABEL[sec.type] || "")));
+  if (sec.sticker) card.append(h("div", { class: "deco", "aria-hidden": "true" }, emo(sec.sticker)));
+  const inner = h("div", { class: "card-in" }); card.append(inner);
+  const num = exercise ? pad(n++) : (sec.type === "review" ? "★" : "i");
+  inner.append(h("div", { class: "card-head" }, h("div", { class: "ticket" + (exercise ? "" : " alt") }, num), h("div", {}, h("h2", { class: "t", html: sec.title || "" }))));
+  if (sec.instructions) inner.append(h("p", { class: "instr", html: sec.instructions }));
+  else inner.append(h("div", { style: "height:14px" }));
+  const body = h("div", { class: "card-body" }); inner.append(body);
+  main.append(card);
+
+  if (sec.type === "review"){ reviewBox = body; return; }
+  const api = RENDER[sec.type] ? RENDER[sec.type](sec, s, body) : null;
+  if (!api || api.noFoot) return;
+
+  const score = h("span", { class: "score" });
+  const btnCheck = h("button", { class: "btn btn-check", type: "button" }, "Check");
+  const btnShow = h("button", { class: "btn btn-soft", type: "button", hidden: !api.alwaysShow }, api.revealLabel || "👀 Show answers");
+  const btnReset = h("button", { class: "btn", type: "button" }, "Reset");
+  inner.append(h("div", { class: "card-foot" }, btnCheck, btnShow, btnReset, score));
+  const g = { sec, s, api, card, num, title: sec.title };
+  graded.push(g);
+
+  function showScore(){
+    if (s.score == null || !api.total){ score.textContent = ""; score.classList.remove("perfect"); return; }
+    score.textContent = s.score + "/" + api.total + (s.score === api.total ? " ✓" : "");
+    score.classList.toggle("perfect", s.score === api.total);
+  }
+  function doCheck(silent){
+    const res = api.check(); const sc = res.filter(x => x === true).length;
+    s.score = sc; s.checked = true;
+    if (!silent){
+      s.tries = (s.tries || 0) + 1;
+      s.first = s.first || [];
+      s.fixed = s.fixed || [];
+      res.forEach((r, i) => {
+        if (s.first[i] == null){ if (r !== null) s.first[i] = r; }
+        else if (s.first[i] === false && r === true && !s.revealed) s.fixed[i] = true;
+      });
+    }
+    btnShow.hidden = !api.alwaysShow && !((s.tries || 0) >= 2 && sc < api.total);
+    persist(); showScore(); updateAll();
+    if (!silent && api.total && sc === api.total){ burst(btnCheck); btnCheck.classList.remove("wiggle"); void btnCheck.offsetWidth; btnCheck.classList.add("wiggle"); }
+  }
+  g.doCheck = doCheck;
+  btnCheck.addEventListener("click", () => doCheck(false));
+  btnShow.addEventListener("click", () => { s.revealed = true; persist(); api.reveal(); updateAll(); });
+  btnReset.addEventListener("click", () => {
+    api.reset(); body.querySelectorAll(".reveal,.model,.why").forEach(x => x.remove());
+    delete s.score; delete s.checked; persist(); btnShow.hidden = !api.alwaysShow; showScore(); updateAll();
+  });
+  body.addEventListener("input", () => { if (s.score != null){ delete s.score; delete s.checked; persist(); showScore(); updateAll(); } });
+  if (s.checked) doCheck(true);
+});
+
+/* ---------- progress + self-check ---------- */
+function updateAll(){
+  let sc = 0, tot = 0, fixed = 0;
+  graded.forEach(({ s, api }) => { tot += api.total; if (s.score != null) sc += s.score; (s.fixed || []).forEach(f => { if (f) fixed++; }); });
+  document.getElementById("pScore").textContent = sc;
+  document.getElementById("pTotal").textContent = tot;
+  document.getElementById("pBar").style.width = tot ? (sc / tot * 100) + "%" : "0";
+  document.getElementById("pFix").textContent = fixed;
+  if (!reviewBox) return;
+  reviewBox.innerHTML = "";
+  reviewBox.append(h("div", { class: "fixcount" }, emo("star"),
+    h("div", {}, h("div", { class: "big" }, "+" + fixed), h("div", { class: "lbl" }, "mistakes you fixed yourself"))));
+  const list = h("div", { class: "rv-list" }); let any = false, checkedAny = false;
+  graded.forEach(g => {
+    const first = g.s.first || []; if (first.length) checkedAny = true;
+    const wrong = [], done = [];
+    first.forEach((f, i) => { if (f === false){ (g.s.fixed && g.s.fixed[i] ? done : wrong).push(i + 1); } });
+    if (!wrong.length && !done.length) return;
+    any = true;
+    const btn = h("button", { class: "btn", type: "button" }, wrong.length ? "Fix →" : "See →");
+    btn.addEventListener("click", () => { g.card.scrollIntoView({ behavior: "smooth", block: "start" }); g.card.classList.remove("flash"); void g.card.offsetWidth; g.card.classList.add("flash"); });
+    list.append(h("div", { class: "rv-item" + (wrong.length ? "" : " done") },
+      h("div", {}, h("div", { class: "rv-t" }, g.num + " · " + g.title.replace(/<[^>]+>/g, "")),
+        h("div", { class: "rv-n" }, wrong.length ? "to fix: " + wrong.join(", ") + (g.s.revealed ? " (answers shown)" : "") : "all fixed ✓")),
+      btn));
+  });
+  if (!any) list.append(h("div", { class: "rv-empty" }, checkedAny ? "No mistakes — wow! 🎉" : "Check some exercises first. Your mistakes will appear here."));
+  reviewBox.append(list);
+}
+updateAll();
+
+document.getElementById("resetAll").addEventListener("click", () => {
+  if (!confirm("Clear all your answers in this lesson?")) return;
+  SAVE = {}; try { localStorage.removeItem(KEY); } catch (e) {}
+  location.reload();
+});
+})();
+</script>
+</body>
+</html>
