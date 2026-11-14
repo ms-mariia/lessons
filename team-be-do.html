@@ -384,7 +384,7 @@
   /* block timer */
   .bt{position:fixed;left:12px;bottom:12px;z-index:60;background:#fff;border:2px solid var(--ink);border-radius:14px;padding:6px 8px;display:flex;align-items:center;gap:6px;box-shadow:4px 4px 0 var(--sand);
     background-image:linear-gradient(90deg,rgba(43,89,255,.16) calc(var(--p,0)*100%),transparent 0)}
-  .bt-face{font:600 14px var(--mono);min-width:76px}
+  .bt .bt-face{font:600 14px var(--mono);min-width:76px;border:0;background:none;padding:2px 4px;color:inherit}
   .bt-presets{display:none;gap:4px} .bt.open .bt-presets{display:flex} .bt-face{cursor:pointer}
   .bt button{border:1.5px solid var(--line);background:#fff;border-radius:8px;padding:3px 6px;font:500 11.5px var(--mono);cursor:pointer}
   .bt.low{border-color:var(--accent)} .bt.low .bt-face{color:var(--accent)}
@@ -1301,14 +1301,14 @@ LABEL.sort = "sort";
 /* ---------- block timer (visible countdown, 5/7/8 min) ---------- */
 (function blockTimer(){
   let left = 0, total = 0, iv = 0;
-  const face = h("span", { class: "bt-face" }, "⏱");
+  const face = h("button", { type: "button", class: "bt-face", title: "Block timer: 5, 7 or 8 minutes" }, "⏱ Timer");
   const presets = h("div", { class: "bt-presets" });
   const box = h("div", { class: "bt" }, face, presets);
   [5, 7, 8].forEach(m => { const b = h("button", { type: "button" }, m + " min"); b.addEventListener("click", () => start(m)); presets.append(b); });
-  face.addEventListener("click", () => box.classList.toggle("open"));
-  const stop = h("button", { type: "button", class: "bt-stop" }, "■"); stop.addEventListener("click", reset); presets.append(stop);
+  face.addEventListener("click", () => { box.classList.toggle("open"); paint(); });
+  const stop = h("button", { type: "button", class: "bt-stop" }, "■ stop"); stop.addEventListener("click", reset); presets.append(stop);
   function fmt(){ const m = Math.floor(left / 60), s = left % 60; return m + ":" + String(s).padStart(2, "0"); }
-  function paint(){ face.textContent = left ? "⏱ " + fmt() : "⏱"; box.style.setProperty("--p", total ? (1 - left / total) : 0); box.classList.toggle("run", !!left); box.classList.toggle("low", left > 0 && left <= 60); }
+  function paint(){ face.textContent = left ? "⏱ " + fmt() : (box.classList.contains("open") ? "⏱ Timer ▸" : "⏱ Timer"); box.style.setProperty("--p", total ? (1 - left / total) : 0); box.classList.toggle("run", !!left); box.classList.toggle("low", left > 0 && left <= 60); }
   function start(m){ box.classList.remove("open"); clearInterval(iv); total = left = m * 60; paint(); iv = setInterval(() => { left--; if (left <= 0){ left = 0; clearInterval(iv); box.classList.add("ring"); setTimeout(() => box.classList.remove("ring"), 2600); burst(box); } paint(); }, 1000); }
   function reset(){ clearInterval(iv); left = total = 0; paint(); }
   document.body.append(box); paint();
