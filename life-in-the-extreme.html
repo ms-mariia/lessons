@@ -1,0 +1,1793 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Life in the Extreme</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;600;700&family=Albert+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<!-- LESSON TEMPLATE: edit only the LESSON object. Emoji names → assets/emoji/<name>.png -->
+<style>
+  /* ===== Deep Dive · ocean theme ===== */
+  :root{
+    --surface:#0F6A86; --mid:#0A3556; --abyss:#041325;
+    --paper:#F4FBFA; --ink:#0B2236; --muted:#5A7083; --line:rgba(11,34,54,.14);
+    --accent:#FF6B57; --accent2:#13B5A8; --sand:#F2D49B; --soft:#E1F3F0;
+    --light:#EAF8F6; --lightmuted:#A9C9D2;
+    --ok:#0E9E7A; --ok-bg:#DDF6EE; --bad:#E2483D; --bad-bg:#FDE6E3; --close:#A46B00; --close-bg:#FFF1D2;
+    --head:"Gloock",Georgia,serif; --mono:"Martian Mono",ui-monospace,Menlo,monospace; --body:"Schibsted Grotesk",system-ui,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%;background:var(--abyss)}
+  body{margin:0;color:var(--ink);font:17px/1.6 var(--body);
+    background:linear-gradient(180deg,var(--surface) 0,#0C4C6E 520px,var(--mid) 1400px,#06223B 3200px,var(--abyss) 6000px);min-height:100vh;position:relative;overflow-x:hidden}
+  body::before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.22;mix-blend-mode:screen;
+    background:radial-gradient(ellipse 40px 14px at 20% 10%,#fff 0,transparent 70%),radial-gradient(ellipse 60px 18px at 70% 6%,#fff 0,transparent 70%),radial-gradient(ellipse 30px 10px at 45% 16%,#fff 0,transparent 70%);
+    animation:caustic 9s ease-in-out infinite alternate}
+  @keyframes caustic{to{transform:translate(-30px,12px) scale(1.1)}}
+  .wrap{max-width:820px;margin:0 auto;padding:0 18px;position:relative;z-index:1}
+  button{font:inherit}
+  img.emo{width:1.15em;height:1.15em;vertical-align:-.2em}
+  .bubbles{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+  .bubbles i{position:absolute;bottom:-30px;border:1.5px solid rgba(255,255,255,.45);border-radius:50%;animation:rise linear infinite}
+  @keyframes rise{to{transform:translate(var(--dx,20px),-110vh)}}
+
+  /* hero */
+  .hero{position:relative;padding:52px 0 18px;color:var(--light)}
+  .kicker{display:inline-block;font:500 11.5px/1.5 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--sand);border:1px solid rgba(242,212,155,.5);padding:5px 12px;border-radius:99px;max-width:calc(100% - 90px)}
+  h1{font-family:var(--head);font-weight:400;font-size:clamp(56px,13vw,112px);line-height:.9;margin:16px 0 0;letter-spacing:-.02em;color:#fff}
+  h1 em{font-style:normal;color:var(--sand)}
+  .sub{color:var(--lightmuted);margin:16px 0 0;max-width:46ch;font-size:18px}
+  .depthline{margin-top:20px;display:flex;gap:10px;align-items:center;font:500 11px var(--mono);color:var(--lightmuted);letter-spacing:.08em}
+  .depthline::before{content:"";flex:none;width:46px;height:1px;background:var(--lightmuted)}
+  .sticker{position:absolute;user-select:none;animation:bob 6s ease-in-out infinite;filter:drop-shadow(0 12px 16px rgba(0,0,0,.35))}
+  .sticker img{width:100%;height:100%;display:block}
+  .s1{right:0;top:40px;width:110px;height:110px;rotate:-8deg}
+  .s2{right:110px;top:150px;width:58px;height:58px;rotate:12deg;animation-delay:-3s}
+  @keyframes bob{0%,100%{translate:0 0}50%{translate:0 -10px}}
+
+  /* progress = depth gauge */
+  .progress{position:sticky;top:10px;z-index:30;display:flex;align-items:center;gap:12px;margin:0 -6px;padding:10px 18px;border-radius:99px;font:500 12px var(--mono);color:var(--light);background:rgba(6,34,59,.86);border:1px solid rgba(255,255,255,.16);box-shadow:0 10px 26px rgba(0,0,0,.3);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+  .progress .lbl{color:var(--lightmuted);text-transform:uppercase;letter-spacing:.08em}
+  .bar{flex:1;height:10px;border-radius:99px;overflow:hidden;background:rgba(255,255,255,.12)}
+  .bar i{display:block;height:100%;width:0;border-radius:99px;background:linear-gradient(90deg,var(--accent2),var(--sand),var(--accent));transition:width .6s cubic-bezier(.3,1.4,.5,1)}
+  .progress .fx{display:flex;align-items:center;gap:5px;white-space:nowrap}
+  .progress .fx img{width:18px;height:18px}
+
+  /* parts = depth markers */
+  .part{display:flex;align-items:center;gap:16px;margin:64px 0 8px;color:var(--light)}
+  .part .pi{width:58px;height:58px;flex:none;display:grid;place-items:center;border-radius:50%;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18)}
+  .part .pi img{width:40px;height:40px}
+  .part .pn{font:500 11px var(--mono);letter-spacing:.1em;color:var(--sand)}
+  .part h2{font-family:var(--head);font-weight:400;font-size:36px;line-height:1.05;margin:2px 0 0}
+  .part p{margin:3px 0 0;color:var(--lightmuted);font-size:15.5px}
+
+  /* cards */
+  .card{position:relative;background:var(--paper);border-radius:24px;margin:26px 0;box-shadow:0 18px 40px rgba(0,0,0,.28),0 0 0 1px rgba(255,255,255,.06)}
+  .winbar{display:flex;align-items:center;gap:8px;padding:14px 22px 0}
+  .winbar i{display:none}
+  .winbar span{font:500 10.5px var(--mono);letter-spacing:.12em;color:var(--accent2);text-transform:uppercase}
+  .card-in{padding:8px 24px 20px}
+  .deco{position:absolute;right:18px;top:-28px;width:56px;height:56px;rotate:8deg;user-select:none;filter:drop-shadow(0 8px 10px rgba(0,0,0,.25))}
+  .deco img{width:100%;height:100%}
+  .card-head{display:flex;align-items:center;gap:14px}
+  .ticket{flex:none;width:44px;height:44px;display:grid;place-items:center;border-radius:50%;background:var(--ink);color:#fff;font:500 13px var(--mono);box-shadow:0 0 0 4px var(--paper),0 0 0 6px var(--accent2)}
+  .ticket.alt{background:var(--accent);box-shadow:0 0 0 4px var(--paper),0 0 0 6px var(--sand)}
+  h2.t{font-family:var(--head);font-weight:400;font-size:27px;line-height:1.1;margin:0}
+  .instr{color:var(--muted);margin:10px 0 18px;font-size:15.5px}
+  .instr b{color:var(--ink)}
+  .card-foot{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:18px;padding-top:14px;border-top:1px solid var(--line)}
+  .btn{font-weight:600;font-size:15px;border-radius:99px;padding:9px 20px;cursor:pointer;border:1.5px solid var(--ink);background:transparent;color:var(--ink);transition:transform .12s,background .15s}
+  .btn:hover{transform:translateY(-1px)}
+  .btn:active{transform:translateY(1px)}
+  .btn-check{background:var(--accent);border-color:var(--accent);color:#fff}
+  .btn-soft{background:var(--soft);border-color:transparent}
+  .score{margin-left:auto;font:500 15px var(--mono)}
+  .score.perfect{color:var(--ok)}
+  .wiggle{animation:wiggle .5s}
+  @keyframes wiggle{25%{rotate:-4deg}50%{rotate:4deg}75%{rotate:-2deg}}
+
+  /* theory */
+  .rule p{margin:0 0 12px}
+  .rule h3{font-family:var(--head);font-weight:400;font-size:21px;margin:22px 0 8px}
+  .rule h3:first-child{margin-top:0}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:14px 0}
+  .box{border-radius:16px;padding:12px 14px;background:var(--soft)}
+  .box.pink{background:#FFE9E4}
+  .box.sand{background:#FBF0D9}
+  .box h4{margin:0 0 4px;font:500 10.5px var(--mono);text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}
+  .box p{margin:0;font-size:15.5px}
+  table.form{width:100%;border-collapse:collapse;font-size:15.5px;margin:10px 0 4px}
+  table.form th,table.form td{border-bottom:1px solid var(--line);padding:8px;text-align:left;vertical-align:top}
+  table.form th{font:500 10.5px var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+  .note{margin-top:14px;font-size:15px;background:var(--close-bg);border-radius:14px;padding:10px 14px}
+  .notes-tip{display:flex;gap:10px;align-items:flex-start;margin-top:14px;font-size:15px;background:var(--soft);border-radius:14px;padding:10px 14px}
+  .notes-tip img{width:30px;height:30px;flex:none}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
+  .chips span{font:500 12.5px var(--mono);border:1px solid var(--ink);border-radius:99px;padding:3px 11px;background:#fff}
+  .colloc{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px;margin:10px 0}
+  .colloc div{background:#fff;border:1px solid var(--line);border-radius:12px;padding:8px 12px;font-size:15.5px}
+  .colloc b{color:var(--accent)}
+  .story{font-size:17px;line-height:1.75;background:#fff;border-left:4px solid var(--accent2);border-radius:0 14px 14px 0;padding:14px 18px;margin:8px 0 14px}
+  ol.qs{margin:0 0 6px;padding-left:1.4em}
+  ol.qs li{margin:0 0 6px}
+  details{margin-top:12px;border:1px solid var(--line);border-radius:14px;background:#fff}
+  details summary{cursor:pointer;padding:10px 14px;font-weight:600;list-style:none}
+  details summary::-webkit-details-marker{display:none}
+  details summary::before{content:"▸ ";color:var(--accent)}
+  details[open] summary::before{content:"▾ "}
+  details > div{padding:0 14px 12px}
+  .hl{background:#FFE0D9;border-radius:4px;padding:0 3px;font-weight:600}
+  .hl2{background:#D3F1EC;border-radius:4px;padding:0 3px;font-weight:600}
+  @media (max-width:600px){.grid2{grid-template-columns:1fr}}
+
+  /* photos */
+  .photos{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:6px 0 14px}
+  .photo{margin:0;border-radius:16px;overflow:hidden;background:#0A3556;position:relative}
+  .photo img{display:block;width:100%;height:100%;aspect-ratio:4/3;object-fit:cover}
+  .photo figcaption{position:absolute;left:0;right:0;bottom:0;padding:22px 12px 8px;font-size:13.5px;color:#fff;background:linear-gradient(transparent,rgba(4,19,37,.85))}
+  .photo figcaption small{display:block;font:400 9.5px var(--mono);opacity:.7;margin-top:2px}
+  .photo.wide{grid-column:1/-1}
+  .photo.wide img{aspect-ratio:16/8}
+  @media (max-width:560px){.photos{grid-template-columns:1fr}}
+
+  /* timeline */
+  .tl{position:relative;height:104px;margin:10px 4px 6px}
+  .tl::before{content:"";position:absolute;left:0;right:12px;top:52px;height:2px;background:var(--ink)}
+  .tl::after{content:"";position:absolute;right:0;top:46px;border-left:13px solid var(--ink);border-top:7px solid transparent;border-bottom:7px solid transparent}
+  .tl .now{position:absolute;right:30px;top:44px;width:2px;height:18px;background:var(--muted)}
+  .tl .now::after{content:"now";position:absolute;top:22px;left:50%;translate:-50% 0;font:500 10.5px var(--mono);color:var(--muted)}
+  .tl .pt{position:absolute;left:var(--x);top:42px;width:20px;height:20px;margin-left:-10px;border-radius:50%;background:var(--accent2);box-shadow:0 0 0 3px var(--paper),0 0 0 4.5px var(--ink)}
+  .tl .pt.e{background:var(--accent)}
+  .tl .pt b,.tl .sp b{position:absolute;left:50%;translate:-50% 0;white-space:nowrap;font:500 12px var(--mono);bottom:30px}
+  .tl .pt i,.tl .sp i{position:absolute;left:50%;translate:-50% 0;white-space:nowrap;font:400 11px var(--mono);color:var(--muted);font-style:normal;top:30px}
+  .tl .sp{position:absolute;left:var(--x);width:var(--w);top:46px;height:13px;border-radius:7px;background:repeating-linear-gradient(90deg,var(--accent2) 0 14px,transparent 14px 22px)}
+  .tl .sp b{color:var(--accent2)}
+  .tl .stop{position:absolute;left:var(--x);top:34px;height:36px;border-left:2px dashed var(--accent)}
+  .tl .stop b{position:absolute;top:-18px;left:4px;white-space:nowrap;font:500 11px var(--mono);color:var(--accent)}
+
+  /* inputs: gaps */
+  .lines{margin:0;padding-left:1.7em}
+  .lines li::marker{color:var(--accent2);font:500 12px var(--mono)}
+  .line{margin:0 0 4px;line-height:2.2}
+  .gapwrap{white-space:nowrap}
+  .gap{font:inherit;font-size:16.5px;color:var(--ink);border:0;border-bottom:2px solid var(--accent2);background:var(--soft);border-radius:8px 8px 2px 2px;padding:1px 8px;min-width:5ch;max-width:100%;text-align:center;outline:none;transition:background .15s,box-shadow .15s}
+  .gap:focus{background:#fff;box-shadow:0 0 0 3px rgba(19,181,168,.25)}
+  .hint{color:var(--muted);font:400 .78em var(--mono);margin-left:5px}
+  input.ok,textarea.ok{background:var(--ok-bg);border-color:var(--ok);color:#0b5e49}
+  input.bad{background:var(--bad-bg);border-color:var(--bad);text-decoration:underline wavy var(--bad);text-underline-offset:4px}
+  input.close{background:var(--close-bg);border-color:var(--close)}
+  .reveal{display:inline-block;margin-left:6px;font-size:.84em;font-weight:600;color:#0b5e49;background:var(--ok-bg);padding:0 9px;border-radius:99px;line-height:1.9;white-space:nowrap}
+  .why{display:block;margin:-2px 0 10px;font-size:14.5px;line-height:1.45;border-radius:10px;padding:6px 10px}
+  .why.ok{background:var(--ok-bg);color:#0b5e49}
+  .why.bad{background:var(--bad-bg);color:#8a2b2e}
+
+  /* multiple choice */
+  .q{margin:0 0 18px}
+  .q-text{margin-bottom:8px}
+  .q-num{font:500 12px var(--mono);color:var(--accent2);margin-right:8px}
+  .blank{display:inline-block;width:60px;border-bottom:2px solid var(--muted);margin:0 3px;translate:0 -4px}
+  .opts{display:flex;flex-wrap:wrap;gap:8px}
+  .opt{font-size:15.5px;border:1.5px solid var(--line);background:#fff;color:var(--ink);border-radius:99px;padding:6px 15px;cursor:pointer;transition:transform .12s,background .15s,border-color .15s;text-align:left}
+  .opt:hover{border-color:var(--ink)}
+  .opt.sel{background:var(--ink);border-color:var(--ink);color:#fff}
+  .opt.ok{background:var(--ok);border-color:var(--ok);color:#fff}
+  .opt.bad{background:var(--bad);border-color:var(--bad);color:#fff}
+  .opt.answer{box-shadow:0 0 0 3px var(--ok)}
+  .tf2 .q{padding:12px 0;margin:0;border-bottom:1px solid var(--line)}
+  .tf2 .q-top{display:flex;gap:14px;align-items:center;justify-content:space-between}
+  .tf2 .q-text{margin:0}
+  .tf2 .opts.tfo{flex:none;flex-wrap:nowrap}
+  .fixbox{margin:10px 0 0 30px;padding:10px 12px;border-left:3px solid var(--accent);background:#FFF3EF;border-radius:0 12px 12px 0}
+  .fixbox .fl{font:500 10.5px var(--mono);color:var(--accent);margin-bottom:6px;text-transform:uppercase;letter-spacing:.08em}
+  .fixbox .opts{flex-direction:column;align-items:flex-start}
+  .warnline{font-size:14px;color:#8a2b2e;margin-top:6px}
+  @media (max-width:560px){.tf2 .q-top{flex-direction:column;align-items:flex-start;gap:8px}.fixbox{margin-left:0}}
+
+  /* drag & drop */
+  .bank{display:flex;flex-wrap:wrap;gap:9px;padding:12px;min-height:60px;margin-bottom:18px;border:1.5px dashed rgba(11,34,54,.25);border-radius:16px;background:var(--soft);transition:background .15s}
+  .bank:empty::before{content:"All placed";color:var(--muted);font-size:14px;align-self:center}
+  .bank.over{background:#d0ece7}
+  .chip{font-size:15px;font-weight:600;line-height:1.35;background:#fff;color:var(--ink);border:1.5px solid var(--ink);border-radius:12px;padding:5px 12px;box-shadow:0 3px 0 var(--accent2);cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;text-align:left}
+  .chip.selected{outline:3px solid var(--accent);outline-offset:2px;rotate:-2deg}
+  .chip.dragging{opacity:.28}
+  .chip.ghost{position:fixed;z-index:1000;pointer-events:none;margin:0;rotate:-4deg;scale:1.05;box-shadow:0 10px 18px rgba(0,0,0,.25)}
+  .chip.ok{background:var(--ok-bg);border-color:var(--ok);box-shadow:none}
+  .chip.bad{background:var(--bad-bg);border-color:var(--bad);box-shadow:none}
+  .slot{display:inline-flex;align-items:center;justify-content:center;min-width:110px;min-height:40px;padding:2px;margin:0 4px;vertical-align:middle;border:1.5px dashed rgba(11,34,54,.35);border-radius:12px;cursor:pointer;transition:background .15s,border-color .15s}
+  .slot .chip{box-shadow:none}
+  .slot.over{background:var(--soft);border-color:var(--accent2)}
+  .slot.ok{border-style:solid;border-color:var(--ok);background:var(--ok-bg)}
+  .slot.bad{border-style:solid;border-color:var(--bad);background:var(--bad-bg)}
+  .slot.ok .chip,.slot.bad .chip{background:transparent;border-color:transparent}
+  .match{display:grid;gap:10px}
+  .mrow{display:grid;grid-template-columns:.8fr 1.4fr;gap:10px;align-items:center}
+  .mrow .left{font-weight:600}
+  .mrow .left::before{content:attr(data-n);font:500 12px var(--mono);color:var(--accent2);margin-right:8px}
+  .mrow .slot{display:flex;justify-content:flex-start;width:100%;min-height:46px;margin:0}
+  @media (max-width:560px){.mrow{grid-template-columns:1fr;gap:6px}.mrow+.mrow{margin-top:8px}}
+
+  /* full inputs */
+  .row{margin:0 0 16px}
+  .row-label{font-size:14.5px;color:var(--muted);margin-bottom:5px}
+  .row-label s{text-decoration-color:var(--bad);text-decoration-thickness:2px}
+  .prompt{font-weight:500;margin-bottom:6px}
+  .prompt .num{font:500 12px var(--mono);color:var(--accent2);margin-right:8px}
+  .key{display:inline-block;font:500 11.5px var(--mono);background:var(--ink);color:#fff;border-radius:99px;padding:2px 10px;margin-left:6px}
+  .full{display:block;width:100%;font:inherit;font-size:16.5px;color:var(--ink);padding:10px 14px;border:1.5px solid rgba(11,34,54,.22);border-radius:14px;background:#fff;outline:none;transition:border-color .15s,background .15s}
+  .full:focus{border-color:var(--accent2)}
+  textarea.full{resize:vertical;min-height:160px;line-height:1.55}
+  .model{margin-top:7px;font-size:15px;color:#0b5e49;background:var(--ok-bg);padding:7px 12px;border-radius:12px}
+  .model.close{color:#7a5300;background:var(--close-bg)}
+  .model.warn{color:#8a2b2e;background:var(--bad-bg)}
+  .checks{list-style:none;padding:0;margin:12px 0 0;display:grid;gap:6px;font-size:15px}
+  .checks li::before{content:"○";display:inline-block;width:1.4em;font-weight:800;color:var(--muted)}
+  .checks li.done::before{content:"✓";color:var(--ok)}
+  .checks li.done{color:#0b5e49}
+  .wordbox{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 12px}
+  .wordbox span{font:500 12px var(--mono);background:var(--soft);border-radius:99px;padding:3px 10px}
+  .wordbox span.used{background:var(--ok-bg);color:#0b5e49;text-decoration:line-through}
+
+  /* drill (automaticity) */
+  .drill{background:var(--ink);color:#fff;border-radius:20px;padding:18px;position:relative;overflow:hidden}
+  .drill .dtop{display:flex;justify-content:space-between;align-items:center;gap:10px;font:500 12px var(--mono);color:var(--lightmuted);flex-wrap:wrap}
+  .drill .dots{display:flex;gap:5px;flex-wrap:wrap}
+  .drill .dots i{width:12px;height:12px;border-radius:50%;border:1.5px solid rgba(255,255,255,.4)}
+  .drill .dots i.half{background:linear-gradient(90deg,var(--sand) 50%,transparent 50%);border-color:var(--sand)}
+  .drill .dots i.full{background:var(--accent2);border-color:var(--accent2)}
+  .drill .timer{font:500 22px var(--mono);color:var(--sand)}
+  .drill .dprompt{font-family:var(--head);font-size:clamp(22px,4.6vw,30px);line-height:1.2;margin:22px 0 14px;min-height:2.4em}
+  .drill .dprompt small{display:block;font:400 12px var(--mono);color:var(--lightmuted);margin-bottom:6px;letter-spacing:.06em;text-transform:uppercase}
+  .drill .drow{display:flex;gap:8px}
+  .drill input{flex:1;min-width:0;font:inherit;font-size:18px;padding:12px 14px;border-radius:14px;border:2px solid rgba(255,255,255,.25);background:rgba(255,255,255,.06);color:#fff;outline:none}
+  .drill input:focus{border-color:var(--accent2)}
+  .drill .go{background:var(--accent);border:0;color:#fff;border-radius:14px;padding:0 18px;font-weight:700;cursor:pointer}
+  .drill .dfb{min-height:26px;margin-top:10px;font-size:15px}
+  .drill .dfb.ok{color:#7CF0CF} .drill .dfb.bad{color:#FFB3A8}
+  .drill.flash-ok{box-shadow:inset 0 0 0 3px #7CF0CF}
+  .drill.flash-bad{animation:shake .35s;box-shadow:inset 0 0 0 3px #FFB3A8}
+  .drill .start{display:block;margin:26px auto 8px;background:var(--accent);color:#fff;border:0;border-radius:99px;padding:14px 30px;font-weight:700;font-size:17px;cursor:pointer}
+  .drill .done{text-align:center;padding:16px 0 4px}
+  .drill .done b{display:block;font:500 40px var(--mono);color:var(--sand)}
+  @keyframes shake{25%{translate:-4px 0}50%{translate:4px 0}75%{translate:-2px 0}}
+
+  /* review */
+  .fixcount{display:flex;align-items:center;gap:14px;padding:14px 16px;border-radius:16px;background:#FBF0D9;margin-bottom:14px}
+  .fixcount img{width:54px;height:54px}
+  .fixcount .big{font:500 32px var(--mono);line-height:1}
+  .fixcount .lbl{font-size:14.5px;color:var(--muted)}
+  .rv-list{display:grid;gap:10px}
+  .rv-item{display:flex;align-items:center;gap:12px;justify-content:space-between;border:1px solid var(--line);border-radius:14px;padding:10px 12px;background:#fff}
+  .rv-item .rv-t{font-weight:600}
+  .rv-item .rv-n{font:400 12px var(--mono);color:var(--bad)}
+  .rv-item.done .rv-n{color:var(--ok)}
+  .rv-empty{color:var(--muted);font-size:15px}
+  .flash{animation:flash 1.2s}
+  @keyframes flash{30%{box-shadow:0 0 0 6px var(--sand),0 18px 40px rgba(0,0,0,.28)}}
+
+  .page-foot{text-align:center;padding:30px 0 80px;color:var(--lightmuted);font-size:14px}
+  .page-foot .btn{margin-bottom:14px;color:var(--light);border-color:rgba(255,255,255,.4)}
+  .page-foot small{display:block;margin-top:8px;font-size:11.5px;opacity:.85;line-height:1.5}
+  .page-foot a{color:var(--lightmuted)}
+  .confetti{position:fixed;z-index:999;pointer-events:none;left:0;top:0;width:30px;height:30px}
+  .confetti img{width:100%;height:100%}
+
+  @media (max-width:560px){
+    body{font-size:16.5px}
+    .card-in{padding:6px 16px 16px}
+    .winbar{padding:12px 16px 0}
+    .s1{width:78px;height:78px;top:30px}
+    .s2{display:none}
+    .score{width:100%;margin-left:0;order:-1}
+    .deco{width:46px;height:46px;top:-22px}
+    .gapwrap{white-space:normal}
+    .part h2{font-size:30px}
+  }
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+  /* ---- word-order slots (fixed colours for the whole lesson) ---- */
+  :root{ --sWho:#4D7CFF; --sDoes:#FF4D6D; --sWhat:#14B887; --sWhere:#F09A00; --sWhen:#9B5CFF; --sFreq:#6B6E8A; }
+  .c-who{--c:var(--sWho)} .c-does{--c:var(--sDoes)} .c-what{--c:var(--sWhat)} .c-where{--c:var(--sWhere)} .c-when{--c:var(--sWhen)} .c-freq{--c:var(--sFreq)}
+  .legend{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+  .legend .lg{flex:1 1 120px;border:2px solid var(--c);border-radius:12px;overflow:hidden;background:#fff;text-align:center}
+  .legend .lg b{display:block;background:var(--c);color:#fff;font:700 13px var(--mono);padding:5px 6px}
+  .legend .lg span{display:block;padding:7px 6px;font-weight:700}
+  .w{color:var(--c);font-weight:700;border-bottom:3px solid var(--c);padding:0 1px}
+  .arrow{font:700 14px var(--mono);color:var(--muted);text-align:center;margin:-2px 0 6px}
+
+  .bitem{padding:14px 0 16px;border-bottom:1.5px dashed color-mix(in srgb,var(--ink) 14%,transparent)}
+  .bitem:last-child{border-bottom:0}
+  .bitem .bhead{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+  .bitem .bnum{font:700 14px var(--mono);color:var(--accent)}
+  .bitem .bstate{font-size:14px;font-weight:700}
+  .bitem .bstate.ok{color:var(--ok)} .bitem .bstate.bad{color:var(--bad)}
+  .bitem .bank{min-height:52px;margin-bottom:10px;padding:9px}
+  .brow{display:flex;flex-wrap:wrap;gap:8px;align-items:stretch}
+  .bslot{flex:1 1 118px;min-width:108px;border:2px dashed var(--c);border-radius:12px;background:color-mix(in srgb,var(--c) 7%,#fff);display:flex;flex-direction:column;cursor:pointer;transition:background .15s,box-shadow .15s}
+  .bslot .bq{font:700 11.5px var(--mono);color:var(--c);padding:4px 8px 0}
+  .bslot .bz{flex:1;min-height:42px;display:flex;align-items:center;justify-content:center;padding:4px 6px 6px}
+  .bslot.over{background:color-mix(in srgb,var(--c) 18%,#fff)}
+  .bslot .chip{box-shadow:none;width:100%;text-align:center}
+  .bslot.ok{border-style:solid;background:var(--ok-bg);border-color:var(--ok)}
+  .bslot.bad{border-style:solid;background:var(--bad-bg);border-color:var(--bad);animation:shake .35s}
+  .bslot.ok .bq{color:var(--ok)} .bslot.bad .bq{color:var(--bad)}
+  .bslot.bad .bq::after{content:"  ✗ not here";}
+  .bdot{align-self:center;font:700 22px var(--head)}
+  @keyframes shake{25%{translate:-3px 0}50%{translate:3px 0}75%{translate:-2px 0}}
+
+  /* slot prompts for writing */
+  .sp-tags{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 7px}
+  .sp-tags span{font:700 12.5px var(--mono);border-radius:6px;padding:2px 8px;border:1.5px solid var(--c);color:var(--c);background:#fff}
+  .sp-tags span.fill{background:var(--c);color:#fff}
+
+  /* rule card */
+  .rcard{border:2px solid var(--ink);border-radius:14px;overflow:hidden;margin:14px 0 4px;background:#fff}
+  .rcard div{display:grid;grid-template-columns:110px 1fr;border-bottom:1.5px solid color-mix(in srgb,var(--ink) 12%,transparent)}
+  .rcard div:last-child{border-bottom:0}
+  .rcard b{font:700 12.5px var(--mono);text-transform:uppercase;letter-spacing:.06em;background:var(--soft);padding:10px 12px}
+  .rcard span{padding:10px 12px}
+  @media (max-width:520px){.rcard div{grid-template-columns:1fr}.rcard b{padding:6px 12px}}
+
+  /* ===== Life in the Extreme · ice-to-lava gauge ===== */
+  :root{
+    --paper:#FFFFFF; --ink:#0E1A2B; --muted:#55627A; --line:rgba(14,26,43,.13);
+    --accent:#FF5A1F; --accent2:#1E9BD7; --sand:#FFC23D; --soft:#EAF6FC; --ice:#BDE8FA;
+    --light:#0E1A2B; --lightmuted:#55627A;
+    --head:"Unbounded",system-ui,sans-serif; --mono:"JetBrains Mono",ui-monospace,Menlo,monospace; --body:"Albert Sans",system-ui,sans-serif;
+  }
+  .c-qw{--c:#55627A} .c-aux{--c:#1E9BD7} .c-who{--c:#7A5AF8} .c-does{--c:#FF5A1F}
+  html{background:#EEF2F6}
+  body{background-color:#EEF2F6;background-image:linear-gradient(180deg,rgba(189,232,250,.7) 0,rgba(238,242,246,0) 520px)}
+  body::before{content:"";display:block;position:fixed;right:10px;top:0;bottom:0;width:6px;border-radius:3px;background:linear-gradient(180deg,#1E9BD7,#BDE8FA 35%,#FFC23D 65%,#FF5A1F);opacity:.85;z-index:0}
+  .bubbles{display:none}
+  h1{font-family:var(--head);font-weight:700;font-size:clamp(44px,11vw,98px);line-height:.95;color:var(--ink);letter-spacing:-.02em}
+  h1 em{font-style:normal;background:linear-gradient(90deg,#1E9BD7,#FF5A1F);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .kicker{color:#fff;background:var(--ink);border-color:var(--ink);font-family:var(--mono)}
+  .sub{color:var(--muted)}
+  .progress{color:var(--ink);background:#fff;border:1.5px solid var(--ink);border-radius:12px}
+  .progress .lbl{color:var(--accent);font-weight:700}
+  .bar{background:#E4EAF1} .bar i{background:linear-gradient(90deg,#1E9BD7,#FFC23D,#FF5A1F)}
+  .part .pi{background:#fff;border:1.5px solid var(--ink);border-radius:12px}
+  .part .pn{color:var(--accent2);font-family:var(--mono)} .part h2{font-family:var(--head);font-weight:600}
+  .part p{color:var(--muted)}
+  .card{border-radius:14px;box-shadow:0 16px 34px rgba(14,26,43,.12);border-left:6px solid var(--accent2)}
+  .card:nth-of-type(even){border-left-color:var(--accent)}
+  h2.t{font-family:var(--head);font-weight:600;font-size:23px}
+  .winbar span{color:var(--accent);font-weight:700}
+  .ticket{border-radius:10px;background:var(--ink);box-shadow:none;font-family:var(--mono)}
+  .ticket.alt{background:var(--accent)}
+  .opt.sel{background:var(--ink);border-color:var(--ink)}
+  .chip{box-shadow:0 3px 0 var(--accent2)}
+  .photo{border-radius:12px}
+  .photo figcaption{background:linear-gradient(transparent,rgba(14,26,43,.85))}
+  .drill{background:var(--ink)} .drill .dtop,.drill .dprompt small{color:#AFC0D6} .drill .timer,.drill .done b{color:var(--sand)}
+  .page-foot{color:var(--muted)} .page-foot .btn{color:var(--ink);border-color:var(--ink)} .page-foot a{color:var(--muted)}
+  .gauge{position:relative;height:14px;border-radius:7px;background:linear-gradient(90deg,#1E9BD7,#BDE8FA 40%,#FFC23D 70%,#FF5A1F);margin:26px 0 30px}
+  .gauge span{position:absolute;top:-22px;transform:translateX(-50%);font:600 11.5px var(--mono);white-space:nowrap}
+  .gauge span.b{top:18px}
+  .article{background:#fff;border:1.5px solid var(--line);border-radius:12px;padding:14px 16px;margin:6px 0 14px;font-size:15.5px;line-height:1.65}
+  .article h4{margin:0 0 6px;font:600 18px var(--head)}
+  .article p{margin:0 0 10px}
+  .article .tag{display:inline-block;font:600 11px var(--mono);text-transform:uppercase;color:#fff;background:var(--accent2);border-radius:6px;padding:2px 8px;margin-bottom:6px}
+  .buckets{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+  .bucket{border:1.5px solid var(--ink);border-radius:12px;background:#fff;overflow:hidden}
+  .bucket h3{margin:0;padding:8px 12px;font:600 14px var(--head);color:#fff;background:var(--accent2)}
+  .bucket:nth-child(2) h3{background:var(--accent)} .bucket:nth-child(3) h3{background:#7A5AF8}
+  .bucket-zone{min-height:90px;padding:8px;display:flex;flex-wrap:wrap;gap:6px;align-content:flex-start;cursor:pointer}
+  .bucket-zone.over{background:var(--soft)} .bucket .chip{box-shadow:none}
+  .wheel-wrap{display:grid;grid-template-columns:minmax(220px,300px) 1fr;gap:18px;align-items:center}
+  .wheel{position:relative;width:100%;aspect-ratio:1} .wheel-rot{width:100%;height:100%}
+  .wheel-svg{width:100%;height:100%;display:block;filter:drop-shadow(0 10px 18px rgba(14,26,43,.18))}
+  .wheel-pin{position:absolute;left:50%;top:-6px;margin-left:-13px;border-left:13px solid transparent;border-right:13px solid transparent;border-top:24px solid var(--ink);z-index:2}
+  .wheel-side{display:flex;flex-direction:column;gap:12px;align-items:flex-start}
+  .wheel-q{background:var(--soft);border-radius:12px;padding:14px 16px;width:100%;min-height:110px}
+  .wq-n{font:600 11px var(--mono);text-transform:uppercase;color:var(--accent);margin-bottom:6px}
+  .wq{font:600 18px/1.35 var(--head)} .wq b{color:var(--accent)}
+  .wq-tip{color:var(--muted);font-size:14px;margin-top:6px}
+  .wheel-done{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+  .wd{font:500 12.5px var(--mono);background:#fff;border:1.5px solid var(--line);border-radius:999px;padding:3px 10px}
+  .bt{position:fixed;left:12px;bottom:12px;z-index:60;background:#fff;border:1.5px solid var(--ink);border-radius:12px;padding:6px 8px;display:flex;align-items:center;gap:6px;box-shadow:0 6px 16px rgba(14,26,43,.18);
+    background-image:linear-gradient(90deg,rgba(255,90,31,.16) calc(var(--p,0)*100%),transparent 0)}
+  .bt .bt-face{font:600 14px var(--mono);cursor:pointer;border:0;background:none;padding:2px 4px;color:inherit}
+  .bt-presets{display:none;gap:4px} .bt.open .bt-presets{display:flex}
+  .bt button{border:1.5px solid var(--line);background:#fff;border-radius:8px;padding:3px 6px;font:500 11.5px var(--mono);cursor:pointer}
+  .bt.low{border-color:var(--accent)} .bt.low .bt-face{color:var(--accent)}
+  .bt.ring{animation:ring .25s linear 10} @keyframes ring{25%{transform:rotate(-4deg)}75%{transform:rotate(4deg)}}
+  @media (max-width:600px){.wheel-wrap{grid-template-columns:1fr}.wheel{max-width:290px;margin:0 auto}body::before{display:none}}
+  .gauge span:first-child{transform:none} .gauge span:last-child{transform:translateX(-100%)}
+  .video{position:relative;aspect-ratio:16/9;border-radius:12px;overflow:hidden;background:#0E1A2B;margin:8px 0 10px}
+  .video iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+  .yt{display:inline-flex;align-items:center;gap:6px;font:600 14px var(--body);color:var(--ink);border:1.5px solid var(--ink);border-radius:999px;padding:6px 14px;text-decoration:none;margin-bottom:6px}
+  .tfo{margin:6px 0 10px;padding-left:22px}
+  .tfo li{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 0;border-bottom:1px dashed var(--line);font-size:15.5px}
+  .tfo-b{display:flex;gap:6px;flex-shrink:0}
+  .tfo-b .opt{min-width:44px}
+</style>
+</head>
+<body>
+<div class="bubbles" aria-hidden="true"><i style="left:6%;width:2px;height:28px;animation-duration:14s;animation-delay:-3s;--dx:30px"></i><i style="left:14%;width:2px;height:20px;animation-duration:11s;animation-delay:-8s;--dx:-20px"></i><i style="left:27%;width:2px;height:36px;animation-duration:18s;animation-delay:-2s;--dx:40px"></i><i style="left:41%;width:2px;height:24px;animation-duration:13s;animation-delay:-10s;--dx:-30px"></i><i style="left:55%;width:2px;height:18px;animation-duration:9s;animation-delay:-4s;--dx:20px"></i><i style="left:66%;width:2px;height:32px;animation-duration:16s;animation-delay:-12s;--dx:-40px"></i><i style="left:78%;width:2px;height:22px;animation-duration:12s;animation-delay:-6s;--dx:25px"></i><i style="left:88%;width:2px;height:40px;animation-duration:20s;animation-delay:-1s;--dx:-25px"></i><i style="left:94%;width:2px;height:20px;animation-duration:10s;animation-delay:-9s;--dx:15px"></i><i style="left:35%;width:2px;height:26px;animation-duration:15s;animation-delay:-14s;--dx:35px"></i></div>
+
+<div class="wrap">
+  <header class="hero">
+    <div class="sticker s1" id="sticker1" aria-hidden="true"></div>
+    <div class="sticker s2" id="sticker2" aria-hidden="true"></div>
+    <span class="kicker" id="kicker"></span>
+    <h1 id="title"></h1>
+    <p class="sub" id="sub"></p>
+  </header>
+
+  <div class="progress" aria-live="polite">
+    <span class="lbl">score</span><span><b id="pScore">0</b>/<b id="pTotal">0</b></span>
+    <div class="bar"><i id="pBar"></i></div>
+    <span class="fx" title="Mistakes you fixed yourself"><img src="assets/emoji/star.png" alt=""> <b id="pFix">0</b></span>
+  </div>
+
+  <main id="lesson"></main>
+
+  <footer class="page-foot">
+    <button class="btn btn-soft" id="resetAll" type="button">↺ Reset all answers</button>
+    <div>Your answers are saved on this device.</div>
+    <small>Emoji: Microsoft Fluent Emoji (MIT licence)</small>
+  </footer>
+</div>
+
+<script>
+/* =====================================================================
+   LESSON CONTENT — edit this object to make a new lesson
+   ---------------------------------------------------------------------
+   build:   { who, freq, does, what, where, when, wrong }  (wrong = extra wrong chip)
+   gapfill: items as "text [[answer // hint]]" or { text, why }
+   tf2:     { q, answer: true/false, fix: [options], fixAnswer }
+   ===================================================================== */
+const IMG = f => "assets/img/" + f;
+const H = v => ` <span class=hint>(${v})</span>`;
+const LESSON = {
+  id: "life-in-the-extreme-impact2-u5",
+  kicker: "Impact 2 · Unit 5",
+  titleHTML: 'Life in the <em>Extreme</em>',
+  title: "Life in the Extreme",
+  subtitle: "From −200 °C to +151 °C: who survives, how — and who decides what’s ugly?",
+  stickers: ["thermo", "microscope"],
+  confetti: ["snow", "fire", "star", "sparkles", "check"],
+
+  sections: [
+
+    /* ================= 1 · TO START ================= */
+    { type: "part", n: "01", icon: "thermo", title: "To start", text: "Hot, cold, dry, deep." },
+
+    {
+      type: "rule", label: "to start · look and talk", sticker: "thermo",
+      title: "Who can live here?",
+      html: `
+        <div class="photos">
+          <figure class="photo"><img loading="lazy" alt="A polar bear jumping between pieces of drift ice" src="${IMG("polarbear.jpg")}"><figcaption><b>A · the Arctic</b><small>Photo: Andreas Weith · CC BY-SA 4.0 · Wikimedia Commons</small></figcaption></figure>
+          <figure class="photo"><img loading="lazy" alt="A camel in a dry stony desert" src="${IMG("camel.jpg")}"><figcaption><b>B · the Gobi Desert</b><small>Photo: Bernard Gagnon · CC0 · Wikimedia Commons</small></figcaption></figure>
+        </div>
+        <div class="gauge"><span style="left:0%">−200 °C</span><span style="left:30%">−30 °C Arctic</span><span class="b" style="left:52%">+50 °C desert</span><span style="left:74%">+121 °C</span><span class="b" style="left:100%">+151 °C</span></div>
+        <ol class="qs">
+          <li>Name an animal that lives somewhere extremely hot or cold. How do you think it survives?</li>
+          <li>What’s the hottest or coldest place you’ve ever been? How did you feel?</li>
+          <li>What can we learn about our planet from animals that live in extreme places?</li>
+        </ol>`
+    },
+
+    /* ================= 2 · READING 1 ================= */
+    { type: "part", n: "02", icon: "microscope", title: "Life at the limits", text: "Reading + new words" },
+
+    {
+      type: "tf2", label: "reading · life at the limits", sticker: "microscope",
+      title: "Survivors",
+      instructions: "Read the text. True or false? If it’s false, choose the correct sentence.",
+      text: `<div class="article"><span class="tag">science</span>
+          <h4>Survivors</h4>
+          <p>In the Arctic, −30 °C is a typical day — and polar bears handle it. In the Sahara, the temperature can reach 50 °C — and camels survive. Both animals have adapted to harsh environments, but like all mammals, they can only live within a certain range of conditions.</p>
+          <p>Some much smaller creatures go far beyond that. The tardigrade, or “water bear”, is less than a millimeter long, but it can tolerate temperatures from −200 °C to 151 °C. It can survive a lack of water and oxygen — in 2011, scientists even sent tardigrades into space, and they survived.</p>
+          <p>Even smaller are extremophiles: microbes made of just one cell. Some thrive in very high levels of salt, some live inside solid rock. One type, Strain 121, lives next to a volcanic vent at the bottom of the Pacific and can handle 121 °C. Others live under 18 meters of Antarctic ice, with no light and no oxygen.</p>
+          <p>Why do scientists care? Because these organisms show where life might exist on other planets. As astrobiologist Kevin Hand puts it, the big question is what it takes for a world to be habitable.</p></div>`,
+      items: [
+        { q: "For the Arctic, −30 °C is a normal temperature.", answer: true, fix: [], fixAnswer: 0 },
+        { q: "Polar bears and camels can live in any conditions.", answer: false, fix: ["They can only live in a certain range of conditions.", "They can live only in water.", "They can’t live in harsh places."], fixAnswer: 0 },
+        { q: "A tardigrade is about one centimeter long.", answer: false, fix: ["It’s less than a millimeter long.", "It’s about one meter long.", "It’s as big as a bear."], fixAnswer: 0 },
+        { q: "Tardigrades can survive without water and oxygen.", answer: true, fix: [], fixAnswer: 0 },
+        { q: "Tardigrades died when scientists sent them into space.", answer: false, fix: ["They survived.", "They were never sent into space.", "Only half of them died."], fixAnswer: 0 },
+        { q: "Extremophiles are made of many cells.", answer: false, fix: ["They are made of one cell.", "They are made of rock.", "They are a kind of bear."], fixAnswer: 0 },
+        { q: "Some extremophiles live inside solid rock.", answer: true, fix: [], fixAnswer: 0 },
+        { q: "Strain 121 lives in the Antarctic ice.", answer: false, fix: ["It lives next to a volcanic vent in the Pacific.", "It lives in the Dead Sea.", "It lives in the Sahara."], fixAnswer: 0 },
+        { q: "Some microbes live with no light and no oxygen.", answer: true, fix: [], fixAnswer: 0 },
+        { q: "Scientists study extremophiles to find out where life might exist on other planets.", answer: true, fix: [], fixAnswer: 0 }
+      ]
+    },
+
+    {
+      type: "rule", label: "vocabulary · unit words", sticker: "snow",
+      title: "Words for extreme places",
+      html: `
+        <div class="colloc">
+          <div><b>environment</b> — the place and conditions where something lives · <b>conditions</b> — the temperature, light, water etc. in a place</div>
+          <div><b>harsh</b> — very difficult to live in · <b>typical</b> — normal, usual · <b>a variety of</b> — many different kinds of</div>
+          <div><b>a high / low level of</b> salt, heat… · <b>a lack of</b> water — not having (enough) water</div>
+          <div><b>handle</b> = <b>tolerate</b> — deal with something difficult · <b>thrive</b> — grow and do very well (more than just survive)</div>
+          <div><b>exist</b> = live, be real · <b>creature</b> = any living animal · <b>remarkable</b> = extraordinary, very surprising · <b>life</b> — living things</div>
+          <div><b>pressure</b> — force pushing on something (deep water has very high pressure) · <b>kill</b> → something <b>dies</b> · <b>normal</b></div>
+          <div><b>bizarre</b> — very strange · <b>rare</b> — not common · <b>a parasite</b> — lives on or in another animal and takes food from it · <b>tongue</b></div>
+        </div>
+        <div class="note">💡 Strategy: <b>synonyms</b>. Writers repeat ideas with different words: handle → tolerate, animal → creature, live → exist, amazing → remarkable.</div>`
+    },
+
+    {
+      type: "match", label: "vocabulary · synonyms", sticker: "snow",
+      title: "Find the synonym",
+      instructions: "Match each word with a word or phrase that means the same.",
+      pairs: [
+        ["tolerate", "handle"], ["creature", "animal"], ["exist", "live, be real"], ["remarkable", "extraordinary"],
+        ["thrive", "grow and do very well"], ["harsh", "very difficult to live in"], ["typical", "normal, usual"],
+        ["variety", "many different kinds"], ["lack of", "not having enough of"], ["bizarre", "very strange"]
+      ]
+    },
+
+    {
+      type: "gapfill", label: "vocabulary · in context", sticker: "volcano",
+      title: "The rainbow spring",
+      instructions: "Complete the text about the photo with words from the unit.",
+      text: `<figure class="photo wide" style="margin:0 0 12px"><img loading="lazy" alt="Aerial view of a hot spring with blue water and orange rings" src="${IMG("prismatic.jpg")}"><figcaption><b>Grand Prismatic Spring, Yellowstone, USA</b><small>Photo: Carsten Steger · CC BY-SA 4.0 · Wikimedia Commons</small></figcaption></figure>`,
+      items: [
+        { text: "The water in the middle is about 87 °C — a [[harsh]] place for almost every living thing.", why: "harsh = very difficult to live in." },
+        { text: "A [[typical]] fish would die in it in seconds.", why: "typical = normal, usual." },
+        { text: "But billions of tiny microbes [[thrive]] in the hot water around the edges.", why: "thrive = do very well, not just survive." },
+        { text: "They can [[handle|tolerate]] heat that would kill us.", why: "handle / tolerate = deal with something difficult." },
+        { text: "The water has very high [[levels]] of minerals.", why: "high levels of = a lot of." },
+        { text: "There is also a [[lack]] of oxygen.", why: "a lack of = not enough." },
+        { text: "Each [[variety]] of microbe likes different conditions.", why: "variety = kind, type." },
+        { text: "Because the [[conditions]] change from the middle to the edge, each ring has a different color.", why: "conditions = temperature, minerals etc." },
+        { text: "This hot spring is a perfect [[environment]] for these organisms.", why: "environment = where something lives." },
+        { text: "Places like this show that [[life]] can exist almost anywhere.", why: "life = living things." }
+      ]
+    },
+
+    {
+      type: "mcq", label: "vocabulary · words in context", sticker: "fish",
+      title: "Choose the right word",
+      instructions: "Choose the word that fits.",
+      items: [
+        { q: "Out of the water, the blobfish looks really ___ — like a sad pink jelly.", options: ["bizarre", "typical", "normal"], answer: 0 },
+        { q: "A ___ lives on another animal and takes food from it.", options: ["predator", "parasite", "mammal"], answer: 1 },
+        { q: "The pig-nosed frog is very ___ — scientists only found it in 2003.", options: ["rare", "common", "harsh"], answer: 0 },
+        { q: "Deep in the ocean the water ___ is enormous — it pushes on everything.", options: ["variety", "pressure", "lack"], answer: 1 },
+        { q: "Very high temperatures ___ most living things.", options: ["kill", "thrive", "die"], answer: 0 },
+        { q: "Without water, most plants ___ in a few days.", options: ["kill", "exist", "die"], answer: 2 },
+        { q: "For a camel, 45 °C is ___ — it’s just another hot day.", options: ["normal", "rare", "bizarre"], answer: 0 },
+        { q: "You taste food with your ___.", options: ["tongue", "teeth", "nose"], answer: 0 }
+      ]
+    },
+
+    /* ================= 3 · SPEAKING ================= */
+    { type: "part", n: "03", icon: "speech", title: "Strong opinions", text: "Speaking strategy" },
+
+    {
+      type: "rule", label: "speaking · strong opinions", sticker: "speech",
+      title: "Say it strongly — answer it politely",
+      html: `
+        <div class="colloc">
+          <div><b>Express</b>: X is the ugliest animal around! · X are <b>the worst</b>. They’re <b>even</b> scarier than Y. · <b>There’s nothing more</b> disgusting <b>than</b> X. · X are definitely the coolest.</div>
+          <div><b>Respond</b>: <b>Really?</b> I think they’re quite cute. · <b>I don’t know.</b> I <b>sort of</b> like X. · <b>That’s not true!</b> <b>I’ll bet</b> there are <b>plenty of</b> more disgusting creatures. · <b>No way!</b></div>
+        </div>`
+    },
+
+    {
+      type: "dragwords", label: "speaking · dialogue", sticker: "speech",
+      title: "Choosing a mascot",
+      instructions: "Max and Lena choose an animal for their science club poster. Put the words in the gaps. <b>Two words are extra.</b>",
+      extra: ["lovely", "rare"],
+      items: [
+        "MAX: Blobfish are the [[worst]]. They’re [[even]] uglier than slugs!",
+        "LENA: [[Really]]? I think they’re quite funny.",
+        "MAX: [[No way]]! There’s [[nothing]] more disgusting than a blobfish.",
+        "LENA: That’s not true! I’ll [[bet]] there are [[plenty]] of uglier animals.",
+        "MAX: Warthogs, maybe? — LENA: I don’t know. I [[sort of]] like warthogs. They look so tough!"
+      ]
+    },
+
+    {
+      type: "wheel", label: "speaking · your turn", sticker: "speech",
+      title: "Spin for an opinion",
+      start: "Spin. Say the opinion strongly — I respond. Then I give one and you respond with a phrase from the box.",
+      colors: ["#1E9BD7", "#FFC23D", "#FF5A1F", "#7A5AF8"],
+      items: [
+        { icon: "🐗", short: "ugliest", q: "The ugliest animal in the world is …" },
+        { icon: "🕷️", short: "scariest", q: "There’s nothing scarier than …" },
+        { icon: "🐼", short: "cutest", q: "… are definitely the cutest animals." },
+        { icon: "❄️", short: "cold vs hot", q: "Cold weather is much better than hot weather. Agree?" },
+        { icon: "🦁", short: "zoos", q: "Zoos are the worst / the best places to see animals." },
+        { icon: "🪱", short: "parasites", q: "Parasites are worse than predators." },
+        { icon: "🌋", short: "places", q: "The most amazing place on Earth is …" },
+        { icon: "🚀", short: "space", q: "Looking for life on other planets is a waste of money." }
+      ]
+    },
+
+    /* ================= 4 · PRESENT PERFECT ================= */
+    { type: "part", n: "04", icon: "polar", title: "Have you ever…?", text: "Grammar: present perfect for experiences" },
+
+    {
+      type: "rule", label: "grammar · present perfect", sticker: "polar",
+      title: "Experiences that connect to now",
+      html: `
+        <div class="colloc">
+          <div>I <b>have studied</b> many extreme environments, but I<b>’ve never been</b> to Antarctica. (my life until now)</div>
+          <div>Scientists <b>have already discovered</b> two new species, but they <b>haven’t named</b> them <b>yet</b>.</div>
+          <div><b>Have</b> you <b>ever seen</b> a giant tube worm? · The study of extremophiles <b>has taught</b> us a lot.</div>
+          <div>Superlative + ever: What’s <b>the coldest place you’ve ever been</b>? — <b>The coldest place I’ve ever been</b> is Kharkiv in January.</div>
+        </div>
+        <div class="note">⚠️ A finished time → past simple: <s>I have seen a blobfish last year.</s> → I <b>saw</b> a blobfish last year.</div>`
+    },
+
+    {
+      type: "gapfill", label: "grammar · Kevin Hand", sticker: "microscope",
+      title: "An explorer’s life so far",
+      instructions: "Use the <b>present perfect</b> of the verbs in brackets.",
+      items: [
+        { text: "Kevin Hand [[has traveled|'s traveled|has travelled]]" + H("travel") + " all over the world to study extremophiles.", why: "he → has + V3." },
+        { text: "He [[has explored|'s explored]]" + H("explore") + " the ice of northern Alaska.", why: "has explored." },
+        { text: "He [[has been|'s been]]" + H("be") + " to the glaciers of Mount Kilimanjaro.", why: "be → been (has been to = visited)." },
+        { text: "He [[has found|'s found]]" + H("find") + " microbes at the bottom of the ocean.", why: "find → found." },
+        { text: "But he [[has never sailed|'s never sailed]]" + H("never / sail") + " on the frozen ocean of Europa, a moon of Jupiter.", why: "never goes between has and V3." },
+        { text: "“[[Have]] you ever [[dreamed|dreamt]]" + H("ever / dream") + " of going into space?” a reporter asked him.", why: "Have you ever + V3?" },
+        { text: "He [[hasn't visited|has not visited]]" + H("not / visit") + " Europa yet.", why: "negative + yet." },
+        { text: "He and a colleague [[have built|'ve built]]" + H("build") + " a “Europa in a can” in their lab.", why: "build → built." },
+        { text: "They [[have already created|'ve already created]]" + H("already / create") + " conditions like the ocean under Europa’s ice.", why: "already goes between have and V3." },
+        { text: "The study of extremophiles [[has taught|'s taught]]" + H("teach") + " us a lot about life on Earth.", why: "the study = it → has taught." }
+      ]
+    },
+
+    {
+      type: "rephrase", label: "grammar · superlative + ever", sticker: "polar",
+      title: "Ask me!",
+      instructions: "Write the question. Then <b>ask me</b> — and answer it yourself too.",
+      items: [
+        { prompt: "coldest place / you / ever / be", key: "?", answers: ["What's the coldest place you've ever been?", "What is the coldest place you have ever been?", "What's the coldest place you've ever been to?", "What is the coldest place you have ever been to?"] },
+        { prompt: "strangest animal / you / ever / see", key: "?", answers: ["What's the strangest animal you've ever seen?", "What is the strangest animal you have ever seen?"] },
+        { prompt: "most beautiful place / you / ever / visit", key: "?", answers: ["What's the most beautiful place you've ever visited?", "What is the most beautiful place you have ever visited?"] },
+        { prompt: "biggest animal / you / ever / touch", key: "?", answers: ["What's the biggest animal you've ever touched?", "What is the biggest animal you have ever touched?"] },
+        { prompt: "hottest weather / you / ever / experience", key: "?", answers: ["What's the hottest weather you've ever experienced?", "What is the hottest weather you have ever experienced?"] },
+        { prompt: "scariest movie / you / ever / watch", key: "?", answers: ["What's the scariest movie you've ever watched?", "What is the scariest movie you have ever watched?"] }
+      ]
+    },
+
+    {
+      type: "correct", label: "grammar · fix it", sticker: "snow",
+      title: "Find and fix the mistake",
+      instructions: "Each sentence has <b>one</b> mistake. Write the correct sentence.",
+      items: [
+        { wrong: "I have seen a blobfish last year.", answers: ["I saw a blobfish last year."] },
+        { wrong: "Have you ever went to Alaska?", answers: ["Have you ever been to Alaska?", "Have you ever gone to Alaska?"] },
+        { wrong: "She has never saw a polar bear.", answers: ["She has never seen a polar bear.", "She's never seen a polar bear."] },
+        { wrong: "Scientists have discover two new species.", answers: ["Scientists have discovered two new species."] },
+        { wrong: "They haven't named them already.", answers: ["They haven't named them yet."] },
+        { wrong: "I never have been to a desert.", answers: ["I have never been to a desert.", "I've never been to a desert."] },
+        { wrong: "The study of microbes have taught us a lot.", answers: ["The study of microbes has taught us a lot."] }
+      ]
+    },
+
+    /* ================= 5 · READING 2 ================= */
+    { type: "part", n: "05", icon: "frog", title: "Weird and wonderful", text: "Reading · strategy: categorize information" },
+
+    {
+      type: "rule", label: "reading · weird and wonderful", sticker: "frog",
+      title: "Who says bizarre is bad?",
+      html: `
+        <div class="article"><span class="tag">nature</span>
+          <p>Some creatures will never be as popular as kittens or lions. But being bizarre doesn’t make an animal less important — and these three have a lot to teach us.</p>
+          <p><b>The purple pig-nosed frog</b> lives in India and has a strange, pointed nose. Scientists only discovered it in 2003, because it spends almost the whole year in a burrow several meters underground, eating worms and other bugs. For about two weeks a year, during the heavy monsoon rains, it comes up to breed — then it goes back down.</p>
+          <p><b>The tongue-eating louse</b> is a tiny parasite, only about 8 mm long, found in oceans all over the world. It does exactly what its name says: it eats a fish’s tongue. Then it stays in the fish’s mouth — and the fish uses the louse as its new tongue! Surprisingly, the fish doesn’t die. (And no, it doesn’t eat human tongues.)</p>
+          <p><b>The blobfish</b> lives in very deep water between Tasmania and New Zealand, so we know very little about it. It has almost no muscles and no hard bones. At the surface it looks like a pink blob, but deep down the high water pressure holds its body in a normal fish shape. Nobody has ever filmed it in its home. Scientists think it doesn’t really swim: it just floats and waits for food to come into its mouth.</p>
+        </div>
+        <figure class="photo wide" style="margin:0"><img loading="lazy" alt="A warthog drinking at a waterhole" src="${IMG("warthog.jpg")}"><figcaption><b>Another “ugly” animal: a warthog</b><small>Photo: Charles J. Sharp · CC BY-SA 4.0 · Wikimedia Commons</small></figcaption></figure>`
+    },
+
+    {
+      type: "sort", label: "reading · categorize", sticker: "frog",
+      title: "Which animal?",
+      instructions: "Put each fact under the right animal — like the table in your book: habitat, diet, appearance.",
+      categories: [
+        { name: "pig-nosed frog", words: ["lives in India", "found only in 2003", "lives underground", "eats worms and bugs"] },
+        { name: "tongue-eating louse", words: ["about 8 mm long", "a parasite", "replaces a fish’s tongue", "the fish doesn’t die"] },
+        { name: "blobfish", words: ["very deep water", "almost no muscles", "pressure keeps its shape", "floats and waits for food"] }
+      ]
+    },
+
+    {
+      type: "mcq", label: "reading · after you read", sticker: "fish",
+      title: "Answer the questions",
+      instructions: "Choose the best answer.",
+      items: [
+        { q: "Why did scientists only discover the pig-nosed frog in 2003?", options: ["It lives underground most of the year.", "It is extremely small.", "It lives in the sea."], answer: 0 },
+        { q: "When does the frog come out of its burrow?", options: ["Every night.", "For about two weeks in the monsoon, to breed.", "In the dry season, to find water."], answer: 1 },
+        { q: "What happens after the louse eats the fish’s tongue?", options: ["The fish dies.", "The louse swims to another fish.", "The fish uses the louse as a tongue."], answer: 2 },
+        { q: "Why does the blobfish look so bizarre at the surface?", options: ["There’s no deep-water pressure to hold its shape.", "It is very old.", "It is sick."], answer: 0 },
+        { q: "Why do we know so little about the blobfish?", options: ["It is very rare in zoos.", "It lives very deep and nobody has filmed it there.", "It hides inside rocks."], answer: 1 },
+        { q: "How does the blobfish get food?", options: ["It hunts very fast.", "It eats plants.", "It floats and waits for food to come to it."], answer: 2 }
+      ]
+    },
+
+
+    /* ================= VIDEO 5.1 ================= */
+    { type: "part", n: "06", icon: "microscope", title: "Video: Photographing Parasites", text: "Scene 5.1" },
+
+    {
+      type: "rule", label: "video · before you watch", sticker: "microscope",
+      title: "Before you watch",
+      html: `
+        <p>The photographer Anand Varma takes pictures of parasites. In this video he photographs a <b>cricket</b> (a small jumping insect) and a <b>horsehair worm</b> — a long, thin worm.</p>
+        <ol class="qs">
+          <li>Why do you think people usually don’t like parasites?</li>
+          <li>How can you take a photo of an animal that lives <b>inside</b> another animal? What equipment would you need? What problems might you have?</li>
+        </ol>`
+    },
+
+    {
+      type: "mcq", label: "video · predict", sticker: "microscope",
+      title: "What do you think?",
+      instructions: "Before you watch: which sentence is true?",
+      items: [
+        { q: "The cricket and the horsehair worm…", options: ["The horsehair worm is a parasite that lives inside the cricket.", "The cricket is a parasite that lives inside the worm.", "The worm is a predator that hunts crickets.", "Crickets and horsehair worms are never together."], answer: 0 }
+      ]
+    },
+
+    {
+      type: "rule", label: "video · watch", sticker: "fire",
+      title: "Watch scene 5.1",
+      html: `
+        <div class="video"><iframe src="https://www.youtube-nocookie.com/embed/icHthO2v7rE?rel=0" title="Impact 2 · scene 5.1" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>
+        <a class="yt" href="https://www.youtube.com/watch?v=icHthO2v7rE" target="_blank" rel="noopener">▶ Open on YouTube</a>
+        <p><b>While you watch:</b> take notes — how does Anand photograph the cricket and the horsehair worm? What does he do first, then, in the end?</p>`
+    },
+
+    {
+      type: "tfopen", label: "video · after you watch", sticker: "check",
+      title: "After you watch: true or false?",
+      note: "We check these together — tell me why, with details from the video.",
+      items: [
+        "Most of the parasite photos Anand had seen before were very beautiful.",
+        "Anand wants people to think that parasites are cool.",
+        "To get the photo, Anand puts the cricket into water with a special mix of salts.",
+        "Anand thought it was easy to photograph the cricket and the worm.",
+        "The salt water made it more difficult for Anand to take the photo.",
+        "Anand feels that every job gives him a new challenge."
+      ]
+    },
+
+    {
+      type: "rule", label: "video · talk", sticker: "speech",
+      title: "Your opinion",
+      html: `
+        <ol class="qs">
+          <li>Anand says that people tend not to like parasites very much. Why is that?</li>
+          <li>Is a parasite “better” or “worse” than a predator, like a lion? Use a strong opinion — I’ll respond!</li>
+          <li>Describe an animal photo you really like: what’s in it, why do you like it, how do you think it was taken?</li>
+        </ol>`
+    },
+
+    /* ================= 6 · AS ... AS ================= */
+    { type: "part", n: "07", icon: "scale", title: "as … as", text: "Grammar: comparisons of equality" },
+
+    {
+      type: "rule", label: "grammar · as … as", sticker: "scale",
+      title: "Just as important",
+      html: `
+        <div class="colloc">
+          <div><b>as + adjective / adverb + as</b>: The Pacific hagfish is <b>just as important as</b> other fish. · Polar bears <b>can’t swim as fast as</b> penguins.</div>
+          <div><b>as much as</b> (uncountable / weight): A blue whale weighs <b>as much as</b> 23 elephants!</div>
+          <div><b>as many + noun + as</b>: Humans have <b>as many</b> hairs on their bodies <b>as</b> chimpanzees.</div>
+          <div><b>not as … as</b> = less: Blobfish are<b>n’t as</b> beautiful <b>as</b> kittens. · <b>just / about / nearly</b> as … as</div>
+        </div>
+        <div class="note">⚠️ <s>as fast like</s> · <s>as faster as</s> · <s>so fast as</s> → <b>as fast as</b></div>`
+    },
+
+    {
+      type: "gapfill", label: "grammar · as … as", sticker: "scale",
+      title: "Equal or not?",
+      instructions: "Use <b>as … as</b> with the word in brackets. Add <b>not</b> where the hint says so.",
+      items: [
+        { text: "The Pacific hagfish is just [[as unusual as]]" + H("unusual") + " many other animals in this unit.", why: "as + adjective + as." },
+        { text: "The hagfish is about 300 million years old — about [[as old as]]" + H("old") + " the first land animals.", why: "as old as." },
+        { text: "Polar bears [[can't swim as fast as|cannot swim as fast as]]" + H("can’t / swim / fast") + " penguins.", why: "not as fast as = slower." },
+        { text: "An adult warthog weighs about [[as much as]]" + H("much") + " a baby elephant.", why: "weight → as much as." },
+        { text: "Humans have [[as many]] hairs on their bodies [[as]] chimpanzees.", why: "as many + noun + as." },
+        { text: "A camel [[isn't as fast as|is not as fast as]]" + H("not / fast") + " a horse, but it can walk for days without water.", why: "isn’t as + adjective + as." },
+        { text: "I think blobfish are [[as ugly as]]" + H("ugly") + " naked mole rats!", why: "as ugly as." },
+        { text: "My little brother [[isn't as brave as|is not as brave as]]" + H("not / brave") + " me — he’s scared of slugs.", why: "isn’t as brave as." }
+      ]
+    },
+
+    {
+      type: "rephrase", label: "grammar · as … as", sticker: "scale",
+      title: "Say it with as … as",
+      instructions: "Rewrite the facts in one sentence with <b>as … as</b>.",
+      items: [
+        { prompt: "I think blobfish and naked mole rats are both very ugly.", key: "AS UGLY AS", answers: ["I think blobfish are as ugly as naked mole rats.", "I think naked mole rats are as ugly as blobfish."] },
+        { prompt: "An adult warthog and a baby elephant both weigh about 90 kg.", key: "AS MUCH AS", answers: ["An adult warthog weighs as much as a baby elephant.", "A baby elephant weighs as much as an adult warthog.", "An adult warthog weighs about as much as a baby elephant."] },
+        { prompt: "There are only about 7,000 proboscis monkeys and about 7,000 snow leopards left.", key: "AS MANY AS", answers: ["There are as many proboscis monkeys as snow leopards.", "There are as many snow leopards as proboscis monkeys.", "There are about as many proboscis monkeys as snow leopards."] },
+        { prompt: "The frilled shark swims 1,500 m deep. The Pacific hagfish swims 1,500 m deep too.", key: "AS DEEP AS", answers: ["The frilled shark swims as deep as the Pacific hagfish.", "The Pacific hagfish swims as deep as the frilled shark."] },
+        { prompt: "A camel is about 2 m tall. A horse is about 1.6 m tall.", key: "NOT AS TALL", answers: ["A horse isn't as tall as a camel.", "A horse is not as tall as a camel."] },
+        { prompt: "Arctic winters are very cold. Antarctic winters are even colder.", key: "NOT AS COLD", answers: ["Arctic winters aren't as cold as Antarctic winters.", "Arctic winters are not as cold as Antarctic winters."] }
+      ]
+    },
+
+    /* ================= 7 · WRITING ================= */
+    { type: "part", n: "08", icon: "pencil", title: "Persuasive essay", text: "Writing: introducing reasons" },
+
+    {
+      type: "rule", label: "writing · introducing reasons", sticker: "pencil",
+      title: "Support your opinion with facts",
+      html: `
+        <div class="colloc">
+          <div><b>because</b> + a sentence: Scientists study it <b>because</b> it can grow back lost legs.</div>
+          <div><b>as a result (of)</b>: It isn’t as attractive as a panda. <b>As a result</b>, nobody notices it. · Many species are in danger <b>as a result of</b> climate change.</div>
+          <div><b>for this reason / for these reasons</b>: It never grows old. <b>For this reason</b>, scientists study it.</div>
+          <div><b>therefore</b>: It is endangered. <b>Therefore</b>, we must protect it.</div>
+        </div>
+        <p>Plan: <b>1</b> the animal and the problem · <b>2–3</b> two reasons to save it, with facts · <b>4</b> conclusion: <i>For all of these reasons, we should…</i></p>`
+    },
+
+    {
+      type: "mcq", label: "writing · linking reasons", sticker: "pencil",
+      title: "Choose the linker",
+      instructions: "Choose the phrase that fits.",
+      items: [
+        { q: "The axolotl isn’t as attractive as a panda. ___, it doesn’t get much attention.", options: ["As a result", "Because", "For example"], answer: 0 },
+        { q: "Scientists study the axolotl ___ it can grow back lost body parts.", options: ["therefore", "because", "as a result"], answer: 1 },
+        { q: "It never becomes an adult. ___, scientists think it can teach us about aging.", options: ["Because", "Although", "For this reason"], answer: 2 },
+        { q: "The axolotl was important in Aztec legends. ___, if it disappears, we will lose part of that culture.", options: ["Therefore", "Because", "However"], answer: 0 },
+        { q: "Many animals are in danger ___ climate change.", options: ["therefore", "as a result of", "for this reason"], answer: 1 },
+        { q: "Blobfish live very deep. ___, we know very little about them.", options: ["Because of", "Because", "For this reason"], answer: 2 }
+      ]
+    },
+
+    {
+      type: "write", label: "writing · Save the …!", sticker: "pencil",
+      title: "Save the …!",
+      instructions: "Choose an unpopular or “ugly” animal (blobfish, warthog, axolotl, naked mole rat, hagfish…). Write a <b>persuasive essay</b> of 4 paragraphs (120–160 words): why should people save it?",
+      words: ["because", "as a result", "for this reason", "therefore", "remarkable", "creature", "thrive", "harsh", "environment", "rare", "exist", "tolerate"],
+      checks: [
+        { label: "3 linkers: because / as a result / for this reason / therefore", pattern: "\\b(because|as a result|for th(is|ese) reasons?|therefore)\\b", min: 3 },
+        { label: "as … as once", pattern: "\\bas\\s+(\\w+\\s+){1,2}as\\b" },
+        { label: "present perfect once", pattern: "\\b(have|has|['’]ve|['’]s)\\s+(never\\s+|already\\s+|ever\\s+|just\\s+)?(been|seen|lived|found|discovered|studied|become|disappeared|survived|existed|learned|learnt|taught|shown|lost|grown|changed|done|made|helped)\\b" },
+        { label: "4+ unit words (they light up)", words: 4 },
+        { label: "at least 8 sentences", sentences: 8 }
+      ],
+      sample: "Save the Blobfish! The blobfish has been called the ugliest animal in the world. As a result, very few people care about it. However, it is just as important as any other fish. First, it lives in a harsh environment, deep in the ocean, where the pressure is enormous. For this reason, scientists can learn a lot from it about how creatures tolerate extreme conditions. Second, it is in danger because deep-sea fishing boats often catch it by accident. Nobody has ever filmed it in its home, so we still know very little about it. Therefore, we should protect the deep ocean before this remarkable creature disappears. For all of these reasons, we should save the blobfish!"
+    },
+
+
+    /* ================= MISSION 5.2 ================= */
+    { type: "part", n: "09", icon: "microscope", title: "Mission: Ask Questions", text: "Scene 5.2 · Kevin Hand" },
+
+    {
+      type: "rule", label: "mission · watch", sticker: "microscope",
+      title: "Watch scene 5.2",
+      html: `
+        <div class="video"><iframe src="https://www.youtube-nocookie.com/embed/85hVpynyFnc?rel=0" title="Impact 2 · scene 5.2" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>
+        <a class="yt" href="https://youtu.be/85hVpynyFnc" target="_blank" rel="noopener">▶ Open on YouTube</a>
+        <p>Kevin Hand’s advice: ask questions, even when they feel scary — the exciting part of science is in the questions.</p>
+        <ol class="qs">
+          <li>What questions does Kevin ask in his work? Which one do you find the most exciting?</li>
+          <li>Choose one animal from this unit. What environment does it live in? How does it handle the conditions? Could it live where you live? Why / why not?</li>
+        </ol>`
+    },
+
+    {
+      type: "write", label: "mission · your questions", sticker: "speech",
+      title: "Survival questions about your area",
+      instructions: "Write <b>6 questions</b> about how animals and plants survive in your area (winter, heat, the city…). Then choose one and tell me how we could find the answer.",
+      words: ["survive", "handle", "tolerate", "thrive", "conditions", "environment", "lack of", "harsh", "creature", "exist"],
+      checks: [
+        { label: "6 questions (each ends with ?)", pattern: "\\?", min: 6 },
+        { label: "different question words (how / why / where / what / which / do / can…)", pattern: "\\b(how|why|where|what|which|when|do|does|can|could|is|are)\\b", min: 6 },
+        { label: "3+ unit words (they light up)", words: 3 }
+      ],
+      sample: "How do hedgehogs survive the harsh winter? Why don’t some birds fly south? Where do insects go when it’s −15 °C? Can palm trees exist in Kyiv? Which plants can tolerate a lack of water in July? How do city foxes handle the noise and the cars?"
+    },
+
+    /* ================= 8 · SPEED ================= */
+    { type: "part", n: "10", icon: "stopwatch", title: "Speed", text: "Make it automatic." },
+
+    {
+      type: "drill", label: "automaticity · speed drill", sticker: "stopwatch",
+      title: "Twelve quick answers, twice each",
+      instructions: "Type the answer and press <b>Enter</b>. Each one must be right <b>twice</b>.",
+      items: [
+        { cue: "synonym", prompt: "handle = t…", answers: ["tolerate"] },
+        { cue: "synonym", prompt: "animal = c…", answers: ["creature"] },
+        { cue: "synonym", prompt: "live, be real = e…", answers: ["exist"] },
+        { cue: "synonym", prompt: "extraordinary = r…", answers: ["remarkable"] },
+        { cue: "V3", prompt: "see", answers: ["seen"] },
+        { cue: "V3", prompt: "find", answers: ["found"] },
+        { cue: "V3", prompt: "teach", answers: ["taught"] },
+        { cue: "V3", prompt: "build", answers: ["built"] },
+        { cue: "equal", prompt: "old", answers: ["as old as"] },
+        { cue: "less", prompt: "fast", answers: ["not as fast as"] },
+        { cue: "weight", prompt: "much", answers: ["as much as"] },
+        { cue: "question", prompt: "you / ever / see / a polar bear", answers: ["Have you ever seen a polar bear?"] }
+      ]
+    },
+
+    /* ================= 9 · SELF-CHECK ================= */
+    { type: "part", n: "11", icon: "star", title: "Self-check", text: "What to look at again." },
+
+    { type: "review", label: "self-check", title: "My mistakes today" }
+  ]
+};
+</script>
+<script>
+/* =====================================================================
+   ENGINE — no need to edit below this line
+   ===================================================================== */
+(function(){
+"use strict";
+
+function h(tag, props){
+  const el = document.createElement(tag);
+  if (props) for (const k in props){
+    const v = props[k];
+    if (v == null || v === false) continue;
+    if (k === "class") el.className = v;
+    else if (k === "html") el.innerHTML = v;
+    else if (k === "style") el.style.cssText = v;
+    else if (k.slice(0,2) === "on") el.addEventListener(k.slice(2), v);
+    else el.setAttribute(k, v === true ? "" : v);
+  }
+  for (let i = 2; i < arguments.length; i++){
+    const kids = [].concat(arguments[i]);
+    for (const kid of kids){
+      if (kid == null || kid === false || kid === "") continue;
+      el.append(kid.nodeType ? kid : document.createTextNode(kid));
+    }
+  }
+  return el;
+}
+function clear(obj){ for (const k of Object.keys(obj)) delete obj[k]; }
+function emo(x){
+  if (!x) return "";
+  if (/^[a-z0-9-]+$/.test(x)) return h("img", { src: "assets/emoji/" + x + ".png", alt: "", draggable: "false" });
+  return document.createTextNode(x);
+}
+function norm(s, dWord){
+  s = String(s || "").toLowerCase().replace(/[’‘`´]/g, "'").replace(/[“”"«»]/g, "");
+  s = s.replace(/\bwon't\b/g, "will not").replace(/\bcan't\b/g, "cannot")
+       .replace(/n't\b/g, " not").replace(/'m\b/g, " am").replace(/'re\b/g, " are")
+       .replace(/'ve\b/g, " have").replace(/'ll\b/g, " will").replace(/'d\b/g, " " + (dWord || "had"));
+  s = s.replace(/[.,!?;:()\[\]–—-]/g, " ").replace(/\s+/g, " ").trim();
+  return s;
+}
+function matches(value, answers){
+  const a = answers.map(x => norm(x)); const v1 = norm(value, "had"), v2 = norm(value, "would");
+  return v1 !== "" && (a.includes(v1) || a.includes(v2));
+}
+function parseGaps(str){
+  const parts = []; const re = /\[\[(.+?)\]\]/g; let last = 0, m;
+  while ((m = re.exec(str))){
+    if (m.index > last) parts.push({ text: str.slice(last, m.index) });
+    const [ans, hint] = m[1].split(" // ");
+    parts.push({ answers: ans.split("|").map(s => s.trim()), hint: hint ? hint.trim() : null });
+    last = re.lastIndex;
+  }
+  if (last < str.length) parts.push({ text: str.slice(last) });
+  return parts;
+}
+function hashStr(s){ let h1 = 1779033703 ^ s.length; for (let i = 0; i < s.length; i++){ h1 = Math.imul(h1 ^ s.charCodeAt(i), 3432918353); h1 = h1 << 13 | h1 >>> 19; } return h1 >>> 0; }
+function shuffle(arr, seedStr){
+  let seed = hashStr(seedStr);
+  const rnd = () => { seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--){ const j = Math.floor(rnd() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
+  if (a.length > 1 && a.every((x, i) => x === arr[i])) a.push(a.shift());
+  return a;
+}
+function fire(el){ el.dispatchEvent(new Event("input", { bubbles: true })); }
+const pad = i => String(i + 1).padStart(2, "0");
+
+/* ---------- storage ---------- */
+const KEY = "lesson:" + LESSON.id;
+let SAVE = {};
+try { SAVE = JSON.parse(localStorage.getItem(KEY) || "{}") || {}; } catch (e) { SAVE = {}; }
+function persist(){ try { localStorage.setItem(KEY, JSON.stringify(SAVE)); } catch (e) {} }
+
+/* ---------- header ---------- */
+const root = document.documentElement;
+for (const k in (LESSON.theme || {})) root.style.setProperty("--" + k, LESSON.theme[k]);
+document.title = LESSON.title;
+document.getElementById("kicker").textContent = LESSON.kicker || "";
+const tEl = document.getElementById("title");
+if (LESSON.titleHTML) tEl.innerHTML = LESSON.titleHTML; else tEl.textContent = LESSON.title;
+document.getElementById("sub").textContent = LESSON.subtitle || "";
+const st = LESSON.stickers || [];
+document.getElementById("sticker1").append(emo(st[0]));
+document.getElementById("sticker2").append(emo(st[1]));
+
+function burst(fromEl){
+  if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const r = fromEl.getBoundingClientRect(); const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+  const set = LESSON.confetti && LESSON.confetti.length ? LESSON.confetti : ["⭐"];
+  for (let i = 0; i < 16; i++){
+    const s = h("span", { class: "confetti" }, emo(set[i % set.length]));
+    document.body.append(s);
+    const dx = (Math.random() - .5) * 360, dy = -60 - Math.random() * 230, rot = (Math.random() - .5) * 540;
+    const anim = s.animate([
+      { transform: `translate(${cx}px, ${cy}px) scale(.5)`, opacity: 1 },
+      { transform: `translate(${cx + dx * .6}px, ${cy + dy}px) rotate(${rot / 2}deg) scale(1.1)`, opacity: 1, offset: .55 },
+      { transform: `translate(${cx + dx}px, ${cy + dy + 170}px) rotate(${rot}deg) scale(.9)`, opacity: 0 }
+    ], { duration: 1150 + Math.random() * 400, easing: "cubic-bezier(.2,.7,.4,1)" });
+    anim.onfinish = () => s.remove();
+  }
+}
+
+/* ---------- drag & drop board (mouse + touch + tap) ---------- */
+function Board(scope, v){
+  const zones = {}, chips = {}; let selected = null;
+  const bank = h("div", { class: "bank" });
+  register(bank, bank, "bank", false);
+  function register(clickEl, dropEl, id, single){
+    clickEl.dataset.zone = id; zones[id] = { el: dropEl, box: clickEl, single };
+    clickEl.addEventListener("click", () => { if (selected) place(selected, id); });
+  }
+  function zoneOf(c){ for (const id in zones){ if (zones[id].el === c.parentElement) return id; } return "bank"; }
+  function unselect(){ if (selected) selected.classList.remove("selected"); selected = null; }
+  function clearMarks(){ scope.querySelectorAll(".ok,.bad").forEach(n => n.classList.remove("ok", "bad")); }
+  function place(c, zid, silent){
+    const z = zones[zid]; if (!z) return;
+    if (z.single) z.el.querySelectorAll(".chip").forEach(o => { if (o !== c) bank.append(o); });
+    z.el.append(c); unselect();
+    if (!silent){ clearMarks(); for (const id in chips){ const zz = zoneOf(chips[id]); if (zz === "bank") delete v[id]; else v[id] = zz; } persist(); fire(scope); }
+  }
+  function tap(c){
+    if (zoneOf(c) !== "bank"){ place(c, "bank"); return; }
+    if (selected === c){ unselect(); return; }
+    unselect(); selected = c; c.classList.add("selected");
+  }
+  function zoneAt(x, y){
+    const el = document.elementFromPoint(x, y); const z = el && el.closest("[data-zone]");
+    return z && scope.contains(z) ? z : null;
+  }
+  let overEl = null;
+  function setOver(z){ if (overEl === z) return; if (overEl) overEl.classList.remove("over"); overEl = z; if (z) z.classList.add("over"); }
+  function chip(id, label, value){
+    const c = h("button", { class: "chip", type: "button", html: label });
+    c.dataset.id = id; c.dataset.value = value; chips[id] = c;
+    let d = null;
+    c.addEventListener("pointerdown", e => {
+      if (e.pointerType === "mouse" && e.button !== 0) return;
+      d = { x: e.clientX, y: e.clientY, moved: false, ghost: null };
+      try { c.setPointerCapture(e.pointerId); } catch (_) {}
+    });
+    c.addEventListener("pointermove", e => {
+      if (!d) return;
+      if (!d.moved && Math.hypot(e.clientX - d.x, e.clientY - d.y) > 6){
+        d.moved = true; unselect();
+        const r = c.getBoundingClientRect(); d.ox = d.x - r.left; d.oy = d.y - r.top;
+        d.ghost = c.cloneNode(true); d.ghost.classList.add("ghost"); d.ghost.classList.remove("ok", "bad");
+        d.ghost.style.width = r.width + "px"; document.body.append(d.ghost); c.classList.add("dragging");
+      }
+      if (d.moved){
+        e.preventDefault();
+        d.ghost.style.left = (e.clientX - d.ox) + "px"; d.ghost.style.top = (e.clientY - d.oy) + "px";
+        setOver(zoneAt(e.clientX, e.clientY));
+      }
+    });
+    const end = e => {
+      if (!d) return; const was = d; d = null;
+      if (!was.moved) return;
+      was.ghost.remove(); c.classList.remove("dragging"); setOver(null); c._suppress = true;
+      if (e.type === "pointerup"){ const z = zoneAt(e.clientX, e.clientY); if (z) place(c, z.dataset.zone); }
+    };
+    c.addEventListener("pointerup", end);
+    c.addEventListener("pointercancel", end);
+    c.addEventListener("click", e => { e.stopPropagation(); if (c._suppress){ c._suppress = false; return; } tap(c); });
+    bank.append(c);
+    return c;
+  }
+  function restore(){ for (const id in v){ if (chips[id] && zones[v[id]]) place(chips[id], v[id], true); } }
+  function resetAll(){ for (const id in chips) bank.append(chips[id]); clear(v); clearMarks(); unselect(); }
+  return { bank, register, chip, place, restore, resetAll, chips, zones, zoneOf };
+}
+
+/* ---------- renderers: check() returns one value per item: true / false / null (not answered) ---------- */
+const RENDER = {};
+const LABEL = { mcq: "multiple choice", match: "match", dragwords: "drag & drop", correct: "correct the mistakes", rephrase: "rewrite", write: "writing", drill: "speed drill", rule: "theory", build: "word order", gapfill: "gap fill", tf2: "true / false", slotwrite: "writing", review: "self-check" };
+const ROLES = [
+  ["qw", "Question word"], ["aux", "have / has"], ["who", "Who?"], ["freq", "How often?"], ["does", "Verb (V3)"], ["what", "What? Whom?"], ["where", "Where?"], ["when", "When?"]
+];
+
+RENDER.rule = (sec, s, body) => { body.append(h("div", { class: "rule", html: sec.html })); return null; };
+
+RENDER.build = (sec, s, body) => {
+  const v = s.v || (s.v = {}); const items = [];
+  sec.items.forEach((it, i) => {
+    const vi = v[i] || (v[i] = {});
+    const wrap = h("div", { class: "bitem" });
+    const state = h("span", { class: "bstate" });
+    wrap.append(h("div", { class: "bhead" }, h("span", { class: "bnum" }, pad(i)), state));
+    const B = Board(wrap, vi);
+    const row = h("div", { class: "brow" }); const slots = [];
+    ROLES.forEach(([role, q]) => {
+      if (it[role] == null) return;
+      const zone = h("div", { class: "bz" });
+      const box = h("div", { class: "bslot c-" + role, role: "button", "aria-label": q }, h("span", { class: "bq" }, q), zone);
+      B.register(box, zone, "z-" + role, true);
+      row.append(box); slots.push({ role, box, zone });
+    });
+    row.append(h("span", { class: "bdot" }, "."));
+    const chipsData = ROLES.filter(([r]) => it[r] != null).map(([r]) => ({ id: r, label: it[r], value: r }));
+    if (it.wrong) chipsData.push({ id: "x", label: it.wrong, value: "x" });
+    shuffle(chipsData, LESSON.id + sec.title + i).forEach(c => B.chip(c.id, c.label, c.value));
+    wrap.append(B.bank, row); body.append(wrap);
+    B.restore();
+    items.push({ B, slots, state });
+  });
+  return {
+    total: items.length,
+    check(){ return items.map(({ slots, state }) => {
+      let filled = 0, ok = true;
+      slots.forEach(o => {
+        const c = o.zone.querySelector(".chip"); if (c) filled++;
+        const good = !!c && c.dataset.value === o.role;
+        o.box.classList.toggle("ok", good); o.box.classList.toggle("bad", !good);
+        if (!good) ok = false;
+      });
+      if (!filled){ slots.forEach(o => o.box.classList.remove("ok", "bad")); state.textContent = ""; return null; }
+      state.className = "bstate " + (ok ? "ok" : "bad"); state.textContent = ok ? "✓" : "Try again — fix the red slot.";
+      return ok;
+    }); },
+    reveal(){ items.forEach(({ B, slots }) => { B.resetAll(); slots.forEach(o => B.place(B.chips[o.role], "z-" + o.role)); }); },
+    reset(){ items.forEach(({ B, state }) => { B.resetAll(); state.textContent = ""; }); persist(); }
+  };
+};
+
+RENDER.gapfill = (sec, s, body) => {
+  const v = s.v || (s.v = {}); const lines = [];
+  const list = h("ol", { class: "lines" }); if (sec.text) body.append(h("div", { class: "story", html: sec.text }));
+  sec.items.forEach((raw, i) => {
+    const it = typeof raw === "string" ? { text: raw } : raw;
+    const li = h("li", {}); const line = h("div", { class: "line" }); const gaps = [];
+    parseGaps(it.text).forEach((p, j) => {
+      if (p.text != null){ line.append(h("span", { html: p.text })); return; }
+      const key = i + "-" + j;
+      const w = Math.max(5, ...p.answers.map(a => a.length)) + 2;
+      const input = h("input", { class: "gap", type: "text", autocomplete: "off", autocapitalize: "off", autocorrect: "off", spellcheck: "false", "aria-label": p.hint ? "gap: " + p.hint : "gap", style: `width:${w}ch` });
+      input.value = v[key] || "";
+      input.addEventListener("input", () => { v[key] = input.value; persist(); input.classList.remove("ok", "bad"); const y = li.querySelector(".why"); if (y) y.remove(); });
+      input.addEventListener("keydown", e => {
+        if (e.key !== "Enter") return; e.preventDefault();
+        const all = Array.from(body.querySelectorAll("input.gap")); const n = all[all.indexOf(input) + 1];
+        if (n) n.focus(); else input.blur();
+      });
+      const wrap = h("span", { class: "gapwrap" }, input);
+      if (p.hint) wrap.append(h("span", { class: "hint" }, "(" + p.hint + ")"));
+      line.append(wrap); gaps.push({ input, answers: p.answers, wrap });
+    });
+    li.append(line); list.append(li); lines.push({ it, li, gaps });
+  });
+  body.append(list);
+  return {
+    total: lines.length,
+    check(){ return lines.map(({ it, li, gaps }) => {
+      const old = li.querySelector(".why"); if (old) old.remove();
+      if (gaps.every(g => !g.input.value.trim())){ gaps.forEach(g => g.input.classList.remove("ok", "bad")); return null; }
+      let ok = true;
+      gaps.forEach(g => { const good = matches(g.input.value, g.answers); g.input.classList.toggle("ok", good); g.input.classList.toggle("bad", !good); if (!good) ok = false; });
+      if (it.why) li.append(h("span", { class: "why " + (ok ? "ok" : "bad") }, (ok ? "✓ " : "✗ ") + it.why));
+      return ok;
+    }); },
+    reveal(){ lines.forEach(({ gaps }) => gaps.forEach(g => { if (!g.input.classList.contains("ok") && !g.wrap.querySelector(".reveal")) g.wrap.append(h("span", { class: "reveal" }, "→ " + g.answers[0])); })); },
+    reset(){ clear(v); lines.forEach(({ li, gaps }) => { gaps.forEach(g => { g.input.value = ""; g.input.classList.remove("ok", "bad"); }); const y = li.querySelector(".why"); if (y) y.remove(); }); }
+  };
+};
+
+RENDER.tf2 = (sec, s, body) => {
+  const v = s.v || (s.v = {}); const qs = [];
+  body.classList.add("tf2");
+  if (sec.text) body.append(h("div", { class: "story", html: sec.text }));
+  sec.items.forEach((it, i) => {
+    const st = v[i] || (v[i] = {});
+    const q = h("div", { class: "q" });
+    const tfo = h("div", { class: "opts tfo" });
+    const bT = h("button", { class: "opt", type: "button" }, "True");
+    const bF = h("button", { class: "opt", type: "button" }, "False");
+    tfo.append(bT, bF);
+    q.append(h("div", { class: "q-top" }, h("div", { class: "q-text" }, h("span", { class: "q-num" }, pad(i)), h("span", { html: it.q })), tfo));
+    const fixOpts = h("div", { class: "opts" });
+    const fixBtns = it.fix.map((f, j) => { const b = h("button", { class: "opt", type: "button", html: f }); b.addEventListener("click", () => { st.fix = j; persist(); paint(); fire(body); }); fixOpts.append(b); return b; });
+    const fixbox = h("div", { class: "fixbox", hidden: true }, h("div", { class: "fl" }, "Correct it:"), fixOpts);
+    const warn = h("div", { class: "warnline", hidden: true }, "Choose the correct sentence.");
+    q.append(fixbox, warn);
+    bT.addEventListener("click", () => { st.tf = true; delete st.fix; persist(); paint(); fire(body); });
+    bF.addEventListener("click", () => { st.tf = false; persist(); paint(); fire(body); });
+    function paint(){
+      [bT, bF, ...fixBtns].forEach(b => b.classList.remove("ok", "bad", "answer"));
+      bT.classList.toggle("sel", st.tf === true); bF.classList.toggle("sel", st.tf === false);
+      fixbox.hidden = st.tf !== false; warn.hidden = true;
+      fixBtns.forEach((b, j) => b.classList.toggle("sel", st.fix === j));
+    }
+    paint(); body.append(q);
+    qs.push({ it, st, bT, bF, fixBtns, fixbox, warn, paint });
+  });
+  return {
+    total: qs.length,
+    check(){ return qs.map(o => {
+      const { it, st } = o; o.paint();
+      if (st.tf === undefined) return null;
+      const tfOk = st.tf === it.answer;
+      (st.tf ? o.bT : o.bF).classList.add(tfOk ? "ok" : "bad");
+      if (st.tf === false && tfOk){
+        if (st.fix === undefined){ o.warn.hidden = false; return null; }
+        const fixOk = st.fix === it.fixAnswer; o.fixBtns[st.fix].classList.add(fixOk ? "ok" : "bad");
+        return fixOk;
+      }
+      return tfOk;
+    }); },
+    reveal(){ qs.forEach(o => { const { it, st } = o;
+      if (st.tf !== it.answer) (it.answer ? o.bT : o.bF).classList.add("answer");
+      if (!it.answer){ o.fixbox.hidden = false; o.fixBtns[it.fixAnswer].classList.add("answer"); }
+    }); },
+    reset(){ qs.forEach(o => { clear(o.st); o.paint(); }); }
+  };
+};
+
+RENDER.slotwrite = (sec, s, body) => {
+  const v = s.v || (s.v = {}); const rows = [];
+  sec.items.forEach((it, i) => {
+    const input = h("input", { class: "full", type: "text", autocomplete: "off", autocapitalize: "sentences", spellcheck: "true", placeholder: it.who.split(" / ")[0] + " …", "aria-label": "sentence about " + it.who });
+    input.value = v[i] || "";
+    const tags = h("div", { class: "sp-tags" },
+      h("span", { class: "c-who fill" }, "Who? " + it.who),
+      h("span", { class: "c-does" }, "Does what?"), h("span", { class: "c-what" }, "What?"),
+      h("span", { class: "c-where" }, "Where?"), h("span", { class: "c-when" }, "When?"));
+    const row = h("div", { class: "row" }, h("div", { class: "prompt" }, h("span", { class: "num" }, pad(i))), tags, input);
+    row.querySelector(".prompt").append(h("span", {}, ""));
+    input.addEventListener("input", () => { v[i] = input.value; persist(); input.classList.remove("ok", "bad"); const m = row.querySelector(".model"); if (m) m.remove(); });
+    body.append(row); rows.push({ it, input, row });
+  });
+  return {
+    total: rows.length, revealLabel: "👀 Show examples",
+    check(){ return rows.map(r => {
+      const old = r.row.querySelector(".model"); if (old) old.remove();
+      const txt = r.input.value.trim(); if (!txt){ r.input.classList.remove("ok", "bad"); return null; }
+      const words = txt.split(/\s+/).filter(Boolean);
+      const verbOk = /^\s*(\S+\s+){1,3}\w*(s)\b/i.test(txt);
+      const ok = words.length >= 5 && verbOk;
+      r.input.classList.toggle("ok", ok); r.input.classList.toggle("bad", !ok);
+      if (!ok) r.row.append(h("div", { class: "model warn" }, !verbOk ? "Check the verb: he / she / it → -s." : "Add more slots: what? where? when?"));
+      return ok;
+    }); },
+    reveal(){ rows.forEach(r => { const old = r.row.querySelector(".model"); if (old) old.remove(); r.row.append(h("div", { class: "model" }, "Example: " + r.it.sample)); }); },
+    reset(){ clear(v); rows.forEach(r => { r.input.value = ""; r.input.classList.remove("ok", "bad"); }); }
+  };
+};
+
+function similarity(a, b){
+  const A = norm(a).split(" ").filter(Boolean), B = norm(b).split(" ").filter(Boolean);
+  if (!A.length || !B.length) return 0;
+  const pool = B.slice(); let hit = 0;
+  for (const w of A){ const i = pool.indexOf(w); if (i > -1){ hit++; pool.splice(i, 1); } }
+  return hit / Math.max(A.length, B.length);
+}
+
+RENDER.mcq = (sec, s, body) => {
+  const v = s.v || (s.v = {}); const qs = [];
+  sec.items.forEach((it, i) => {
+    const q = h("div", { class: "q" });
+    const text = h("div", { class: "q-text" }, h("span", { class: "q-num" }, pad(i)));
+    it.q.split("___").forEach((part, k) => { if (k) text.append(h("span", { class: "blank" })); text.append(h("span", { html: part })); });
+    const opts = h("div", { class: "opts", role: "radiogroup" });
+    const btns = it.options.map((o, j) => {
+      const b = h("button", { class: "opt", type: "button", role: "radio", html: o });
+      b.addEventListener("click", () => { v[i] = j; persist(); paint(); fire(body); });
+      opts.append(b); return b;
+    });
+    function paint(){ btns.forEach((b, j) => { b.classList.toggle("sel", v[i] === j); b.classList.remove("ok", "bad", "answer"); b.setAttribute("aria-checked", v[i] === j); }); }
+    paint(); q.append(text, opts); body.append(q); qs.push({ it, btns, i, paint });
+  });
+  return {
+    total: qs.length,
+    check(){ return qs.map(({ it, btns, i, paint }) => { paint(); if (v[i] === undefined) return null; const ok = v[i] === it.answer; btns[v[i]].classList.add(ok ? "ok" : "bad"); return ok; }); },
+    reveal(){ qs.forEach(({ it, btns, i }) => { if (v[i] !== it.answer) btns[it.answer].classList.add("answer"); }); },
+    reset(){ clear(v); qs.forEach(({ paint }) => paint()); }
+  };
+};
+
+RENDER.match = (sec, s, body) => {
+  const v = s.v || (s.v = {}); const B = Board(body, v); const rows = [];
+  const grid = h("div", { class: "match" });
+  sec.pairs.forEach((p, i) => {
+    const slot = h("div", { class: "slot", role: "button", "aria-label": "drop zone" });
+    B.register(slot, slot, "m" + i, true);
+    grid.append(h("div", { class: "mrow" }, h("div", { class: "left", "data-n": pad(i), html: p[0] }), slot));
+    rows.push(slot);
+  });
+  shuffle(sec.pairs.map((p, i) => i), LESSON.id + sec.title).forEach(i => B.chip("r" + i, sec.pairs[i][1], String(i)));
+  body.append(B.bank, grid); B.restore();
+  return {
+    total: rows.length,
+    check(){ return rows.map((slot, i) => { const c = slot.querySelector(".chip");
+      if (!c){ slot.classList.remove("ok", "bad"); return null; }
+      const ok = c.dataset.value === String(i); slot.classList.toggle("ok", ok); slot.classList.toggle("bad", !ok); return ok; }); },
+    reveal(){ B.resetAll(); rows.forEach((slot, i) => B.place(B.chips["r" + i], "m" + i)); },
+    reset(){ B.resetAll(); persist(); }
+  };
+};
+
+RENDER.dragwords = (sec, s, body) => {
+  const v = s.v || (s.v = {}); const B = Board(body, v); const slots = []; const words = [];
+  const list = h("ol", { class: "lines" });
+  sec.items.forEach((it, i) => {
+    const line = h("li", { class: "line" });
+    parseGaps(it).forEach((p, j) => {
+      if (p.text != null){ line.append(h("span", { html: p.text })); return; }
+      const slot = h("span", { class: "slot", role: "button", "aria-label": "drop zone" });
+      B.register(slot, slot, "g" + i + "-" + j, true);
+      slots.push({ slot, answers: p.answers }); words.push(p.answers[0]); line.append(slot);
+    });
+    list.append(line);
+  });
+  (sec.extra || []).forEach(w => words.push(w));
+  shuffle(words.map((w, k) => ({ id: "c" + k, w })), LESSON.id + sec.title).forEach(o => B.chip(o.id, o.w, o.w));
+  if (sec.text) body.append(h("div", { class: "story", html: sec.text }));
+  body.append(B.bank, list); B.restore();
+  return {
+    total: slots.length,
+    check(){ return slots.map(o => {
+      const c = o.slot.querySelector(".chip"); if (!c){ o.slot.classList.remove("ok", "bad"); return null; }
+      const ok = matches(c.dataset.value, o.answers); o.slot.classList.toggle("ok", ok); o.slot.classList.toggle("bad", !ok); return ok;
+    }); },
+    reveal(){
+      B.resetAll(); const used = new Set();
+      slots.forEach(o => { const c = Object.values(B.chips).find(ch => !used.has(ch) && matches(ch.dataset.value, o.answers));
+        if (c){ used.add(c); B.place(c, o.slot.dataset.zone); } });
+    },
+    reset(){ B.resetAll(); persist(); }
+  };
+};
+
+RENDER.correct = (sec, s, body) => {
+  const v = s.v || (s.v = {}); const rows = [];
+  sec.items.forEach((it, i) => {
+    const input = h("input", { class: "full", type: "text", autocomplete: "off", autocapitalize: "sentences", spellcheck: "false", "aria-label": "corrected sentence " + (i + 1) });
+    input.value = v[i] != null ? v[i] : it.wrong;
+    input.addEventListener("input", () => { v[i] = input.value; persist(); input.classList.remove("ok", "bad"); });
+    const row = h("div", { class: "row" }, h("div", { class: "row-label" }, h("span", { class: "q-num" }, pad(i)), h("s", {}, it.wrong)), input);
+    body.append(row); rows.push({ it, input, row });
+  });
+  return {
+    total: rows.length,
+    check(){ return rows.map(r => {
+      if (norm(r.input.value) === norm(r.it.wrong) || !r.input.value.trim()){ r.input.classList.remove("ok", "bad"); return null; }
+      const ok = matches(r.input.value, r.it.answers); r.input.classList.toggle("ok", ok); r.input.classList.toggle("bad", !ok); return ok; }); },
+    reveal(){ rows.forEach(r => { if (!r.input.classList.contains("ok") && !r.row.querySelector(".model")) r.row.append(h("div", { class: "model" }, "✓ " + r.it.answers[0])); }); },
+    reset(){ clear(v); rows.forEach(r => { r.input.value = r.it.wrong; r.input.classList.remove("ok", "bad"); }); }
+  };
+};
+
+RENDER.rephrase = (sec, s, body) => {
+  const v = s.v || (s.v = {}); const rows = [];
+  sec.items.forEach((it, i) => {
+    const input = h("input", { class: "full", type: "text", autocomplete: "off", autocapitalize: "sentences", spellcheck: "false", placeholder: "Type the full sentence…", "aria-label": "answer " + (i + 1) });
+    input.value = v[i] || "";
+    const prompt = h("div", { class: "prompt" }, h("span", { class: "num" }, pad(i)), h("span", { html: it.prompt }));
+    if (it.key) prompt.append(h("span", { class: "key" }, it.key));
+    const row = h("div", { class: "row" }, prompt, input);
+    input.addEventListener("input", () => { v[i] = input.value; persist(); input.classList.remove("ok", "bad", "close"); const m = row.querySelector(".model"); if (m) m.remove(); });
+    body.append(row); rows.push({ it, input, row });
+  });
+  return {
+    total: rows.length,
+    check(){ return rows.map(r => {
+      const old = r.row.querySelector(".model"); if (old) old.remove();
+      r.input.classList.remove("ok", "bad", "close");
+      if (!r.input.value.trim()) return null;
+      if (matches(r.input.value, r.it.answers)){ r.input.classList.add("ok"); return true; }
+      const best = Math.max(...r.it.answers.map(a => similarity(r.input.value, a)));
+      if (best >= .7){ r.input.classList.add("close"); r.row.append(h("div", { class: "model close" }, "Almost! Check the form of the words.")); }
+      else r.input.classList.add("bad");
+      return false;
+    }); },
+    reveal(){ rows.forEach(r => { const old = r.row.querySelector(".model"); if (old) old.remove(); if (!r.input.classList.contains("ok")) r.row.append(h("div", { class: "model" }, "✓ " + r.it.answers[0])); }); },
+    reset(){ clear(v); rows.forEach(r => { r.input.value = ""; r.input.classList.remove("ok", "bad", "close"); }); }
+  };
+};
+
+RENDER.write = (sec, s, body) => {
+  const v = s.v || (s.v = {});
+  let box = null;
+  if (sec.words){ box = h("div", { class: "wordbox" }); sec.words.forEach(w => box.append(h("span", { "data-w": w }, w))); body.append(box); }
+  const ta = h("textarea", { class: "full", rows: 8, spellcheck: "true", placeholder: "Write here…", "aria-label": "your text" });
+  ta.value = v.text || "";
+  const ul = h("ul", { class: "checks" });
+  const lis = (sec.checks || []).map(c => { const li = h("li", {}, c.label); ul.append(li); return { c, li }; });
+  body.append(ta, ul);
+  function usedWords(t){ return (sec.words || []).filter(w => new RegExp("\\b" + w.replace(/\s+/g, "\\s+(?:\\w+\\s+)?"), "i").test(t)); }
+  function run(){ const tx = ta.value.replace(/[’‘]/g, "'");
+    const used = usedWords(tx);
+    if (box) box.querySelectorAll("span").forEach(sp => sp.classList.toggle("used", used.includes(sp.dataset.w)));
+    lis.forEach(({ c, li }) => {
+      let ok = false;
+      if (c.pattern){ const n = (tx.match(new RegExp(c.pattern, "gi")) || []).length; ok = n >= (c.min || 1); }
+      if (c.words) ok = used.length >= c.words;
+      if (c.sentences) ok = tx.split(/[.!?]+|\n+/).filter(x => x.trim().split(/\s+/).length >= 3).length >= c.sentences;
+      li.classList.toggle("done", ok);
+    });
+  }
+  ta.addEventListener("input", () => { v.text = ta.value; persist(); run(); });
+  run();
+  return {
+    total: 0, revealLabel: "👀 See an example", alwaysShow: true,
+    check(){ run(); return []; },
+    reveal(){ if (!body.querySelector(".model")) body.append(h("div", { class: "model" }, "Example: " + sec.sample)); },
+    reset(){ clear(v); ta.value = ""; run(); }
+  };
+};
+
+/* automaticity drill: every item must be typed correctly twice; mistakes come back */
+RENDER.drill = (sec, s, body) => {
+  const items = sec.items; const NEED = sec.need || 2;
+  const box = h("div", { class: "drill" }); body.append(box);
+  let q, hits, cur, t0, tick, mistakes;
+  function fmt(ms){ const t = Math.floor(ms / 1000); return Math.floor(t / 60) + ":" + String(t % 60).padStart(2, "0"); }
+  function intro(){
+    clearInterval(tick); box.innerHTML = "";
+    box.append(h("div", { class: "dtop" }, h("span", {}, items.length + " phrases × " + NEED), h("span", {}, s.best ? "best time " + fmt(s.best) : "no best time yet")));
+    box.append(h("div", { class: "dprompt" }, h("small", {}, "how it works"), "Type each answer fast. Mistakes come back until you get them right twice."));
+    const go = h("button", { class: "start", type: "button" }, "Start the dive ↓"); go.addEventListener("click", start); box.append(go);
+  }
+  function start(){
+    q = shuffle(items.map((_, i) => i), "d" + Date.now()); hits = items.map(() => 0); mistakes = 0; t0 = Date.now();
+    box.innerHTML = "";
+    const dots = h("div", { class: "dots" }, items.map(() => h("i")));
+    const timer = h("span", { class: "timer" }, "0:00");
+    const prompt = h("div", { class: "dprompt" });
+    const input = h("input", { type: "text", autocomplete: "off", autocapitalize: "sentences", spellcheck: "false", "aria-label": "your answer" });
+    const go = h("button", { class: "go", type: "button" }, "↵");
+    const fb = h("div", { class: "dfb" });
+    box.append(h("div", { class: "dtop" }, dots, timer), prompt, h("div", { class: "drow" }, input, go), fb);
+    tick = setInterval(() => { timer.textContent = fmt(Date.now() - t0); }, 250);
+    function paintDots(){ [...dots.children].forEach((d, i) => { d.className = hits[i] >= NEED ? "full" : hits[i] > 0 ? "half" : ""; }); }
+    function next(){
+      if (!q.length){ finish(); return; }
+      cur = q.shift(); const it = items[cur];
+      prompt.innerHTML = ""; prompt.append(h("small", {}, it.cue), h("span", { html: it.prompt }));
+      input.value = ""; input.focus({ preventScroll: true });
+    }
+    function submit(){
+      if (cur == null || !input.value.trim()) return;
+      const it = items[cur]; const ok = matches(input.value, it.answers);
+      box.classList.remove("flash-ok", "flash-bad"); void box.offsetWidth; box.classList.add(ok ? "flash-ok" : "flash-bad");
+      if (ok){ hits[cur]++; fb.className = "dfb ok"; fb.textContent = "✓ " + it.answers[0]; if (hits[cur] < NEED) q.splice(Math.min(q.length, 3 + Math.floor(Math.random() * 3)), 0, cur); }
+      else { mistakes++; hits[cur] = 0; fb.className = "dfb bad"; fb.textContent = "✗ " + it.answers[0]; q.splice(Math.min(q.length, 2), 0, cur); }
+      paintDots(); next();
+    }
+    go.addEventListener("click", submit);
+    input.addEventListener("keydown", e => { if (e.key === "Enter"){ e.preventDefault(); submit(); } });
+    paintDots(); next();
+  }
+  function finish(){
+    clearInterval(tick); const ms = Date.now() - t0; const best = !s.best || ms < s.best;
+    if (best){ s.best = ms; persist(); }
+    box.innerHTML = "";
+    const again = h("button", { class: "start", type: "button" }, "Dive again");
+    again.addEventListener("click", start);
+    box.append(h("div", { class: "done" }, h("small", {}, "your time"), h("b", {}, fmt(ms)),
+      h("div", {}, (best ? "New best time! " : "Best: " + fmt(s.best) + ". ") + (mistakes ? mistakes + " slip" + (mistakes > 1 ? "s" : "") + " on the way." : "No mistakes at all!"))), again);
+    burst(again);
+  }
+  intro();
+  return { noFoot: true, total: 0 };
+};
+
+RENDER.sort = (sec, s, body) => {
+  const v = s.v || (s.v = {}); const B = Board(body, v);
+  const wrap = h("div", { class: "buckets" }); const all = [];
+  sec.categories.forEach((cat, ci) => {
+    const zone = h("div", { class: "bucket-zone" }); B.register(zone, zone, "b" + ci, false);
+    wrap.append(h("div", { class: "bucket" }, h("h3", { html: cat.name }), zone));
+    cat.words.forEach((w, wi) => all.push({ id: "w" + ci + "-" + wi, w, ci }));
+  });
+  shuffle(all, LESSON.id + sec.title).forEach(o => B.chip(o.id, o.w, String(o.ci)));
+  body.append(B.bank, wrap); B.restore();
+  const order = all.map(o => o.id);
+  return {
+    total: all.length,
+    check(){ return order.map(id => { const c = B.chips[id]; const z = B.zoneOf(c);
+      c.classList.remove("ok", "bad"); if (z === "bank") return null;
+      const ok = z === "b" + c.dataset.value; c.classList.add(ok ? "ok" : "bad"); return ok; }); },
+    reveal(){ order.forEach(id => { const c = B.chips[id]; if (B.zoneOf(c) !== "b" + c.dataset.value) B.place(c, "b" + c.dataset.value); }); },
+    reset(){ B.resetAll(); persist(); }
+  };
+};
+LABEL.sort = "sort";
+
+/* ---------- birthday widgets: cake, wheel, gifts ---------- */
+RENDER.cake = (sec, s, body) => {
+  const N = sec.candles || 16; const list = [];
+  const stage = h("div", { class: "cake-stage" });
+  const candles = h("div", { class: "candles" });
+  for (let i = 0; i < N; i++){
+    const c = h("button", { class: "candle lit", type: "button", "aria-label": "candle " + (i + 1), style: "--i:" + i }, h("i", { class: "flame" }), h("i", { class: "smoke" }));
+    c.addEventListener("click", () => { if (c.classList.contains("lit")){ c.classList.remove("lit"); after(); } });
+    candles.append(c); list.push(c);
+  }
+  stage.append(candles, h("div", { class: "cake" }, h("div", { class: "tier t2" }, h("span", {}, sec.top || "")), h("div", { class: "tier t1" }), h("div", { class: "plate" })));
+  const left = h("span", { class: "cake-left" });
+  const btnMic = h("button", { class: "btn btn-check", type: "button" }, "🎤 Blow into the mic");
+  const btnRelight = h("button", { class: "btn", type: "button" }, "🕯️ Light them again");
+  const msg = h("div", { class: "cake-msg", html: sec.done || "" }); msg.hidden = true;
+  body.append(h("div", { class: "cake-banner", html: sec.banner || "" }), stage,
+    h("p", { class: "cake-hint", html: sec.hint || "" }), h("div", { class: "cake-ctr" }, btnMic, btnRelight, left), msg);
+  const lit = () => list.filter(c => c.classList.contains("lit"));
+  function after(){
+    const n = lit().length; left.textContent = n ? n + (n === 1 ? " candle left" : " candles left") : "";
+    if (!n && msg.hidden){ msg.hidden = false; stopMic(); [0, 260, 560, 900].forEach(t => setTimeout(() => burst(stage), t)); }
+  }
+  btnRelight.addEventListener("click", () => { list.forEach(c => c.classList.add("lit")); msg.hidden = true; after(); });
+  let stream = null, raf = 0, ctx = null;
+  function stopMic(){
+    cancelAnimationFrame(raf);
+    if (stream) stream.getTracks().forEach(t => t.stop()); stream = null;
+    if (ctx){ try { ctx.close(); } catch (e) {} ctx = null; }
+    btnMic.textContent = "🎤 Blow into the mic";
+  }
+  btnMic.addEventListener("click", async () => {
+    if (stream){ stopMic(); return; }
+    try { stream = await navigator.mediaDevices.getUserMedia({ audio: true }); }
+    catch (e){ btnMic.textContent = "🎤 No mic — tap the candles"; return; }
+    ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const an = ctx.createAnalyser(); an.fftSize = 512; ctx.createMediaStreamSource(stream).connect(an);
+    const buf = new Uint8Array(an.fftSize); let hot = 0, last = 0;
+    btnMic.textContent = "⏹ Stop the mic";
+    const loop = t => {
+      an.getByteTimeDomainData(buf); let sum = 0;
+      for (const x of buf){ const d = (x - 128) / 128; sum += d * d; }
+      hot = Math.sqrt(sum / buf.length) > 0.12 ? hot + 1 : 0;
+      if (hot > 3 && t - last > 110){ last = t; const L = lit(); if (L.length){ L[Math.floor(Math.random() * L.length)].classList.remove("lit"); after(); } }
+      raf = requestAnimationFrame(loop);
+    };
+    raf = requestAnimationFrame(loop);
+  });
+  after();
+  return { noFoot: true, total: 0, check(){ return []; }, reveal(){}, reset(){} };
+};
+
+RENDER.wheel = (sec, s, body) => {
+  const qs = sec.items, n = qs.length; const used = s.used || (s.used = []);
+  const colors = sec.colors || ["#FF7FA8", "#FFC857", "#B8A1FF", "#7ED6C3"];
+  const R = 146, C = 150; let svg = '<svg viewBox="0 0 300 300" class="wheel-svg" aria-hidden="true">';
+  for (let i = 0; i < n; i++){
+    const a0 = i / n * 2 * Math.PI - Math.PI / 2, a1 = (i + 1) / n * 2 * Math.PI - Math.PI / 2, am = (a0 + a1) / 2;
+    const p = a => (C + R * Math.cos(a)).toFixed(1) + "," + (C + R * Math.sin(a)).toFixed(1);
+    const tx = (C + R * .7 * Math.cos(am)).toFixed(1), ty = (C + R * .7 * Math.sin(am)).toFixed(1);
+    svg += `<path d="M${C},${C} L${p(a0)} A${R},${R} 0 0 1 ${p(a1)} Z" fill="${colors[i % colors.length]}" stroke="#fff" stroke-width="2.5"/>`;
+    svg += `<text x="${tx}" y="${ty}" text-anchor="middle" dominant-baseline="central" font-size="22" transform="rotate(${(am * 180 / Math.PI + 90).toFixed(1)} ${tx} ${ty})">${qs[i].icon || i + 1}</text>`;
+  }
+  svg += '<circle cx="150" cy="150" r="24" fill="#fff" stroke="#3B1F3A" stroke-width="3"/></svg>';
+  const rot = h("div", { class: "wheel-rot", html: svg });
+  const btn = h("button", { class: "btn btn-check", type: "button" }, "🎡 Spin the wheel");
+  const card = h("div", { class: "wheel-q" }, h("p", { class: "wq-tip" }, sec.start || "Spin the wheel!"));
+  const done = h("div", { class: "wheel-done" });
+  body.append(h("div", { class: "wheel-wrap" }, h("div", { class: "wheel" }, h("div", { class: "wheel-pin" }), rot), h("div", { class: "wheel-side" }, btn, card)), done);
+  let angle = s.angle || 0; rot.style.transform = `rotate(${angle}deg)`;
+  function paintDone(){ done.innerHTML = ""; used.forEach(i => done.append(h("span", { class: "wd" }, (qs[i].icon || "") + " " + qs[i].short))); }
+  function show(i){
+    card.innerHTML = "";
+    card.append(h("div", { class: "wq-n" }, "question " + (used.indexOf(i) + 1) + " of " + n), h("div", { class: "wq", html: qs[i].q }));
+    if (qs[i].tip) card.append(h("div", { class: "wq-tip", html: qs[i].tip }));
+  }
+  btn.addEventListener("click", () => {
+    let free = qs.map((q, i) => i).filter(i => !used.includes(i));
+    if (!free.length){ used.length = 0; free = qs.map((q, i) => i); }
+    const i = free[Math.floor(Math.random() * free.length)];
+    const center = (i + .5) / n * 360;
+    angle = Math.ceil(angle / 360) * 360 + 1440 + (360 - center);
+    rot.style.transition = "transform 3.2s cubic-bezier(.17,.67,.2,1)"; rot.style.transform = `rotate(${angle}deg)`;
+    btn.disabled = true;
+    setTimeout(() => { used.push(i); s.angle = angle; persist(); show(i); paintDone(); btn.disabled = false; burst(card); }, 3300);
+  });
+  paintDone(); if (used.length) show(used[used.length - 1]);
+  return { noFoot: true, total: 0, check(){ return []; }, reveal(){}, reset(){} };
+};
+
+RENDER.gifts = (sec, s, body) => {
+  const v = s.v || (s.v = {}); const o = s.o || (s.o = {}); const items = [];
+  const grid = h("div", { class: "gifts" });
+  sec.items.forEach((it, i) => {
+    const box = h("div", { class: "gift" + (o[i] ? " open" : ""), style: "--g:" + i });
+    const lid = h("button", { class: "gift-closed", type: "button", "aria-label": "open present " + (i + 1) }, emo(sec.icon || "gift"), h("span", { class: "gift-n" }, pad(i)));
+    const text = h("div", { class: "q-text" }, h("span", { class: "q-num" }, pad(i)));
+    it.q.split("___").forEach((part, k) => { if (k) text.append(h("span", { class: "blank" })); text.append(h("span", { html: part })); });
+    const opts = h("div", { class: "opts" });
+    const btns = it.options.map((op, j) => { const b = h("button", { class: "opt", type: "button", html: op }); b.addEventListener("click", () => { v[i] = j; persist(); paint(); fire(body); }); opts.append(b); return b; });
+    function paint(){ btns.forEach((b, j) => { b.classList.toggle("sel", v[i] === j); b.classList.remove("ok", "bad", "answer"); }); }
+    lid.addEventListener("click", () => { o[i] = 1; persist(); box.classList.add("open"); burst(box); });
+    box.append(lid, h("div", { class: "gift-in" }, text, opts)); grid.append(box); paint();
+    items.push({ it, btns, i, paint, box });
+  });
+  body.append(grid);
+  return {
+    total: items.length,
+    check(){ return items.map(({ it, btns, i, paint }) => { paint(); if (v[i] === undefined) return null; const ok = v[i] === it.answer; btns[v[i]].classList.add(ok ? "ok" : "bad"); return ok; }); },
+    reveal(){ items.forEach(({ it, btns, i, box }) => { box.classList.add("open"); o[i] = 1; if (v[i] !== it.answer) btns[it.answer].classList.add("answer"); }); persist(); },
+    reset(){ clear(v); clear(o); items.forEach(({ paint, box }) => { paint(); box.classList.remove("open"); }); }
+  };
+};
+
+RENDER.balloons = (sec, s, body) => {
+  const items = sec.items; const popped = s.p || (s.p = {});
+  const colors = ["#FF4F8B", "#7B5CFF", "#FFC857", "#2EC4B6"];
+  const grid = h("div", { class: "balloons" }); const els = [];
+  const left = h("span", { class: "cake-left" });
+  items.forEach((q, i) => {
+    const b = h("button", { class: "bln" + (popped[i] ? " popped" : ""), type: "button", style: `--c:${colors[i % 4]};--d:${(i % 5) * .35}s`, "aria-label": "balloon " + (i + 1) },
+      h("span", { class: "bln-body" }, h("b", {}, String(i + 1))), h("span", { class: "bln-q", html: q }));
+    b.addEventListener("click", () => { if (popped[i]) return; popped[i] = 1; persist(); b.classList.add("popped"); burst(b); count(); });
+    grid.append(b); els.push(b);
+  });
+  const again = h("button", { class: "btn", type: "button" }, "🎈 Blow them up again");
+  again.addEventListener("click", () => { clear(popped); persist(); els.forEach(b => b.classList.remove("popped")); count(); });
+  function count(){ const n = items.length - Object.keys(popped).length; left.textContent = n ? n + " balloons left" : "🎉 All popped!"; }
+  body.append(h("div", { class: "cake-banner", html: sec.banner || "" }), grid, h("div", { class: "cake-ctr" }, again, left));
+  count();
+  return { noFoot: true, total: 0, check(){ return []; }, reveal(){}, reset(){} };
+};
+
+RENDER.letter = (sec, s, body) => {
+  const env = h("button", { class: "env", type: "button", "aria-label": "open the envelope" },
+    h("span", { class: "env-back" }), h("span", { class: "env-letter" }), h("span", { class: "env-front" }), h("span", { class: "env-flap" }),
+    h("span", { class: "env-seal" }, emo(sec.seal || "loveletter")), h("span", { class: "env-to", html: sec.to || "" }));
+  const letter = h("div", { class: "letter", html: sec.html }); letter.hidden = true;
+  const hint = h("p", { class: "cake-hint" }, sec.hint || "Tap the envelope to open it.");
+  env.addEventListener("click", () => {
+    if (env.classList.contains("open")) return;
+    env.classList.add("open"); hint.hidden = true;
+    setTimeout(() => { letter.hidden = false; letter.classList.add("in"); [0, 300, 650].forEach(t => setTimeout(() => burst(env), t)); }, 700);
+  });
+  body.append(h("div", { class: "env-wrap" }, env), hint, letter);
+  return { noFoot: true, total: 0, check(){ return []; }, reveal(){}, reset(){} };
+};
+
+/* ---------- block timer (visible countdown, 5/7/8 min) ---------- */
+(function blockTimer(){
+  let left = 0, total = 0, iv = 0;
+  const face = h("button", { type: "button", class: "bt-face", title: "Block timer: 5, 7 or 8 minutes" }, "⏱ Timer");
+  const presets = h("div", { class: "bt-presets" });
+  const box = h("div", { class: "bt" }, face, presets);
+  [5, 7, 8].forEach(m => { const b = h("button", { type: "button" }, m + " min"); b.addEventListener("click", () => start(m)); presets.append(b); });
+  face.addEventListener("click", () => { box.classList.toggle("open"); paint(); });
+  const stop = h("button", { type: "button", class: "bt-stop" }, "■ stop"); stop.addEventListener("click", reset); presets.append(stop);
+  function fmt(){ const m = Math.floor(left / 60), s = left % 60; return m + ":" + String(s).padStart(2, "0"); }
+  function paint(){ face.textContent = left ? "⏱ " + fmt() : (box.classList.contains("open") ? "⏱ Timer ▸" : "⏱ Timer"); box.style.setProperty("--p", total ? (1 - left / total) : 0); box.classList.toggle("run", !!left); box.classList.toggle("low", left > 0 && left <= 60); }
+  function start(m){ box.classList.remove("open"); clearInterval(iv); total = left = m * 60; paint(); iv = setInterval(() => { left--; if (left <= 0){ left = 0; clearInterval(iv); box.classList.add("ring"); setTimeout(() => box.classList.remove("ring"), 2600); burst(box); } paint(); }, 1000); }
+  function reset(){ clearInterval(iv); left = total = 0; paint(); }
+  document.body.append(box); paint();
+})();
+
+/* ---------- open T/F (checked together, no auto score) ---------- */
+RENDER.tfopen = (sec, s, body) => {
+  const v = s.v || (s.v = {});
+  const list = h("ol", { class: "tfo" });
+  sec.items.forEach((q, i) => {
+    const btns = ["T", "F"].map(L => {
+      const b = h("button", { type: "button", class: "opt" + (v[i] === L ? " sel" : "") }, L);
+      b.addEventListener("click", () => { v[i] = L; persist(); btns.forEach(x => x.classList.toggle("sel", x === b)); });
+      return b;
+    });
+    list.append(h("li", {}, h("span", { html: q }), h("span", { class: "tfo-b" }, btns[0], btns[1])));
+  });
+  body.append(list);
+  if (sec.note) body.append(h("p", { class: "wq-tip", html: sec.note }));
+  return { noFoot: true, total: 0, check(){ return []; }, reveal(){}, reset(){} };
+};
+
+/* ---------- build page ---------- */
+const main = document.getElementById("lesson");
+const graded = []; let reviewBox = null; let n = 0;
+
+LESSON.sections.forEach((sec, idx) => {
+  if (sec.type === "part"){
+    main.append(h("div", { class: "part", style: sec.color ? "--pc:" + sec.color : "" },
+      h("div", { class: "pi" }, emo(sec.icon)),
+      h("div", {}, h("div", { class: "pn" }, "PART " + sec.n), h("h2", {}, sec.title), sec.text ? h("p", {}, sec.text) : null)));
+    return;
+  }
+  const sid = "s" + idx; const s = SAVE[sid] || (SAVE[sid] = {});
+  const exercise = sec.type !== "rule" && sec.type !== "review";
+  const card = h("section", { class: "card", id: sid });
+  card.append(h("div", { class: "winbar", "aria-hidden": "true" }, h("i"), h("i"), h("i"), h("span", {}, sec.label || LABEL[sec.type] || "")));
+  if (sec.sticker) card.append(h("div", { class: "deco", "aria-hidden": "true" }, emo(sec.sticker)));
+  const inner = h("div", { class: "card-in" }); card.append(inner);
+  const num = exercise ? pad(n++) : (sec.type === "review" ? "★" : "i");
+  inner.append(h("div", { class: "card-head" }, h("div", { class: "ticket" + (exercise ? "" : " alt") }, num), h("div", {}, h("h2", { class: "t", html: sec.title || "" }))));
+  if (sec.instructions) inner.append(h("p", { class: "instr", html: sec.instructions }));
+  else inner.append(h("div", { style: "height:14px" }));
+  const body = h("div", { class: "card-body" }); inner.append(body);
+  main.append(card);
+
+  if (sec.type === "review"){ reviewBox = body; return; }
+  const api = RENDER[sec.type] ? RENDER[sec.type](sec, s, body) : null;
+  if (!api || api.noFoot) return;
+
+  const score = h("span", { class: "score" });
+  const btnCheck = h("button", { class: "btn btn-check", type: "button" }, "Check");
+  const btnShow = h("button", { class: "btn btn-soft", type: "button", hidden: !api.alwaysShow }, api.revealLabel || "👀 Show answers");
+  const btnReset = h("button", { class: "btn", type: "button" }, "Reset");
+  inner.append(h("div", { class: "card-foot" }, btnCheck, btnShow, btnReset, score));
+  const g = { sec, s, api, card, num, title: sec.title };
+  graded.push(g);
+
+  function showScore(){
+    if (s.score == null || !api.total){ score.textContent = ""; score.classList.remove("perfect"); return; }
+    score.textContent = s.score + "/" + api.total + (s.score === api.total ? " ✓" : "");
+    score.classList.toggle("perfect", s.score === api.total);
+  }
+  function doCheck(silent){
+    const res = api.check(); const sc = res.filter(x => x === true).length;
+    s.score = sc; s.checked = true;
+    if (!silent){
+      s.tries = (s.tries || 0) + 1;
+      s.first = s.first || [];
+      s.fixed = s.fixed || [];
+      res.forEach((r, i) => {
+        if (s.first[i] == null){ if (r !== null) s.first[i] = r; }
+        else if (s.first[i] === false && r === true && !s.revealed) s.fixed[i] = true;
+      });
+    }
+    btnShow.hidden = !api.alwaysShow && !((s.tries || 0) >= 2 && sc < api.total);
+    persist(); showScore(); updateAll();
+    if (!silent && api.total && sc === api.total){ burst(btnCheck); btnCheck.classList.remove("wiggle"); void btnCheck.offsetWidth; btnCheck.classList.add("wiggle"); }
+  }
+  g.doCheck = doCheck;
+  btnCheck.addEventListener("click", () => doCheck(false));
+  btnShow.addEventListener("click", () => { s.revealed = true; persist(); api.reveal(); updateAll(); });
+  btnReset.addEventListener("click", () => {
+    api.reset(); body.querySelectorAll(".reveal,.model,.why").forEach(x => x.remove());
+    delete s.score; delete s.checked; persist(); btnShow.hidden = !api.alwaysShow; showScore(); updateAll();
+  });
+  body.addEventListener("input", () => { if (s.score != null){ delete s.score; delete s.checked; persist(); showScore(); updateAll(); } });
+  if (s.checked) doCheck(true);
+});
+
+/* ---------- progress + self-check ---------- */
+function updateAll(){
+  let sc = 0, tot = 0, fixed = 0;
+  graded.forEach(({ s, api }) => { tot += api.total; if (s.score != null) sc += s.score; (s.fixed || []).forEach(f => { if (f) fixed++; }); });
+  document.getElementById("pScore").textContent = sc;
+  document.getElementById("pTotal").textContent = tot;
+  document.getElementById("pBar").style.width = tot ? (sc / tot * 100) + "%" : "0";
+  document.getElementById("pFix").textContent = fixed;
+  if (!reviewBox) return;
+  reviewBox.innerHTML = "";
+  reviewBox.append(h("div", { class: "fixcount" }, emo("star"),
+    h("div", {}, h("div", { class: "big" }, "+" + fixed), h("div", { class: "lbl" }, "mistakes you fixed yourself"))));
+  const list = h("div", { class: "rv-list" }); let any = false, checkedAny = false;
+  graded.forEach(g => {
+    const first = g.s.first || []; if (first.length) checkedAny = true;
+    const wrong = [], done = [];
+    first.forEach((f, i) => { if (f === false){ (g.s.fixed && g.s.fixed[i] ? done : wrong).push(i + 1); } });
+    if (!wrong.length && !done.length) return;
+    any = true;
+    const btn = h("button", { class: "btn", type: "button" }, wrong.length ? "Fix →" : "See →");
+    btn.addEventListener("click", () => { g.card.scrollIntoView({ behavior: "smooth", block: "start" }); g.card.classList.remove("flash"); void g.card.offsetWidth; g.card.classList.add("flash"); });
+    list.append(h("div", { class: "rv-item" + (wrong.length ? "" : " done") },
+      h("div", {}, h("div", { class: "rv-t" }, g.num + " · " + g.title.replace(/<[^>]+>/g, "")),
+        h("div", { class: "rv-n" }, wrong.length ? "to fix: " + wrong.join(", ") + (g.s.revealed ? " (answers shown)" : "") : "all fixed ✓")),
+      btn));
+  });
+  if (!any) list.append(h("div", { class: "rv-empty" }, checkedAny ? "No mistakes — wow! 🎉" : "Check some exercises first. Your mistakes will appear here."));
+  reviewBox.append(list);
+}
+updateAll();
+
+document.getElementById("resetAll").addEventListener("click", () => {
+  if (!confirm("Clear all your answers in this lesson?")) return;
+  SAVE = {}; try { localStorage.removeItem(KEY); } catch (e) {}
+  location.reload();
+});
+})();
+</script>
+</body>
+</html>
