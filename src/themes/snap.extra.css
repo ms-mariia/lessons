@@ -1,0 +1,55 @@
+
+  /* ===== Snapshot · instant-photo theme (overrides) ===== */
+  :root{
+    --paper:#FFFDF8; --ink:#2B2118; --muted:#6E6052; --line:rgba(43,33,24,.13);
+    --accent:#F2652F; --accent2:#1B998B; --sand:#F2C14E; --soft:#FBEFDD;
+    --light:#2B2118; --lightmuted:#6E6052;
+    --head:"Young Serif",Georgia,serif; --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace; --body:"Hanken Grotesk",system-ui,sans-serif;
+  }
+  html{background:#E9DCC6}
+  body{background-color:#E9DCC6;background-image:radial-gradient(rgba(120,90,50,.16) 1px,transparent 1.4px),radial-gradient(rgba(120,90,50,.1) 1px,transparent 1.4px);background-size:14px 14px,23px 23px;background-position:0 0,7px 11px}
+  body::before{display:none}
+  .bubbles{display:none}
+  .hero{color:var(--ink)}
+  h1{font-family:var(--head);font-weight:400;font-size:clamp(58px,14vw,124px);line-height:.95;color:var(--ink);letter-spacing:-.01em}
+  h1 em{font-style:normal;color:var(--accent)}
+  .kicker{color:var(--accent);border-color:rgba(242,101,47,.5);background:#FFFDF8}
+  .sub{color:var(--muted)}
+  .sticker{background:#fff;padding:10px 10px 26px;border-radius:3px;box-shadow:0 10px 20px rgba(43,33,24,.22)}
+  .progress{color:var(--ink);background:#FFFDF8;border-color:var(--line);box-shadow:0 8px 20px rgba(43,33,24,.14)}
+  .progress .lbl{color:var(--muted)}
+  .bar{background:#EFE3CF}
+  .bar i{background:linear-gradient(90deg,var(--accent2),var(--sand),var(--accent))}
+  .part{color:var(--ink)}
+  .part .pi{background:#FFFDF8;border:1px solid var(--line);border-radius:6px;rotate:-4deg;box-shadow:0 6px 12px rgba(43,33,24,.15)}
+  .part .pn{color:var(--accent);font-family:var(--mono)}
+  .part p{color:var(--muted)}
+  .card{border-radius:6px;box-shadow:0 12px 26px rgba(43,33,24,.16)}
+  .card::after{content:"";position:absolute;top:-10px;left:50%;width:90px;height:22px;margin-left:-45px;background:rgba(242,193,78,.55);rotate:-2deg;border-radius:2px}
+  .winbar span{color:var(--accent2)}
+  .ticket{border-radius:6px;box-shadow:none;background:var(--ink)}
+  .ticket.alt{background:var(--accent);box-shadow:none}
+  .box{border-radius:6px} .box.pink{background:#FCE3D8} .box.sand{background:#FBF0D2}
+  .colloc b{color:var(--accent)}
+  .hl{background:#FCE0D3} .hl2{background:#D5EFEC}
+  /* polaroid photos */
+  .photos{gap:18px}
+  .photo{background:#fff;border-radius:2px;padding:10px 10px 44px;box-shadow:0 10px 20px rgba(43,33,24,.2);overflow:visible}
+  .photo:nth-child(odd){rotate:-1.6deg} .photo:nth-child(even){rotate:1.4deg}
+  .photo img{border-radius:1px}
+  .photo figcaption{position:absolute;left:10px;right:10px;bottom:6px;padding:0;background:none;color:var(--ink);font:400 22px/1.1 "Reenie Beanie",cursive}
+  .photo figcaption small{font:400 9.5px var(--mono);color:var(--muted);opacity:1;margin-top:3px}
+  .rulecard{background:#fff;border:1px solid var(--line);border-left:6px solid var(--accent2);border-radius:4px;padding:12px 14px;margin:14px 0;font-size:15.5px;background-image:repeating-linear-gradient(180deg,transparent 0 25px,rgba(27,153,139,.12) 25px 26px)}
+  .rulecard h4{margin:0 0 6px;font:500 11px var(--mono);text-transform:uppercase;letter-spacing:.1em;color:var(--accent2)}
+  .rulecard p{margin:0;line-height:26px}
+  .drill{background:var(--ink)}
+  .drill .dtop,.drill .dprompt small{color:#CDBFAE}
+  .drill .timer,.drill .done b{color:var(--sand)}
+  .page-foot{color:var(--muted)} .page-foot .btn{color:var(--ink);border-color:var(--ink)} .page-foot a{color:var(--muted)}
+  .buckets{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
+  .bucket{border:1.5px solid var(--line);border-radius:6px;background:#fff;overflow:hidden}
+  .bucket h3{margin:0;padding:7px 10px;font:600 11px var(--mono);text-transform:uppercase;letter-spacing:.1em;color:#fff;background:var(--accent2)}
+  .bucket-zone{min-height:84px;padding:8px;display:flex;flex-wrap:wrap;gap:6px;align-content:flex-start;cursor:pointer}
+  .bucket-zone.over{background:var(--soft)}
+  .bucket .chip{box-shadow:none}
+  @media (max-width:560px){.photo figcaption{font-size:19px}}

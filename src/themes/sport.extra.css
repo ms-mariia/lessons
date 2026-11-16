@@ -1,0 +1,58 @@
+
+  /* ===== Match report · sport theme (overrides) ===== */
+  :root{
+    --paper:#FFFFFF; --ink:#16202A; --muted:#5D6874; --line:rgba(22,32,42,.13);
+    --accent:#D9472B; --accent2:#1F7A4D; --sand:#F5B700; --soft:#EAF3EC;
+    --light:#16202A; --lightmuted:#4C5864;
+    --head:"Big Shoulders Display",Impact,sans-serif; --mono:"Chivo Mono",ui-monospace,Menlo,monospace; --body:"Figtree",system-ui,sans-serif;
+  }
+  html{background:#F4F1EA}
+  body{background:#F4F1EA}
+  body::before{content:"";position:absolute;left:0;right:0;top:0;height:420px;opacity:1;mix-blend-mode:normal;animation:none;
+    background:repeating-linear-gradient(180deg,transparent 0 58px,rgba(255,255,255,.55) 58px 61px),linear-gradient(180deg,#C9472E,#D9583C)}
+  .bubbles{display:none}
+  .hero{color:#fff;padding-bottom:30px}
+  h1{font-family:var(--head);font-weight:900;text-transform:uppercase;font-size:clamp(60px,15vw,138px);line-height:.85;letter-spacing:.01em;color:#fff}
+  h1 em{font-style:normal;color:var(--sand)}
+  .kicker{color:#fff;border-color:rgba(255,255,255,.6);background:rgba(0,0,0,.12)}
+  .sub{color:rgba(255,255,255,.88)}
+  .progress{color:#fff;background:#16202A;border-color:#16202A;box-shadow:0 10px 24px rgba(22,32,42,.25)}
+  .progress .lbl{color:#9AA6B2}
+  .progress b{color:var(--sand);font-family:var(--mono)}
+  .bar{background:rgba(255,255,255,.14)}
+  .bar i{background:repeating-linear-gradient(90deg,var(--sand) 0 10px,#FFD54A 10px 20px)}
+  .part{color:#fff;background:#16202A;border-radius:18px;padding:14px 18px;box-shadow:0 10px 24px rgba(22,32,42,.18)}
+  .part .pi{background:#243341;border-color:#304354}
+  .part .pn{color:var(--sand);font-family:var(--mono)}
+  .part h2{font-weight:800;text-transform:uppercase;letter-spacing:.02em;font-size:34px}
+  .part p{color:#AFBAC5}
+  h2.t{font-weight:800;text-transform:uppercase;letter-spacing:.01em;font-size:30px}
+  .rule h3{font-family:var(--head);font-weight:800;text-transform:uppercase;font-size:23px}
+  .card{border-radius:18px;box-shadow:0 10px 26px rgba(22,32,42,.1),0 0 0 1px rgba(22,32,42,.06)}
+  .card::before{content:"";position:absolute;left:0;top:18px;bottom:18px;width:5px;border-radius:0 4px 4px 0;background:var(--accent2)}
+  .winbar span{color:var(--accent2)}
+  .ticket{border-radius:10px;background:var(--ink);box-shadow:none;font-family:var(--mono)}
+  .ticket.alt{background:var(--accent);box-shadow:none}
+  .box.pink{background:#FBE4DE} .box.sand{background:#FFF2C9}
+  .colloc b{color:var(--accent)}
+  .hl{background:#FBE0D8} .hl2{background:#D8EEDF}
+  .chip{box-shadow:0 3px 0 var(--accent2)}
+  .drill{background:#16202A}
+  .drill .dtop,.drill .dprompt small{color:#9AA6B2}
+  .drill .dots i.full{background:var(--sand);border-color:var(--sand)}
+  .drill .timer,.drill .done b{color:var(--sand);font-family:var(--mono)}
+  .page-foot{color:var(--muted)}
+  .page-foot .btn{color:var(--ink);border-color:var(--ink)}
+  .page-foot a{color:var(--muted)}
+  table.sp{width:100%;border-collapse:collapse;font-size:15px;margin:8px 0}
+  table.sp th{font:500 10.5px var(--mono);text-transform:uppercase;letter-spacing:.08em;color:#fff;background:var(--accent2);padding:7px 8px;text-align:left}
+  table.sp td{border-bottom:1px solid var(--line);padding:6px 8px}
+  table.sp tr:nth-child(even) td{background:#F6F8F6}
+  @media (max-width:560px){table.sp{font-size:13.5px} table.sp td,table.sp th{padding:5px}}
+  /* sort buckets */
+  .buckets{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
+  .bucket{border:1.5px solid var(--line);border-radius:14px;background:#fff;overflow:hidden}
+  .bucket h3{margin:0;padding:7px 10px;font:600 11px var(--mono);text-transform:uppercase;letter-spacing:.1em;color:#fff;background:var(--ink)}
+  .bucket-zone{min-height:84px;padding:8px;display:flex;flex-wrap:wrap;gap:6px;align-content:flex-start;cursor:pointer}
+  .bucket-zone.over{background:var(--soft)}
+  .bucket .chip{box-shadow:none}

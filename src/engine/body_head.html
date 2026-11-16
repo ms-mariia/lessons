@@ -1,0 +1,35 @@
+<body>
+<div class="rgb" aria-hidden="true"><i></i><i></i><i></i></div>
+
+<div class="wrap">
+  <header class="hero">
+    <div class="sticker s1" id="sticker1" aria-hidden="true"></div>
+    <div class="sticker s2" id="sticker2" aria-hidden="true"></div>
+    <span class="kicker" id="kicker"></span>
+    <h1 id="title"></h1>
+    <p class="sub" id="sub"></p>
+  </header>
+
+  <div class="progress" aria-live="polite">
+    <span class="lbl">progress</span><span><b id="pScore">0</b>/<b id="pTotal">0</b></span>
+    <div class="bar"><i id="pBar"></i></div>
+    <span class="fx" title="Mistakes you fixed yourself"><img src="assets/emoji/star.png" alt=""> <b id="pFix">0</b></span>
+  </div>
+
+  <main id="lesson"></main>
+
+  <footer class="page-foot">
+    <button class="btn btn-soft" id="resetAll" type="button">↺ Reset all answers</button>
+    <div>Your answers are saved on this device.</div>
+    <small>Emoji: Microsoft Fluent Emoji (MIT licence)</small>
+  </footer>
+</div>
+
+<script>
+/* =====================================================================
+   LESSON CONTENT — edit this object to make a new lesson
+   ---------------------------------------------------------------------
+   build:   { who, freq, does, what, where, when, wrong }  (wrong = extra wrong chip)
+   gapfill: items as "text [[answer // hint]]" or { text, why }
+   tf2:     { q, answer: true/false, fix: [options], fixAnswer }
+   ===================================================================== */
