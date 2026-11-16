@@ -1,0 +1,1582 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Now or always?</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Gabarito:wght@500;700;800&family=Atkinson+Hyperlegible:wght@400;700&family=Sometype+Mono:wght@400;600&display=swap" rel="stylesheet">
+<!-- LESSON TEMPLATE: edit only the LESSON object. Emoji names → assets/emoji/<name>.png -->
+<style>
+  /* ===== Deep Dive · ocean theme ===== */
+  :root{
+    --surface:#0F6A86; --mid:#0A3556; --abyss:#041325;
+    --paper:#F4FBFA; --ink:#0B2236; --muted:#5A7083; --line:rgba(11,34,54,.14);
+    --accent:#FF6B57; --accent2:#13B5A8; --sand:#F2D49B; --soft:#E1F3F0;
+    --light:#EAF8F6; --lightmuted:#A9C9D2;
+    --ok:#0E9E7A; --ok-bg:#DDF6EE; --bad:#E2483D; --bad-bg:#FDE6E3; --close:#A46B00; --close-bg:#FFF1D2;
+    --head:"Gloock",Georgia,serif; --mono:"Martian Mono",ui-monospace,Menlo,monospace; --body:"Schibsted Grotesk",system-ui,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%;background:var(--abyss)}
+  body{margin:0;color:var(--ink);font:17px/1.6 var(--body);
+    background:linear-gradient(180deg,var(--surface) 0,#0C4C6E 520px,var(--mid) 1400px,#06223B 3200px,var(--abyss) 6000px);min-height:100vh;position:relative;overflow-x:hidden}
+  body::before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.22;mix-blend-mode:screen;
+    background:radial-gradient(ellipse 40px 14px at 20% 10%,#fff 0,transparent 70%),radial-gradient(ellipse 60px 18px at 70% 6%,#fff 0,transparent 70%),radial-gradient(ellipse 30px 10px at 45% 16%,#fff 0,transparent 70%);
+    animation:caustic 9s ease-in-out infinite alternate}
+  @keyframes caustic{to{transform:translate(-30px,12px) scale(1.1)}}
+  .wrap{max-width:820px;margin:0 auto;padding:0 18px;position:relative;z-index:1}
+  button{font:inherit}
+  img.emo{width:1.15em;height:1.15em;vertical-align:-.2em}
+  .bubbles{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+  .bubbles i{position:absolute;bottom:-30px;border:1.5px solid rgba(255,255,255,.45);border-radius:50%;animation:rise linear infinite}
+  @keyframes rise{to{transform:translate(var(--dx,20px),-110vh)}}
+
+  /* hero */
+  .hero{position:relative;padding:52px 0 18px;color:var(--light)}
+  .kicker{display:inline-block;font:500 11.5px/1.5 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--sand);border:1px solid rgba(242,212,155,.5);padding:5px 12px;border-radius:99px;max-width:calc(100% - 90px)}
+  h1{font-family:var(--head);font-weight:400;font-size:clamp(56px,13vw,112px);line-height:.9;margin:16px 0 0;letter-spacing:-.02em;color:#fff}
+  h1 em{font-style:normal;color:var(--sand)}
+  .sub{color:var(--lightmuted);margin:16px 0 0;max-width:46ch;font-size:18px}
+  .depthline{margin-top:20px;display:flex;gap:10px;align-items:center;font:500 11px var(--mono);color:var(--lightmuted);letter-spacing:.08em}
+  .depthline::before{content:"";flex:none;width:46px;height:1px;background:var(--lightmuted)}
+  .sticker{position:absolute;user-select:none;animation:bob 6s ease-in-out infinite;filter:drop-shadow(0 12px 16px rgba(0,0,0,.35))}
+  .sticker img{width:100%;height:100%;display:block}
+  .s1{right:0;top:40px;width:110px;height:110px;rotate:-8deg}
+  .s2{right:110px;top:150px;width:58px;height:58px;rotate:12deg;animation-delay:-3s}
+  @keyframes bob{0%,100%{translate:0 0}50%{translate:0 -10px}}
+
+  /* progress = depth gauge */
+  .progress{position:sticky;top:10px;z-index:30;display:flex;align-items:center;gap:12px;margin:0 -6px;padding:10px 18px;border-radius:99px;font:500 12px var(--mono);color:var(--light);background:rgba(6,34,59,.86);border:1px solid rgba(255,255,255,.16);box-shadow:0 10px 26px rgba(0,0,0,.3);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+  .progress .lbl{color:var(--lightmuted);text-transform:uppercase;letter-spacing:.08em}
+  .bar{flex:1;height:10px;border-radius:99px;overflow:hidden;background:rgba(255,255,255,.12)}
+  .bar i{display:block;height:100%;width:0;border-radius:99px;background:linear-gradient(90deg,var(--accent2),var(--sand),var(--accent));transition:width .6s cubic-bezier(.3,1.4,.5,1)}
+  .progress .fx{display:flex;align-items:center;gap:5px;white-space:nowrap}
+  .progress .fx img{width:18px;height:18px}
+
+  /* parts = depth markers */
+  .part{display:flex;align-items:center;gap:16px;margin:64px 0 8px;color:var(--light)}
+  .part .pi{width:58px;height:58px;flex:none;display:grid;place-items:center;border-radius:50%;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18)}
+  .part .pi img{width:40px;height:40px}
+  .part .pn{font:500 11px var(--mono);letter-spacing:.1em;color:var(--sand)}
+  .part h2{font-family:var(--head);font-weight:400;font-size:36px;line-height:1.05;margin:2px 0 0}
+  .part p{margin:3px 0 0;color:var(--lightmuted);font-size:15.5px}
+
+  /* cards */
+  .card{position:relative;background:var(--paper);border-radius:24px;margin:26px 0;box-shadow:0 18px 40px rgba(0,0,0,.28),0 0 0 1px rgba(255,255,255,.06)}
+  .winbar{display:flex;align-items:center;gap:8px;padding:14px 22px 0}
+  .winbar i{display:none}
+  .winbar span{font:500 10.5px var(--mono);letter-spacing:.12em;color:var(--accent2);text-transform:uppercase}
+  .card-in{padding:8px 24px 20px}
+  .deco{position:absolute;right:18px;top:-28px;width:56px;height:56px;rotate:8deg;user-select:none;filter:drop-shadow(0 8px 10px rgba(0,0,0,.25))}
+  .deco img{width:100%;height:100%}
+  .card-head{display:flex;align-items:center;gap:14px}
+  .ticket{flex:none;width:44px;height:44px;display:grid;place-items:center;border-radius:50%;background:var(--ink);color:#fff;font:500 13px var(--mono);box-shadow:0 0 0 4px var(--paper),0 0 0 6px var(--accent2)}
+  .ticket.alt{background:var(--accent);box-shadow:0 0 0 4px var(--paper),0 0 0 6px var(--sand)}
+  h2.t{font-family:var(--head);font-weight:400;font-size:27px;line-height:1.1;margin:0}
+  .instr{color:var(--muted);margin:10px 0 18px;font-size:15.5px}
+  .instr b{color:var(--ink)}
+  .card-foot{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:18px;padding-top:14px;border-top:1px solid var(--line)}
+  .btn{font-weight:600;font-size:15px;border-radius:99px;padding:9px 20px;cursor:pointer;border:1.5px solid var(--ink);background:transparent;color:var(--ink);transition:transform .12s,background .15s}
+  .btn:hover{transform:translateY(-1px)}
+  .btn:active{transform:translateY(1px)}
+  .btn-check{background:var(--accent);border-color:var(--accent);color:#fff}
+  .btn-soft{background:var(--soft);border-color:transparent}
+  .score{margin-left:auto;font:500 15px var(--mono)}
+  .score.perfect{color:var(--ok)}
+  .wiggle{animation:wiggle .5s}
+  @keyframes wiggle{25%{rotate:-4deg}50%{rotate:4deg}75%{rotate:-2deg}}
+
+  /* theory */
+  .rule p{margin:0 0 12px}
+  .rule h3{font-family:var(--head);font-weight:400;font-size:21px;margin:22px 0 8px}
+  .rule h3:first-child{margin-top:0}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:14px 0}
+  .box{border-radius:16px;padding:12px 14px;background:var(--soft)}
+  .box.pink{background:#FFE9E4}
+  .box.sand{background:#FBF0D9}
+  .box h4{margin:0 0 4px;font:500 10.5px var(--mono);text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}
+  .box p{margin:0;font-size:15.5px}
+  table.form{width:100%;border-collapse:collapse;font-size:15.5px;margin:10px 0 4px}
+  table.form th,table.form td{border-bottom:1px solid var(--line);padding:8px;text-align:left;vertical-align:top}
+  table.form th{font:500 10.5px var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+  .note{margin-top:14px;font-size:15px;background:var(--close-bg);border-radius:14px;padding:10px 14px}
+  .notes-tip{display:flex;gap:10px;align-items:flex-start;margin-top:14px;font-size:15px;background:var(--soft);border-radius:14px;padding:10px 14px}
+  .notes-tip img{width:30px;height:30px;flex:none}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
+  .chips span{font:500 12.5px var(--mono);border:1px solid var(--ink);border-radius:99px;padding:3px 11px;background:#fff}
+  .colloc{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px;margin:10px 0}
+  .colloc div{background:#fff;border:1px solid var(--line);border-radius:12px;padding:8px 12px;font-size:15.5px}
+  .colloc b{color:var(--accent)}
+  .story{font-size:17px;line-height:1.75;background:#fff;border-left:4px solid var(--accent2);border-radius:0 14px 14px 0;padding:14px 18px;margin:8px 0 14px}
+  ol.qs{margin:0 0 6px;padding-left:1.4em}
+  ol.qs li{margin:0 0 6px}
+  details{margin-top:12px;border:1px solid var(--line);border-radius:14px;background:#fff}
+  details summary{cursor:pointer;padding:10px 14px;font-weight:600;list-style:none}
+  details summary::-webkit-details-marker{display:none}
+  details summary::before{content:"▸ ";color:var(--accent)}
+  details[open] summary::before{content:"▾ "}
+  details > div{padding:0 14px 12px}
+  .hl{background:#FFE0D9;border-radius:4px;padding:0 3px;font-weight:600}
+  .hl2{background:#D3F1EC;border-radius:4px;padding:0 3px;font-weight:600}
+  @media (max-width:600px){.grid2{grid-template-columns:1fr}}
+
+  /* photos */
+  .photos{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:6px 0 14px}
+  .photo{margin:0;border-radius:16px;overflow:hidden;background:#0A3556;position:relative}
+  .photo img{display:block;width:100%;height:100%;aspect-ratio:4/3;object-fit:cover}
+  .photo figcaption{position:absolute;left:0;right:0;bottom:0;padding:22px 12px 8px;font-size:13.5px;color:#fff;background:linear-gradient(transparent,rgba(4,19,37,.85))}
+  .photo figcaption small{display:block;font:400 9.5px var(--mono);opacity:.7;margin-top:2px}
+  .photo.wide{grid-column:1/-1}
+  .photo.wide img{aspect-ratio:16/8}
+  @media (max-width:560px){.photos{grid-template-columns:1fr}}
+
+  /* timeline */
+  .tl{position:relative;height:104px;margin:10px 4px 6px}
+  .tl::before{content:"";position:absolute;left:0;right:12px;top:52px;height:2px;background:var(--ink)}
+  .tl::after{content:"";position:absolute;right:0;top:46px;border-left:13px solid var(--ink);border-top:7px solid transparent;border-bottom:7px solid transparent}
+  .tl .now{position:absolute;right:30px;top:44px;width:2px;height:18px;background:var(--muted)}
+  .tl .now::after{content:"now";position:absolute;top:22px;left:50%;translate:-50% 0;font:500 10.5px var(--mono);color:var(--muted)}
+  .tl .pt{position:absolute;left:var(--x);top:42px;width:20px;height:20px;margin-left:-10px;border-radius:50%;background:var(--accent2);box-shadow:0 0 0 3px var(--paper),0 0 0 4.5px var(--ink)}
+  .tl .pt.e{background:var(--accent)}
+  .tl .pt b,.tl .sp b{position:absolute;left:50%;translate:-50% 0;white-space:nowrap;font:500 12px var(--mono);bottom:30px}
+  .tl .pt i,.tl .sp i{position:absolute;left:50%;translate:-50% 0;white-space:nowrap;font:400 11px var(--mono);color:var(--muted);font-style:normal;top:30px}
+  .tl .sp{position:absolute;left:var(--x);width:var(--w);top:46px;height:13px;border-radius:7px;background:repeating-linear-gradient(90deg,var(--accent2) 0 14px,transparent 14px 22px)}
+  .tl .sp b{color:var(--accent2)}
+  .tl .stop{position:absolute;left:var(--x);top:34px;height:36px;border-left:2px dashed var(--accent)}
+  .tl .stop b{position:absolute;top:-18px;left:4px;white-space:nowrap;font:500 11px var(--mono);color:var(--accent)}
+
+  /* inputs: gaps */
+  .lines{margin:0;padding-left:1.7em}
+  .lines li::marker{color:var(--accent2);font:500 12px var(--mono)}
+  .line{margin:0 0 4px;line-height:2.2}
+  .gapwrap{white-space:nowrap}
+  .gap{font:inherit;font-size:16.5px;color:var(--ink);border:0;border-bottom:2px solid var(--accent2);background:var(--soft);border-radius:8px 8px 2px 2px;padding:1px 8px;min-width:5ch;max-width:100%;text-align:center;outline:none;transition:background .15s,box-shadow .15s}
+  .gap:focus{background:#fff;box-shadow:0 0 0 3px rgba(19,181,168,.25)}
+  .hint{color:var(--muted);font:400 .78em var(--mono);margin-left:5px}
+  input.ok,textarea.ok{background:var(--ok-bg);border-color:var(--ok);color:#0b5e49}
+  input.bad{background:var(--bad-bg);border-color:var(--bad);text-decoration:underline wavy var(--bad);text-underline-offset:4px}
+  input.close{background:var(--close-bg);border-color:var(--close)}
+  .reveal{display:inline-block;margin-left:6px;font-size:.84em;font-weight:600;color:#0b5e49;background:var(--ok-bg);padding:0 9px;border-radius:99px;line-height:1.9;white-space:nowrap}
+  .why{display:block;margin:-2px 0 10px;font-size:14.5px;line-height:1.45;border-radius:10px;padding:6px 10px}
+  .why.ok{background:var(--ok-bg);color:#0b5e49}
+  .why.bad{background:var(--bad-bg);color:#8a2b2e}
+
+  /* multiple choice */
+  .q{margin:0 0 18px}
+  .q-text{margin-bottom:8px}
+  .q-num{font:500 12px var(--mono);color:var(--accent2);margin-right:8px}
+  .blank{display:inline-block;width:60px;border-bottom:2px solid var(--muted);margin:0 3px;translate:0 -4px}
+  .opts{display:flex;flex-wrap:wrap;gap:8px}
+  .opt{font-size:15.5px;border:1.5px solid var(--line);background:#fff;color:var(--ink);border-radius:99px;padding:6px 15px;cursor:pointer;transition:transform .12s,background .15s,border-color .15s;text-align:left}
+  .opt:hover{border-color:var(--ink)}
+  .opt.sel{background:var(--ink);border-color:var(--ink);color:#fff}
+  .opt.ok{background:var(--ok);border-color:var(--ok);color:#fff}
+  .opt.bad{background:var(--bad);border-color:var(--bad);color:#fff}
+  .opt.answer{box-shadow:0 0 0 3px var(--ok)}
+  .tf2 .q{padding:12px 0;margin:0;border-bottom:1px solid var(--line)}
+  .tf2 .q-top{display:flex;gap:14px;align-items:center;justify-content:space-between}
+  .tf2 .q-text{margin:0}
+  .tf2 .opts.tfo{flex:none;flex-wrap:nowrap}
+  .fixbox{margin:10px 0 0 30px;padding:10px 12px;border-left:3px solid var(--accent);background:#FFF3EF;border-radius:0 12px 12px 0}
+  .fixbox .fl{font:500 10.5px var(--mono);color:var(--accent);margin-bottom:6px;text-transform:uppercase;letter-spacing:.08em}
+  .fixbox .opts{flex-direction:column;align-items:flex-start}
+  .warnline{font-size:14px;color:#8a2b2e;margin-top:6px}
+  @media (max-width:560px){.tf2 .q-top{flex-direction:column;align-items:flex-start;gap:8px}.fixbox{margin-left:0}}
+
+  /* drag & drop */
+  .bank{display:flex;flex-wrap:wrap;gap:9px;padding:12px;min-height:60px;margin-bottom:18px;border:1.5px dashed rgba(11,34,54,.25);border-radius:16px;background:var(--soft);transition:background .15s}
+  .bank:empty::before{content:"All placed";color:var(--muted);font-size:14px;align-self:center}
+  .bank.over{background:#d0ece7}
+  .chip{font-size:15px;font-weight:600;line-height:1.35;background:#fff;color:var(--ink);border:1.5px solid var(--ink);border-radius:12px;padding:5px 12px;box-shadow:0 3px 0 var(--accent2);cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;text-align:left}
+  .chip.selected{outline:3px solid var(--accent);outline-offset:2px;rotate:-2deg}
+  .chip.dragging{opacity:.28}
+  .chip.ghost{position:fixed;z-index:1000;pointer-events:none;margin:0;rotate:-4deg;scale:1.05;box-shadow:0 10px 18px rgba(0,0,0,.25)}
+  .chip.ok{background:var(--ok-bg);border-color:var(--ok);box-shadow:none}
+  .chip.bad{background:var(--bad-bg);border-color:var(--bad);box-shadow:none}
+  .slot{display:inline-flex;align-items:center;justify-content:center;min-width:110px;min-height:40px;padding:2px;margin:0 4px;vertical-align:middle;border:1.5px dashed rgba(11,34,54,.35);border-radius:12px;cursor:pointer;transition:background .15s,border-color .15s}
+  .slot .chip{box-shadow:none}
+  .slot.over{background:var(--soft);border-color:var(--accent2)}
+  .slot.ok{border-style:solid;border-color:var(--ok);background:var(--ok-bg)}
+  .slot.bad{border-style:solid;border-color:var(--bad);background:var(--bad-bg)}
+  .slot.ok .chip,.slot.bad .chip{background:transparent;border-color:transparent}
+  .match{display:grid;gap:10px}
+  .mrow{display:grid;grid-template-columns:.8fr 1.4fr;gap:10px;align-items:center}
+  .mrow .left{font-weight:600}
+  .mrow .left::before{content:attr(data-n);font:500 12px var(--mono);color:var(--accent2);margin-right:8px}
+  .mrow .slot{display:flex;justify-content:flex-start;width:100%;min-height:46px;margin:0}
+  @media (max-width:560px){.mrow{grid-template-columns:1fr;gap:6px}.mrow+.mrow{margin-top:8px}}
+
+  /* full inputs */
+  .row{margin:0 0 16px}
+  .row-label{font-size:14.5px;color:var(--muted);margin-bottom:5px}
+  .row-label s{text-decoration-color:var(--bad);text-decoration-thickness:2px}
+  .prompt{font-weight:500;margin-bottom:6px}
+  .prompt .num{font:500 12px var(--mono);color:var(--accent2);margin-right:8px}
+  .key{display:inline-block;font:500 11.5px var(--mono);background:var(--ink);color:#fff;border-radius:99px;padding:2px 10px;margin-left:6px}
+  .full{display:block;width:100%;font:inherit;font-size:16.5px;color:var(--ink);padding:10px 14px;border:1.5px solid rgba(11,34,54,.22);border-radius:14px;background:#fff;outline:none;transition:border-color .15s,background .15s}
+  .full:focus{border-color:var(--accent2)}
+  textarea.full{resize:vertical;min-height:160px;line-height:1.55}
+  .model{margin-top:7px;font-size:15px;color:#0b5e49;background:var(--ok-bg);padding:7px 12px;border-radius:12px}
+  .model.close{color:#7a5300;background:var(--close-bg)}
+  .model.warn{color:#8a2b2e;background:var(--bad-bg)}
+  .checks{list-style:none;padding:0;margin:12px 0 0;display:grid;gap:6px;font-size:15px}
+  .checks li::before{content:"○";display:inline-block;width:1.4em;font-weight:800;color:var(--muted)}
+  .checks li.done::before{content:"✓";color:var(--ok)}
+  .checks li.done{color:#0b5e49}
+  .wordbox{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 12px}
+  .wordbox span{font:500 12px var(--mono);background:var(--soft);border-radius:99px;padding:3px 10px}
+  .wordbox span.used{background:var(--ok-bg);color:#0b5e49;text-decoration:line-through}
+
+  /* drill (automaticity) */
+  .drill{background:var(--ink);color:#fff;border-radius:20px;padding:18px;position:relative;overflow:hidden}
+  .drill .dtop{display:flex;justify-content:space-between;align-items:center;gap:10px;font:500 12px var(--mono);color:var(--lightmuted);flex-wrap:wrap}
+  .drill .dots{display:flex;gap:5px;flex-wrap:wrap}
+  .drill .dots i{width:12px;height:12px;border-radius:50%;border:1.5px solid rgba(255,255,255,.4)}
+  .drill .dots i.half{background:linear-gradient(90deg,var(--sand) 50%,transparent 50%);border-color:var(--sand)}
+  .drill .dots i.full{background:var(--accent2);border-color:var(--accent2)}
+  .drill .timer{font:500 22px var(--mono);color:var(--sand)}
+  .drill .dprompt{font-family:var(--head);font-size:clamp(22px,4.6vw,30px);line-height:1.2;margin:22px 0 14px;min-height:2.4em}
+  .drill .dprompt small{display:block;font:400 12px var(--mono);color:var(--lightmuted);margin-bottom:6px;letter-spacing:.06em;text-transform:uppercase}
+  .drill .drow{display:flex;gap:8px}
+  .drill input{flex:1;min-width:0;font:inherit;font-size:18px;padding:12px 14px;border-radius:14px;border:2px solid rgba(255,255,255,.25);background:rgba(255,255,255,.06);color:#fff;outline:none}
+  .drill input:focus{border-color:var(--accent2)}
+  .drill .go{background:var(--accent);border:0;color:#fff;border-radius:14px;padding:0 18px;font-weight:700;cursor:pointer}
+  .drill .dfb{min-height:26px;margin-top:10px;font-size:15px}
+  .drill .dfb.ok{color:#7CF0CF} .drill .dfb.bad{color:#FFB3A8}
+  .drill.flash-ok{box-shadow:inset 0 0 0 3px #7CF0CF}
+  .drill.flash-bad{animation:shake .35s;box-shadow:inset 0 0 0 3px #FFB3A8}
+  .drill .start{display:block;margin:26px auto 8px;background:var(--accent);color:#fff;border:0;border-radius:99px;padding:14px 30px;font-weight:700;font-size:17px;cursor:pointer}
+  .drill .done{text-align:center;padding:16px 0 4px}
+  .drill .done b{display:block;font:500 40px var(--mono);color:var(--sand)}
+  @keyframes shake{25%{translate:-4px 0}50%{translate:4px 0}75%{translate:-2px 0}}
+
+  /* review */
+  .fixcount{display:flex;align-items:center;gap:14px;padding:14px 16px;border-radius:16px;background:#FBF0D9;margin-bottom:14px}
+  .fixcount img{width:54px;height:54px}
+  .fixcount .big{font:500 32px var(--mono);line-height:1}
+  .fixcount .lbl{font-size:14.5px;color:var(--muted)}
+  .rv-list{display:grid;gap:10px}
+  .rv-item{display:flex;align-items:center;gap:12px;justify-content:space-between;border:1px solid var(--line);border-radius:14px;padding:10px 12px;background:#fff}
+  .rv-item .rv-t{font-weight:600}
+  .rv-item .rv-n{font:400 12px var(--mono);color:var(--bad)}
+  .rv-item.done .rv-n{color:var(--ok)}
+  .rv-empty{color:var(--muted);font-size:15px}
+  .flash{animation:flash 1.2s}
+  @keyframes flash{30%{box-shadow:0 0 0 6px var(--sand),0 18px 40px rgba(0,0,0,.28)}}
+
+  .page-foot{text-align:center;padding:30px 0 80px;color:var(--lightmuted);font-size:14px}
+  .page-foot .btn{margin-bottom:14px;color:var(--light);border-color:rgba(255,255,255,.4)}
+  .page-foot small{display:block;margin-top:8px;font-size:11.5px;opacity:.85;line-height:1.5}
+  .page-foot a{color:var(--lightmuted)}
+  .confetti{position:fixed;z-index:999;pointer-events:none;left:0;top:0;width:30px;height:30px}
+  .confetti img{width:100%;height:100%}
+
+  @media (max-width:560px){
+    body{font-size:16.5px}
+    .card-in{padding:6px 16px 16px}
+    .winbar{padding:12px 16px 0}
+    .s1{width:78px;height:78px;top:30px}
+    .s2{display:none}
+    .score{width:100%;margin-left:0;order:-1}
+    .deco{width:46px;height:46px;top:-22px}
+    .gapwrap{white-space:normal}
+    .part h2{font-size:30px}
+  }
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+  /* ---- word-order slots (fixed colours for the whole lesson) ---- */
+  :root{
+    --paper:#FFFFFF; --ink:#1E1B3A; --muted:#5D5A78; --line:rgba(30,27,58,.14);
+    --accent:#FF2D55; --accent2:#5B5BD6; --sand:#FFD84D; --soft:#F1EFFF; --ice:#F7F6FF;
+    --light:#1E1B3A; --lightmuted:#5D5A78;
+    --head:"Gabarito",system-ui,sans-serif; --mono:"Sometype Mono",ui-monospace,Menlo,monospace; --body:"Atkinson Hyperlegible",system-ui,sans-serif;
+  }
+  .c-qw{--c:#55627A} .c-aux{--c:#1E9BD7} .c-who{--c:#7A5AF8} .c-does{--c:#FF5A1F}
+  html{background:#F3F1FF}
+  body{background-color:#F3F1FF;background-image:radial-gradient(rgba(91,91,214,.16) 1.4px,transparent 1.6px);background-size:22px 22px}
+  body::before{display:none}
+  .bubbles{display:none}
+  h1{font-family:var(--head);font-weight:800;font-size:clamp(46px,12vw,100px);line-height:.95;letter-spacing:-.03em;color:var(--ink);letter-spacing:-.02em}
+  h1 em{font-style:normal;color:var(--accent);-webkit-text-fill-color:var(--accent);background:none}
+  .kicker{color:#fff;background:var(--accent2);border-color:var(--accent2);font-family:var(--mono)}
+  .sub{color:var(--muted)}
+  .progress{color:var(--ink);background:#fff;border:1.5px solid var(--ink);border-radius:12px}
+  .progress .lbl{color:var(--accent);font-weight:700}
+  .bar{background:#E4EAF1} .bar i{background:var(--accent)}
+  .part .pi{background:#fff;border:1.5px solid var(--ink);border-radius:12px}
+  .part .pn{color:var(--accent2);font-family:var(--mono)} .part h2{font-family:var(--head);font-weight:800}
+  .part p{color:var(--muted)}
+  .card{border-radius:14px;box-shadow:0 16px 34px rgba(14,26,43,.12);border-left:6px solid var(--accent2)}
+  .card:nth-of-type(even){border-left-color:var(--accent)}
+  h2.t{font-family:var(--head);font-weight:800;font-size:23px}
+  .winbar span{color:var(--accent);font-weight:700}
+  .ticket{border-radius:10px;background:var(--ink);box-shadow:none;font-family:var(--mono)}
+  .ticket.alt{background:var(--accent)}
+  .opt.sel{background:var(--ink);border-color:var(--ink)}
+  .chip{box-shadow:0 3px 0 var(--accent2)}
+  .photo{border-radius:12px}
+  .photo figcaption{background:linear-gradient(transparent,rgba(14,26,43,.85))}
+  .drill{background:var(--ink)} .drill .dtop,.drill .dprompt small{color:#AFC0D6} .drill .timer,.drill .done b{color:var(--sand)}
+  .page-foot{color:var(--muted)} .page-foot .btn{color:var(--ink);border-color:var(--ink)} .page-foot a{color:var(--muted)}
+  .gauge{position:relative;height:14px;border-radius:7px;background:linear-gradient(90deg,#1E9BD7,#BDE8FA 40%,#FFC23D 70%,#FF5A1F);margin:26px 0 30px}
+  .gauge span{position:absolute;top:-22px;transform:translateX(-50%);font:600 11.5px var(--mono);white-space:nowrap}
+  .gauge span.b{top:18px}
+  .article{background:#fff;border:1.5px solid var(--line);border-radius:12px;padding:14px 16px;margin:6px 0 14px;font-size:15.5px;line-height:1.65}
+  .article h4{margin:0 0 6px;font:600 18px var(--head)}
+  .article p{margin:0 0 10px}
+  .article .tag{display:inline-block;font:600 11px var(--mono);text-transform:uppercase;color:#fff;background:var(--accent2);border-radius:6px;padding:2px 8px;margin-bottom:6px}
+  .buckets{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+  .bucket{border:1.5px solid var(--ink);border-radius:12px;background:#fff;overflow:hidden}
+  .bucket h3{margin:0;padding:8px 12px;font:600 14px var(--head);color:#fff;background:var(--accent2)}
+  .bucket:nth-child(2) h3{background:var(--accent)} .bucket:nth-child(3) h3{background:#7A5AF8}
+  .bucket-zone{min-height:90px;padding:8px;display:flex;flex-wrap:wrap;gap:6px;align-content:flex-start;cursor:pointer}
+  .bucket-zone.over{background:var(--soft)} .bucket .chip{box-shadow:none}
+  .wheel-wrap{display:grid;grid-template-columns:minmax(220px,300px) 1fr;gap:18px;align-items:center}
+  .wheel{position:relative;width:100%;aspect-ratio:1} .wheel-rot{width:100%;height:100%}
+  .wheel-svg{width:100%;height:100%;display:block;filter:drop-shadow(0 10px 18px rgba(14,26,43,.18))}
+  .wheel-pin{position:absolute;left:50%;top:-6px;margin-left:-13px;border-left:13px solid transparent;border-right:13px solid transparent;border-top:24px solid var(--ink);z-index:2}
+  .wheel-side{display:flex;flex-direction:column;gap:12px;align-items:flex-start}
+  .wheel-q{background:var(--soft);border-radius:12px;padding:14px 16px;width:100%;min-height:110px}
+  .wq-n{font:600 11px var(--mono);text-transform:uppercase;color:var(--accent);margin-bottom:6px}
+  .wq{font:600 18px/1.35 var(--head)} .wq b{color:var(--accent)}
+  .wq-tip{color:var(--muted);font-size:14px;margin-top:6px}
+  .wheel-done{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+  .wd{font:500 12.5px var(--mono);background:#fff;border:1.5px solid var(--line);border-radius:999px;padding:3px 10px}
+  .bt{position:fixed;left:12px;bottom:12px;z-index:60;background:#fff;border:1.5px solid var(--ink);border-radius:12px;padding:6px 8px;display:flex;align-items:center;gap:6px;box-shadow:0 6px 16px rgba(14,26,43,.18);
+    background-image:linear-gradient(90deg,rgba(255,90,31,.16) calc(var(--p,0)*100%),transparent 0)}
+  .bt .bt-face{font:600 14px var(--mono);cursor:pointer;border:0;background:none;padding:2px 4px;color:inherit}
+  .bt-presets{display:none;gap:4px} .bt.open .bt-presets{display:flex}
+  .bt button{border:1.5px solid var(--line);background:#fff;border-radius:8px;padding:3px 6px;font:500 11.5px var(--mono);cursor:pointer}
+  .bt.low{border-color:var(--accent)} .bt.low .bt-face{color:var(--accent)}
+  .bt.ring{animation:ring .25s linear 10} @keyframes ring{25%{transform:rotate(-4deg)}75%{transform:rotate(4deg)}}
+  @media (max-width:600px){.wheel-wrap{grid-template-columns:1fr}.wheel{max-width:290px;margin:0 auto}body::before{display:none}}
+  .gauge span:first-child{transform:none} .gauge span:last-child{transform:translateX(-100%)}
+  .video{position:relative;aspect-ratio:16/9;border-radius:12px;overflow:hidden;background:#0E1A2B;margin:8px 0 10px}
+  .video iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+  .yt{display:inline-flex;align-items:center;gap:6px;font:600 14px var(--body);color:var(--ink);border:1.5px solid var(--ink);border-radius:999px;padding:6px 14px;text-decoration:none;margin-bottom:6px}
+  .tfo{margin:6px 0 10px;padding-left:22px}
+  .tfo li{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 0;border-bottom:1px dashed var(--line);font-size:15.5px}
+  .tfo-b{display:flex;gap:6px;flex-shrink:0}
+  .tfo-b .opt{min-width:44px}
+  .nmt3{display:grid;gap:6px;margin:8px 0 12px}
+  .nmt3 div{display:grid;grid-template-columns:28px 1fr;gap:8px;background:#fff;border:1.5px solid var(--line);border-radius:6px;padding:7px 10px;font-size:15px}
+  .nmt3 b{font:700 15px var(--mono);color:var(--accent)}
+  .notice{background:#fff;border:1.5px solid var(--ink);border-radius:6px;padding:10px 12px;margin:2px 0 4px;font-size:15px;line-height:1.45}
+  .notice b{font-family:var(--head)}
+  .cloze{background:#fff;border:1.5px solid var(--line);border-radius:8px;padding:14px 16px;margin:6px 0 14px;font-size:16px;line-height:1.8}
+  .cloze b{font:700 13px var(--mono);background:var(--sand);padding:1px 6px;border-radius:4px}
+  .lines{display:flex;flex-direction:column;gap:10px;margin:8px 0 14px}
+  .ln{display:grid;grid-template-columns:44px 1fr;gap:10px;align-items:start;background:#fff;border:1.5px solid var(--line);border-radius:12px;padding:8px 10px}
+  .ln b.dot{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;color:#fff;font:800 13px var(--head);background:var(--accent)}
+  .ln p{margin:0;font-size:15.5px;line-height:1.45}
+  .ln.al b.dot{background:var(--accent2)} .ln.y b.dot{background:var(--sand);color:var(--ink)}
+  .live{display:inline-flex;align-items:center;gap:6px;background:var(--accent);color:#fff;font:700 12px var(--mono);letter-spacing:.08em;padding:3px 9px;border-radius:6px}
+  .live::before{content:"";width:8px;height:8px;border-radius:50%;background:#fff;animation:blink 1.2s infinite}
+  @keyframes blink{50%{opacity:.25}}
+  .alw{display:inline-block;background:var(--accent2);color:#fff;font:700 12px var(--mono);letter-spacing:.08em;padding:3px 9px;border-radius:6px}
+  .stream{background:#fff;border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;margin:6px 0 14px;font-size:15.5px;line-height:1.6}
+  .stream p{margin:0 0 8px}
+  .note s{opacity:.6}
+  .bitem{padding:14px 0 16px;border-bottom:1.5px dashed color-mix(in srgb,var(--ink) 14%,transparent)}
+  .bitem:last-child{border-bottom:0}
+  .bitem .bhead{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+  .bitem .bnum{font:700 14px var(--mono);color:var(--accent)}
+  .bitem .bstate{font-size:14px;font-weight:700}
+  .bitem .bstate.ok{color:var(--ok)} .bitem .bstate.bad{color:var(--bad)}
+  .bitem .bank{min-height:52px;margin-bottom:10px;padding:9px}
+  .brow{display:flex;flex-wrap:wrap;gap:8px;align-items:stretch}
+  .bslot{flex:1 1 118px;min-width:108px;border:2px dashed var(--c);border-radius:12px;background:color-mix(in srgb,var(--c) 7%,#fff);display:flex;flex-direction:column;cursor:pointer;transition:background .15s,box-shadow .15s}
+  .bslot .bq{font:700 11.5px var(--mono);color:var(--c);padding:4px 8px 0}
+  .bslot .bz{flex:1;min-height:42px;display:flex;align-items:center;justify-content:center;padding:4px 6px 6px}
+  .bslot.over{background:color-mix(in srgb,var(--c) 18%,#fff)}
+  .bslot .chip{box-shadow:none;width:100%;text-align:center}
+  .bslot.ok{border-style:solid;background:var(--ok-bg);border-color:var(--ok)}
+  .bslot.bad{border-style:solid;background:var(--bad-bg);border-color:var(--bad);animation:shake .35s}
+  .bslot.ok .bq{color:var(--ok)} .bslot.bad .bq{color:var(--bad)}
+  .bslot.bad .bq::after{content:"  ✗ not here";}
+  .bdot{align-self:center;font:700 22px var(--head)}
+  .c-qw{--c:#3D3D5C} .c-aux{--c:#FF2D55} .c-who{--c:#5B5BD6} .c-does{--c:#E08A00} .c-what{--c:#00A6A6} .c-where{--c:#00A6A6} .c-when{--c:#2E8B57} .c-freq{--c:#9B51E0}
+</style>
+</head>
+<body>
+<div class="bubbles" aria-hidden="true"><i style="left:6%;width:2px;height:28px;animation-duration:14s;animation-delay:-3s;--dx:30px"></i><i style="left:14%;width:2px;height:20px;animation-duration:11s;animation-delay:-8s;--dx:-20px"></i><i style="left:27%;width:2px;height:36px;animation-duration:18s;animation-delay:-2s;--dx:40px"></i><i style="left:41%;width:2px;height:24px;animation-duration:13s;animation-delay:-10s;--dx:-30px"></i><i style="left:55%;width:2px;height:18px;animation-duration:9s;animation-delay:-4s;--dx:20px"></i><i style="left:66%;width:2px;height:32px;animation-duration:16s;animation-delay:-12s;--dx:-40px"></i><i style="left:78%;width:2px;height:22px;animation-duration:12s;animation-delay:-6s;--dx:25px"></i><i style="left:88%;width:2px;height:40px;animation-duration:20s;animation-delay:-1s;--dx:-25px"></i><i style="left:94%;width:2px;height:20px;animation-duration:10s;animation-delay:-9s;--dx:15px"></i><i style="left:35%;width:2px;height:26px;animation-duration:15s;animation-delay:-14s;--dx:35px"></i></div>
+
+<div class="wrap">
+  <header class="hero">
+    <div class="sticker s1" id="sticker1" aria-hidden="true"></div>
+    <div class="sticker s2" id="sticker2" aria-hidden="true"></div>
+    <span class="kicker" id="kicker"></span>
+    <h1 id="title"></h1>
+    <p class="sub" id="sub"></p>
+  </header>
+
+  <div class="progress" aria-live="polite">
+    <span class="lbl">score</span><span><b id="pScore">0</b>/<b id="pTotal">0</b></span>
+    <div class="bar"><i id="pBar"></i></div>
+    <span class="fx" title="Mistakes you fixed yourself"><img src="assets/emoji/star.png" alt=""> <b id="pFix">0</b></span>
+  </div>
+
+  <main id="lesson"></main>
+
+  <footer class="page-foot">
+    <button class="btn btn-soft" id="resetAll" type="button">↺ Reset all answers</button>
+    <div>Your answers are saved on this device.</div>
+    <small>Emoji: Microsoft Fluent Emoji (MIT licence)</small>
+  </footer>
+</div>
+
+<script>
+/* =====================================================================
+   LESSON CONTENT — edit this object to make a new lesson
+   ---------------------------------------------------------------------
+   build:   { who, freq, does, what, where, when, wrong }  (wrong = extra wrong chip)
+   gapfill: items as "text [[answer // hint]]" or { text, why }
+   tf2:     { q, answer: true/false, fix: [options], fixAnswer }
+   ===================================================================== */
+const IMG = f => "assets/img/" + f;
+const H = v => ` <span class=hint>(${v})</span>`;
+const LESSON = {
+  id: "now-or-always-egiu3-4-8",
+  kicker: "am / is / are + -ing · I do · now or always?",
+  titleHTML: 'Now or <em>always</em>?',
+  title: "Now or always?",
+  subtitle: "Is it happening right now — or does it happen every day? Two tenses, one easy question.",
+  stickers: ["camera", "calendar"],
+  confetti: ["camera", "star", "sparkles", "check", "redheart"],
+
+  sections: [
+
+    /* ================= 1 · WARM-UP ================= */
+    { type: "part", n: "01", icon: "camera", title: "Warm-up", text: "What’s happening in the photos?" },
+
+    {
+      type: "rule", label: "warm-up · look and talk", sticker: "camera",
+      title: "Right now",
+      html: `
+        <div class="photos">
+          <figure class="photo"><img loading="lazy" alt="Two street musicians playing guitars" src="${IMG("buskers.jpg")}"><figcaption><b>A</b><small>Photo: Touam (Hervé Agnoux) · CC BY-SA 4.0 · Wikimedia Commons</small></figcaption></figure>
+          <figure class="photo"><img loading="lazy" alt="A woman lying on a pier reading a book next to her bike" src="${IMG("readingbike.jpg")}"><figcaption><b>B</b><small>Photo: Jules Verne Times Two · CC BY-SA 4.0 · Wikimedia Commons</small></figcaption></figure>
+        </div>
+        <ol class="qs">
+          <li>A: What <b>are</b> they <b>doing</b>? These musicians <b>play</b> in the street every day. Do you see street musicians in your city?</li>
+          <li>B: What <b>is</b> she <b>doing</b>? Where <b>is</b> she <b>lying</b>? How do you think she usually <b>gets</b> to work?</li>
+          <li>What <b>are</b> you <b>wearing</b> right now? What do you usually <b>wear</b> to school?</li>
+        </ol>`
+    },
+
+    /* ================= 2 · RIGHT NOW ================= */
+    { type: "part", n: "02", icon: "camera", title: "Right now", text: "Essential Grammar in Use · Unit 3" },
+
+    {
+      type: "rule", label: "grammar · present continuous", sticker: "camera",
+      title: '<span class="live">LIVE</span> am / is / are + -ing',
+      html: `
+        <div class="lines">
+          <div class="ln"><b class="dot">I</b><p><b>I am</b> (I’m) work<b>ing</b>. · I’m <b>not</b> watching TV.</p></div>
+          <div class="ln"><b class="dot">she</b><p><b>he / she / it is</b> (’s) eat<b>ing</b>. · The bus <b>is</b> coming. · It <b>isn’t</b> raining.</p></div>
+          <div class="ln"><b class="dot">we</b><p><b>we / you / they are</b> (’re) play<b>ing</b>. · The kids <b>aren’t</b> sleeping.</p></div>
+        </div>
+        <div class="note">Two parts — always! <s>I working</s> → I <b>am</b> working · <s>I am work</s> → I am work<b>ing</b><br>Spelling: come → com<b>ing</b> · write → writ<b>ing</b> · run → ru<b>nn</b>ing · swim → swi<b>mm</b>ing · sit → si<b>tt</b>ing · lie → l<b>y</b>ing</div>`
+    },
+
+    {
+      type: "sort", label: "spelling · -ing", sticker: "pencil",
+      title: "How do you spell it?",
+      instructions: "Put each verb in the right box.",
+      categories: [
+        { name: "just + ing (play → playing)", words: ["play", "read", "cook", "wait"] },
+        { name: "e → ing (come → coming)", words: ["write", "dance", "make", "ride"] },
+        { name: "double (run → running)", words: ["swim", "sit", "stop", "get"] },
+        { name: "ie → ying (lie → lying)", words: ["die", "tie"] }
+      ]
+    },
+
+    {
+      type: "gapfill", label: "present continuous · write it", sticker: "camera",
+      title: "What’s happening?",
+      instructions: "Write <b>am / is / are + -ing</b>. Use the verb in brackets.",
+      items: [
+        { text: "Please be quiet. I [[am working|'m working]]." + H("work"), why: "I + am + working." },
+        { text: "“Where’s Dad?” “He [[is cooking|'s cooking]] in the kitchen.”" + H("cook"), why: "he + is + cooking." },
+        { text: "Look! Somebody [[is swimming|'s swimming]] in the river." + H("swim"), why: "swim → swimming (double m)." },
+        { text: "Take an umbrella. It [[is raining|'s raining]]." + H("rain"), why: "it + is + raining." },
+        { text: "The kids [[are playing|'re playing]] in the yard." + H("play"), why: "they + are + playing." },
+        { text: "Sorry, I can’t talk now. We [[are having|'re having]] dinner." + H("have"), why: "have → having (no e)." },
+        { text: "You can turn off the TV. I [[am not watching|'m not watching]] it." + H("not / watch"), why: "I’m not + watching." },
+        { text: "Why [[are]] you [[sitting]] on the floor?" + H("sit"), why: "question: are + you + sitting (double t)." }
+      ]
+    },
+
+    /* ================= 3 · QUESTIONS ================= */
+    { type: "part", n: "03", icon: "question", title: "What are you doing?", text: "Essential Grammar in Use · Unit 4" },
+
+    {
+      type: "build", label: "grammar · questions", sticker: "question",
+      title: "Is she working?",
+      instructions: "Tap a card, then tap a slot. <b>One card is wrong</b> — leave it out.",
+      items: [
+        { aux: "Is", who: "Ben", does: "working", when: "today", wrong: "Does", end: "?" },
+        { qw: "What", aux: "are", who: "the kids", does: "doing", wrong: "do", end: "?" },
+        { aux: "Are", who: "you", does: "listening", what: "to me", wrong: "listen", end: "?" },
+        { qw: "Where", aux: "are", who: "your friends", does: "going", wrong: "is", end: "?" },
+        { qw: "Why", aux: "are", who: "you", does: "wearing", what: "a coat", wrong: "wear", end: "?" },
+        { qw: "What", aux: "is", who: "your mom", does: "cooking", wrong: "cooks", end: "?" }
+      ]
+    },
+
+    {
+      type: "mcq", label: "short answers", sticker: "question",
+      title: "Yes, I am. / No, she isn’t.",
+      instructions: "Choose the right short answer.",
+      items: [
+        { q: "“Are you watching TV?” “No, ___.”", options: ["I don’t", "I’m not", "I amn’t"], answer: 1 },
+        { q: "“Is it raining?” “Yes, ___.”", options: ["it is", "it’s", "it does"], answer: 0 },
+        { q: "“Are your parents working today?” “No, ___.”", options: ["they don’t", "they isn’t", "they aren’t"], answer: 2 },
+        { q: "“Is Masha sleeping?” “No, ___. She’s reading.”", options: ["she isn’t", "she doesn’t", "she not"], answer: 0 },
+        { q: "“Are we going now?” “Yes, ___.”", options: ["we’re", "we are", "we do"], answer: 1 }
+      ]
+    },
+
+    /* ================= 4 · NOW OR ALWAYS ================= */
+    { type: "part", n: "04", icon: "calendar", title: "Now or always?", text: "Essential Grammar in Use · Unit 8" },
+
+    {
+      type: "rule", label: "grammar · I am doing / I do", sticker: "calendar",
+      title: "One question: is it happening NOW?",
+      html: `
+        <div class="lines">
+          <div class="ln"><b class="dot">NOW</b><p><span class="live">LIVE</span> <b>am / is / are + -ing</b> = it’s happening now: <i>Jack <b>is watching</b> TV.</i> · <i>Listen! Somebody <b>is singing</b>.</i></p></div>
+          <div class="ln al"><b class="dot">ALL</b><p><span class="alw">ALWAYS</span> <b>I do / he does</b> = in general, every day, sometimes: <i>Jack <b>plays</b> the guitar.</i> · <i>It <b>rains</b> a lot in November.</i></p></div>
+          <div class="ln y"><b class="dot">!</b><p>These verbs are <b>never</b> -ing: like · want · need · know · understand · remember · forget · prefer · mean · believe → <i>I <b>want</b> pizza.</i> <s>I’m wanting</s></p></div>
+        </div>
+        <div class="note">Jack <b>plays</b> the guitar, but he <b>isn’t playing</b> it now. · <b>Is</b> he <b>playing</b> now? — No, he isn’t. · <b>Does</b> he <b>play</b>? — Yes, he does.</div>`
+    },
+
+    {
+      type: "sort", label: "signal words", sticker: "calendar",
+      title: "Which tense do they like?",
+      instructions: "Put each time word in the right box.",
+      categories: [
+        { name: "NOW → am / is / are + -ing", words: ["now", "right now", "at the moment", "Look!", "Listen!", "today, this minute"] },
+        { name: "ALWAYS → I do / he does", words: ["every day", "usually", "often", "never", "on Mondays", "twice a week"] }
+      ]
+    },
+
+    {
+      type: "mcq", label: "now or always? · choose", sticker: "camera",
+      title: "Live or every day?",
+      instructions: "Choose the right form.",
+      items: [
+        { q: "Jack ___ the guitar very well.", options: ["is playing", "plays", "play"], answer: 1 },
+        { q: "Look! Jack ___ the guitar in the street.", options: ["is playing", "plays", "play"], answer: 0 },
+        { q: "My mom ___ in a hospital. She’s a nurse.", options: ["is working", "work", "works"], answer: 2 },
+        { q: "Be quiet! The baby ___.", options: ["sleeps", "is sleeping", "sleep"], answer: 1 },
+        { q: "I ___ a new phone. Mine is very old.", options: ["want", "am wanting", "wanting"], answer: 0 },
+        { q: "We usually ___ to school by bus.", options: ["are going", "go", "goes"], answer: 1 },
+        { q: "“Where’s Kate?” “She ___ a shower.”", options: ["has", "is having", "have"], answer: 1 },
+        { q: "Sorry, I ___ what you mean.", options: ["am not understanding", "don’t understand", "not understand"], answer: 1 },
+        { q: "It ___ a lot here in winter.", options: ["snows", "is snowing", "snow"], answer: 0 },
+        { q: "Why ___ you laughing? What’s funny?", options: ["do", "are", "is"], answer: 1 }
+      ]
+    },
+
+    {
+      type: "gapfill", label: "now or always? · write it", sticker: "calendar",
+      title: "Write the verb",
+      instructions: "Present continuous (<b>am -ing</b>) or present simple (<b>I do / he does</b>)?",
+      items: [
+        { text: "Listen! Somebody [[is singing|'s singing]]." + H("sing"), why: "Listen! → now." },
+        { text: "My brother [[plays]] basketball on Fridays." + H("play"), why: "on Fridays → always; he → plays." },
+        { text: "“Where’s Tom?” “He [[is doing|'s doing]] his homework.”" + H("do"), why: "right now → is doing." },
+        { text: "I [[don't watch|do not watch]] TV very often." + H("not / watch"), why: "very often → present simple." },
+        { text: "Sarah is tired. She [[wants]] to go home." + H("want"), why: "want → never -ing." },
+        { text: "How often [[do]] you [[use]] your phone? Every hour?" + H("you / use"), why: "how often → do you use." },
+        { text: "Excuse me, you [[are sitting|'re sitting]] in my seat." + H("sit"), why: "now → are sitting." },
+        { text: "My dad [[doesn't drive|does not drive]] to work. He usually walks." + H("not / drive"), why: "usually → present simple; he → doesn’t." },
+        { text: "What time [[does]] your sister [[finish]] school every day?" + H("your sister / finish"), why: "every day → does … finish." },
+        { text: "Turn off the radio. I [[am not listening|'m not listening]] to it." + H("not / listen"), why: "now → am not listening." }
+      ]
+    },
+
+    {
+      type: "correct", label: "classic mistakes · fix it", sticker: "tools",
+      title: "Find and fix the mistake",
+      instructions: "Each sentence has <b>one</b> mistake. Write the correct sentence.",
+      items: [
+        { wrong: "I am go to school every day.", answers: ["I go to school every day."] },
+        { wrong: "She is play tennis now.", answers: ["She is playing tennis now.", "She's playing tennis now."] },
+        { wrong: "My dad work in a bank.", answers: ["My dad works in a bank."] },
+        { wrong: "I am wanting a pizza.", answers: ["I want a pizza."] },
+        { wrong: "Are you like chocolate?", answers: ["Do you like chocolate?"] },
+        { wrong: "What you are doing?", answers: ["What are you doing?"] },
+        { wrong: "It rain a lot in November.", answers: ["It rains a lot in November."] },
+        { wrong: "Look! The baby sleeps.", answers: ["Look! The baby is sleeping.", "Look! The baby's sleeping."] }
+      ]
+    },
+
+    /* ================= 5 · READING ================= */
+    { type: "part", n: "05", icon: "mobile", title: "A video call", text: "Read and check." },
+
+    {
+      type: "tf2", label: "reading · a video message", sticker: "mobile",
+      title: "Hi from Lviv!",
+      instructions: "Read the message. True or false? If it’s false, choose the correct sentence.",
+      text: `<div class="stream"><span class="live">LIVE</span>
+          <p>Hi, Grandma! I’m sending you this video from Lviv. It’s Saturday, and I’m sitting in a small café with my mom. We’re drinking hot chocolate, and Mom is reading a map.</p>
+          <p>Lviv is so beautiful! It’s snowing right now, and some people are singing in the square. A man is playing the violin. He plays here every weekend, the waiter says.</p>
+          <p>At home I usually get up at 7 and go to school, but on this trip we get up at 9! We walk a lot every day. I don’t like museums very much, but I love the old streets. Bye! I miss you!</p></div>`,
+      items: [
+        { q: "She is in a café now.", answer: true, fix: [], fixAnswer: 0 },
+        { q: "She is drinking coffee.", answer: false, fix: ["She is drinking hot chocolate.", "She is eating cake.", "She is drinking tea."], fixAnswer: 0 },
+        { q: "Her mom is reading a book.", answer: false, fix: ["Her mom is reading a map.", "Her mom is talking on the phone.", "Her mom is sleeping."], fixAnswer: 0 },
+        { q: "It is snowing at the moment.", answer: true, fix: [], fixAnswer: 0 },
+        { q: "The man plays the violin there every weekend.", answer: true, fix: [], fixAnswer: 0 },
+        { q: "At home she usually gets up at 9.", answer: false, fix: ["At home she usually gets up at 7.", "At home she gets up at 10.", "She never gets up early."], fixAnswer: 0 },
+        { q: "She likes museums a lot.", answer: false, fix: ["She doesn’t like museums very much.", "She goes to a museum every day.", "She is in a museum now."], fixAnswer: 0 },
+        { q: "They walk a lot on the trip.", answer: true, fix: [], fixAnswer: 0 }
+      ]
+    },
+
+    /* ================= 6 · TALK ================= */
+    { type: "part", n: "06", icon: "speech", title: "Over to you", text: "Spin it — answer both: now and usually. Then ask me." },
+
+    {
+      type: "wheel", label: "speaking · now & usually", sticker: "speech",
+      title: "Spin the live stream",
+      start: "Spin the wheel. Answer two questions: one about NOW, one about USUALLY. Then ask me the same.",
+      colors: ["#FF2D55", "#5B5BD6", "#FFD84D", "#1E1B3A"],
+      items: [
+        { icon: "👕", short: "clothes", q: "What <b>are</b> you <b>wearing</b> now? What do you usually <b>wear</b> on weekends?" },
+        { icon: "🏠", short: "family", q: "What <b>is</b> your mom <b>doing</b> right now, do you think? What <b>does</b> she <b>do</b> in the evenings?" },
+        { icon: "🎧", short: "music", q: "<b>Are</b> you <b>listening</b> to anything these days? What music do you usually <b>listen</b> to?" },
+        { icon: "🌦️", short: "weather", q: "What’s the weather like now — <b>is</b> it <b>raining</b>, <b>snowing</b>? <b>Does</b> it <b>snow</b> a lot in your city?" },
+        { icon: "📱", short: "phone", q: "<b>Are</b> you <b>using</b> your phone now? How often <b>do</b> you <b>use</b> it every day?" },
+        { icon: "🍽️", short: "food", q: "<b>Are</b> you <b>eating</b> or <b>drinking</b> anything now? What do you usually <b>have</b> for breakfast?" },
+        { icon: "🐾", short: "pet", q: "<b>Do</b> you <b>have</b> a pet? What <b>is</b> it <b>doing</b> right now?" },
+        { icon: "📚", short: "school", q: "What <b>are</b> you <b>learning</b> at school this week? What subject <b>do</b> you <b>like</b>?" }
+      ]
+    },
+
+    /* ================= 7 · SPEED ================= */
+    { type: "part", n: "07", icon: "stopwatch", title: "Speed", text: "Make it automatic." },
+
+    {
+      type: "drill", label: "automaticity · speed drill", sticker: "stopwatch",
+      title: "Twelve quick answers, twice each",
+      instructions: "Write the answer and press <b>Enter</b>. Each one must be right <b>twice</b>.",
+      items: [
+        { cue: "-ing", prompt: "swim", answers: ["swimming"] },
+        { cue: "-ing", prompt: "write", answers: ["writing"] },
+        { cue: "-ing", prompt: "sit", answers: ["sitting"] },
+        { cue: "-ing", prompt: "lie", answers: ["lying"] },
+        { cue: "now", prompt: "she / read", answers: ["she is reading", "she's reading"] },
+        { cue: "now", prompt: "they / play", answers: ["they are playing", "they're playing"] },
+        { cue: "always", prompt: "she / read", answers: ["she reads"] },
+        { cue: "always", prompt: "he / watch", answers: ["he watches"] },
+        { cue: "now", prompt: "I / not / work", answers: ["i am not working", "i'm not working"] },
+        { cue: "always", prompt: "he / not / work", answers: ["he doesn't work", "he does not work"] },
+        { cue: "question now", prompt: "you / sleep", answers: ["are you sleeping?", "are you sleeping"] },
+        { cue: "question always", prompt: "you / sleep", answers: ["do you sleep?", "do you sleep"] }
+      ]
+    },
+
+    /* ================= 8 · WRITING ================= */
+    { type: "part", n: "08", icon: "pencil", title: "Writing", text: "Live now — and usually." },
+
+    {
+      type: "write", label: "writing · now and usually", sticker: "pencil",
+      title: "My video message",
+      instructions: "Write a video message to a friend — <b>6–8 sentences</b>. Say what is happening <b>right now</b> (3 sentences with am / is / are + -ing) and what you <b>usually</b> do (3 sentences with I do / he does).",
+      words: ["right now", "at the moment", "usually", "every day", "often", "never", "on Saturdays", "sitting", "wearing", "watching", "playing"],
+      checks: [
+        { label: "am / is / are + -ing — 3 times", pattern: "\\b(am|is|are|’m|'m|’s|'s|’re|'re)\\s+(not\\s+)?[a-z]+ing\\b", min: 3 },
+        { label: "usually / every … / often / never — 2 times", pattern: "\\b(usually|every|often|always|never|sometimes)\\b", min: 2 },
+        { label: "no “I am go” (am / is / are + verb without -ing)", pattern: "^(?![\\s\\S]*\\b(am|is|are)\\s+(go|play|watch|eat|read|do|like|want|work|live|sit|wear|have|sleep|listen|drink|cook|write|walk|study|use)\\b)[\\s\\S]+$" },
+        { label: "4+ words from the list (they light up)", words: 4 },
+        { label: "at least 6 sentences", sentences: 6 }
+      ],
+      sample: "Hi, Liza! I’m sitting in my room right now. I’m wearing my favorite hoodie and I’m drinking tea. My little brother is playing a video game. I usually do my homework after school, but today is Saturday! On Saturdays I often go to the park with my friends. My mom never works on weekends. See you soon!"
+    },
+
+    /* ================= 9 · SELF-CHECK ================= */
+    { type: "part", n: "09", icon: "star", title: "Self-check", text: "What to look at again." },
+
+    { type: "review", label: "self-check", title: "My mistakes today" }
+  ]
+};
+</script>
+<script>
+/* =====================================================================
+   ENGINE — no need to edit below this line
+   ===================================================================== */
+(function(){
+"use strict";
+
+function h(tag, props){
+  const el = document.createElement(tag);
+  if (props) for (const k in props){
+    const v = props[k];
+    if (v == null || v === false) continue;
+    if (k === "class") el.className = v;
+    else if (k === "html") el.innerHTML = v;
+    else if (k === "style") el.style.cssText = v;
+    else if (k.slice(0,2) === "on") el.addEventListener(k.slice(2), v);
+    else el.setAttribute(k, v === true ? "" : v);
+  }
+  for (let i = 2; i < arguments.length; i++){
+    const kids = [].concat(arguments[i]);
+    for (const kid of kids){
+      if (kid == null || kid === false || kid === "") continue;
+      el.append(kid.nodeType ? kid : document.createTextNode(kid));
+    }
+  }
+  return el;
+}
+function clear(obj){ for (const k of Object.keys(obj)) delete obj[k]; }
+function emo(x){
+  if (!x) return "";
+  if (/^[a-z0-9-]+$/.test(x)) return h("img", { src: "assets/emoji/" + x + ".png", alt: "", draggable: "false" });
+  return document.createTextNode(x);
+}
+function norm(s, dWord){
+  s = String(s || "").toLowerCase().replace(/[’‘`´]/g, "'").replace(/[“”"«»]/g, "");
+  s = s.replace(/\bwon't\b/g, "will not").replace(/\bcan't\b/g, "cannot")
+       .replace(/n't\b/g, " not").replace(/'m\b/g, " am").replace(/'re\b/g, " are")
+       .replace(/'ve\b/g, " have").replace(/'ll\b/g, " will").replace(/'d\b/g, " " + (dWord || "had"));
+  s = s.replace(/[.,!?;:()\[\]–—-]/g, " ").replace(/\s+/g, " ").trim();
+  return s;
+}
+function matches(value, answers){
+  const a = answers.map(x => norm(x)); const v1 = norm(value, "had"), v2 = norm(value, "would");
+  return v1 !== "" && (a.includes(v1) || a.includes(v2));
+}
+function parseGaps(str){
+  const parts = []; const re = /\[\[(.+?)\]\]/g; let last = 0, m;
+  while ((m = re.exec(str))){
+    if (m.index > last) parts.push({ text: str.slice(last, m.index) });
+    const [ans, hint] = m[1].split(" // ");
+    parts.push({ answers: ans.split("|").map(s => s.trim()), hint: hint ? hint.trim() : null });
+    last = re.lastIndex;
+  }
+  if (last < str.length) parts.push({ text: str.slice(last) });
+  return parts;
+}
+function hashStr(s){ let h1 = 1779033703 ^ s.length; for (let i = 0; i < s.length; i++){ h1 = Math.imul(h1 ^ s.charCodeAt(i), 3432918353); h1 = h1 << 13 | h1 >>> 19; } return h1 >>> 0; }
+function shuffle(arr, seedStr){
+  let seed = hashStr(seedStr);
+  const rnd = () => { seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--){ const j = Math.floor(rnd() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
+  if (a.length > 1 && a.every((x, i) => x === arr[i])) a.push(a.shift());
+  return a;
+}
+function fire(el){ el.dispatchEvent(new Event("input", { bubbles: true })); }
+const pad = i => String(i + 1).padStart(2, "0");
+
+/* ---------- storage ---------- */
+const KEY = "lesson:" + LESSON.id;
+let SAVE = {};
+try { SAVE = JSON.parse(localStorage.getItem(KEY) || "{}") || {}; } catch (e) { SAVE = {}; }
+function persist(){ try { localStorage.setItem(KEY, JSON.stringify(SAVE)); } catch (e) {} }
+
+/* ---------- header ---------- */
+const root = document.documentElement;
+for (const k in (LESSON.theme || {})) root.style.setProperty("--" + k, LESSON.theme[k]);
+document.title = LESSON.title;
+document.getElementById("kicker").textContent = LESSON.kicker || "";
+const tEl = document.getElementById("title");
+if (LESSON.titleHTML) tEl.innerHTML = LESSON.titleHTML; else tEl.textContent = LESSON.title;
+document.getElementById("sub").textContent = LESSON.subtitle || "";
+const st = LESSON.stickers || [];
+document.getElementById("sticker1").append(emo(st[0]));
+document.getElementById("sticker2").append(emo(st[1]));
+
+function burst(fromEl){
+  if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const r = fromEl.getBoundingClientRect(); const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+  const set = LESSON.confetti && LESSON.confetti.length ? LESSON.confetti : ["⭐"];
+  for (let i = 0; i < 16; i++){
+    const s = h("span", { class: "confetti" }, emo(set[i % set.length]));
+    document.body.append(s);
+    const dx = (Math.random() - .5) * 360, dy = -60 - Math.random() * 230, rot = (Math.random() - .5) * 540;
+    const anim = s.animate([
+      { transform: `translate(${cx}px, ${cy}px) scale(.5)`, opacity: 1 },
+      { transform: `translate(${cx + dx * .6}px, ${cy + dy}px) rotate(${rot / 2}deg) scale(1.1)`, opacity: 1, offset: .55 },
+      { transform: `translate(${cx + dx}px, ${cy + dy + 170}px) rotate(${rot}deg) scale(.9)`, opacity: 0 }
+    ], { duration: 1150 + Math.random() * 400, easing: "cubic-bezier(.2,.7,.4,1)" });
+    anim.onfinish = () => s.remove();
+  }
+}
+
+/* ---------- drag & drop board (mouse + touch + tap) ---------- */
+function Board(scope, v){
+  const zones = {}, chips = {}; let selected = null;
+  const bank = h("div", { class: "bank" });
+  register(bank, bank, "bank", false);
+  function register(clickEl, dropEl, id, single){
+    clickEl.dataset.zone = id; zones[id] = { el: dropEl, box: clickEl, single };
+    clickEl.addEventListener("click", () => { if (selected) place(selected, id); });
+  }
+  function zoneOf(c){ for (const id in zones){ if (zones[id].el === c.parentElement) return id; } return "bank"; }
+  function unselect(){ if (selected) selected.classList.remove("selected"); selected = null; }
+  function clearMarks(){ scope.querySelectorAll(".ok,.bad").forEach(n => n.classList.remove("ok", "bad")); }
+  function place(c, zid, silent){
+    const z = zones[zid]; if (!z) return;
+    if (z.single) z.el.querySelectorAll(".chip").forEach(o => { if (o !== c) bank.append(o); });
+    z.el.append(c); unselect();
+    if (!silent){ clearMarks(); for (const id in chips){ const zz = zoneOf(chips[id]); if (zz === "bank") delete v[id]; else v[id] = zz; } persist(); fire(scope); }
+  }
+  function tap(c){
+    if (zoneOf(c) !== "bank"){ place(c, "bank"); return; }
+    if (selected === c){ unselect(); return; }
+    unselect(); selected = c; c.classList.add("selected");
+  }
+  function zoneAt(x, y){
+    const el = document.elementFromPoint(x, y); const z = el && el.closest("[data-zone]");
+    return z && scope.contains(z) ? z : null;
+  }
+  let overEl = null;
+  function setOver(z){ if (overEl === z) return; if (overEl) overEl.classList.remove("over"); overEl = z; if (z) z.classList.add("over"); }
+  function chip(id, label, value){
+    const c = h("button", { class: "chip", type: "button", html: label });
+    c.dataset.id = id; c.dataset.value = value; chips[id] = c;
+    let d = null;
+    c.addEventListener("pointerdown", e => {
+      if (e.pointerType === "mouse" && e.button !== 0) return;
+      d = { x: e.clientX, y: e.clientY, moved: false, ghost: null };
+      try { c.setPointerCapture(e.pointerId); } catch (_) {}
+    });
+    c.addEventListener("pointermove", e => {
+      if (!d) return;
+      if (!d.moved && Math.hypot(e.clientX - d.x, e.clientY - d.y) > 6){
+        d.moved = true; unselect();
+        const r = c.getBoundingClientRect(); d.ox = d.x - r.left; d.oy = d.y - r.top;
+        d.ghost = c.cloneNode(true); d.ghost.classList.add("ghost"); d.ghost.classList.remove("ok", "bad");
+        d.ghost.style.width = r.width + "px"; document.body.append(d.ghost); c.classList.add("dragging");
+      }
+      if (d.moved){
+        e.preventDefault();
+        d.ghost.style.left = (e.clientX - d.ox) + "px"; d.ghost.style.top = (e.clientY - d.oy) + "px";
+        setOver(zoneAt(e.clientX, e.clientY));
+      }
+    });
+    const end = e => {
+      if (!d) return; const was = d; d = null;
+      if (!was.moved) return;
+      was.ghost.remove(); c.classList.remove("dragging"); setOver(null); c._suppress = true;
+      if (e.type === "pointerup"){ const z = zoneAt(e.clientX, e.clientY); if (z) place(c, z.dataset.zone); }
+    };
+    c.addEventListener("pointerup", end);
+    c.addEventListener("pointercancel", end);
+    c.addEventListener("click", e => { e.stopPropagation(); if (c._suppress){ c._suppress = false; return; } tap(c); });
+    bank.append(c);
+    return c;
+  }
+  function restore(){ for (const id in v){ if (chips[id] && zones[v[id]]) place(chips[id], v[id], true); } }
+  function resetAll(){ for (const id in chips) bank.append(chips[id]); clear(v); clearMarks(); unselect(); }
+  return { bank, register, chip, place, restore, resetAll, chips, zones, zoneOf };
+}
+
+/* ---------- renderers: check() returns one value per item: true / false / null (not answered) ---------- */
+const RENDER = {};
+const LABEL = { mcq: "multiple choice", match: "match", dragwords: "drag & drop", correct: "correct the mistakes", rephrase: "rewrite", write: "writing", drill: "speed drill", rule: "theory", build: "word order", gapfill: "gap fill", tf2: "true / false", slotwrite: "writing", review: "self-check" };
+const ROLES = [
+  ["qw", "Question word"], ["aux", "am / is / are"], ["who", "Who?"], ["freq", "How often?"], ["does", "Verb + -ing"], ["what", "What? Whom?"], ["where", "Where?"], ["when", "When?"]
+];
+
+RENDER.rule = (sec, s, body) => { body.append(h("div", { class: "rule", html: sec.html })); return null; };
+
+RENDER.build = (sec, s, body) => {
+  const v = s.v || (s.v = {}); const items = [];
+  sec.items.forEach((it, i) => {
+    const vi = v[i] || (v[i] = {});
+    const wrap = h("div", { class: "bitem" });
+    const state = h("span", { class: "bstate" });
+    wrap.append(h("div", { class: "bhead" }, h("span", { class: "bnum" }, pad(i)), state));
+    const B = Board(wrap, vi);
+    const row = h("div", { class: "brow" }); const slots = [];
+    ROLES.forEach(([role, q]) => {
+      if (it[role] == null) return;
+      const zone = h("div", { class: "bz" });
+      const box = h("div", { class: "bslot c-" + role, role: "button", "aria-label": q }, h("span", { class: "bq" }, q), zone);
+      B.register(box, zone, "z-" + role, true);
+      row.append(box); slots.push({ role, box, zone });
+    });
+    row.append(h("span", { class: "bdot" }, it.end || "."));
+    const chipsData = ROLES.filter(([r]) => it[r] != null).map(([r]) => ({ id: r, label: it[r], value: r }));
+    if (it.wrong) chipsData.push({ id: "x", label: it.wrong, value: "x" });
+    shuffle(chipsData, LESSON.id + sec.title + i).forEach(c => B.chip(c.id, c.label, c.value));
+    wrap.append(B.bank, row); body.append(wrap);
+    B.restore();
+    items.push({ B, slots, state });
+  });
+  return {
+    total: items.length,
+    check(){ return items.map(({ slots, state }) => {
+      let filled = 0, ok = true;
+      slots.forEach(o => {
+        const c = o.zone.querySelector(".chip"); if (c) filled++;
+        const good = !!c && c.dataset.value === o.role;
+        o.box.classList.toggle("ok", good); o.box.classList.toggle("bad", !good);
+        if (!good) ok = false;
+      });
+      if (!filled){ slots.forEach(o => o.box.classList.remove("ok", "bad")); state.textContent = ""; return null; }
+      state.className = "bstate " + (ok ? "ok" : "bad"); state.textContent = ok ? "✓" : "Try again — fix the red slot.";
+      return ok;
+    }); },
+    reveal(){ items.forEach(({ B, slots }) => { B.resetAll(); slots.forEach(o => B.place(B.chips[o.role], "z-" + o.role)); }); },
+    reset(){ items.forEach(({ B, state }) => { B.resetAll(); state.textContent = ""; }); persist(); }
+  };
+};
+
+RENDER.gapfill = (sec, s, body) => {
+  const v = s.v || (s.v = {}); const lines = [];
+  const list = h("ol", { class: "lines" }); if (sec.text) body.append(h("div", { class: "story", html: sec.text }));
+  sec.items.forEach((raw, i) => {
+    const it = typeof raw === "string" ? { text: raw } : raw;
+    const li = h("li", {}); const line = h("div", { class: "line" }); const gaps = [];
+    parseGaps(it.text).forEach((p, j) => {
+      if (p.text != null){ line.append(h("span", { html: p.text })); return; }
+      const key = i + "-" + j;
+      const w = Math.max(5, ...p.answers.map(a => a.length)) + 2;
+      const input = h("input", { class: "gap", type: "text", autocomplete: "off", autocapitalize: "off", autocorrect: "off", spellcheck: "false", "aria-label": p.hint ? "gap: " + p.hint : "gap", style: `width:${w}ch` });
+      input.value = v[key] || "";
+      input.addEventListener("input", () => { v[key] = input.value; persist(); input.classList.remove("ok", "bad"); const y = li.querySelector(".why"); if (y) y.remove(); });
+      input.addEventListener("keydown", e => {
+        if (e.key !== "Enter") return; e.preventDefault();
+        const all = Array.from(body.querySelectorAll("input.gap")); const n = all[all.indexOf(input) + 1];
+        if (n) n.focus(); else input.blur();
+      });
+      const wrap = h("span", { class: "gapwrap" }, input);
+      if (p.hint) wrap.append(h("span", { class: "hint" }, "(" + p.hint + ")"));
+      line.append(wrap); gaps.push({ input, answers: p.answers, wrap });
+    });
+    li.append(line); list.append(li); lines.push({ it, li, gaps });
+  });
+  body.append(list);
+  return {
+    total: lines.length,
+    check(){ return lines.map(({ it, li, gaps }) => {
+      const old = li.querySelector(".why"); if (old) old.remove();
+      if (gaps.every(g => !g.input.value.trim())){ gaps.forEach(g => g.input.classList.remove("ok", "bad")); return null; }
+      let ok = true;
+      gaps.forEach(g => { const good = matches(g.input.value, g.answers); g.input.classList.toggle("ok", good); g.input.classList.toggle("bad", !good); if (!good) ok = false; });
+      if (it.why) li.append(h("span", { class: "why " + (ok ? "ok" : "bad") }, (ok ? "✓ " : "✗ ") + it.why));
+      return ok;
+    }); },
+    reveal(){ lines.forEach(({ gaps }) => gaps.forEach(g => { if (!g.input.classList.contains("ok") && !g.wrap.querySelector(".reveal")) g.wrap.append(h("span", { class: "reveal" }, "→ " + g.answers[0])); })); },
+    reset(){ clear(v); lines.forEach(({ li, gaps }) => { gaps.forEach(g => { g.input.value = ""; g.input.classList.remove("ok", "bad"); }); const y = li.querySelector(".why"); if (y) y.remove(); }); }
+  };
+};
+
+RENDER.tf2 = (sec, s, body) => {
+  const v = s.v || (s.v = {}); const qs = [];
+  body.classList.add("tf2");
+  if (sec.text) body.append(h("div", { class: "story", html: sec.text }));
+  sec.items.forEach((it, i) => {
+    const st = v[i] || (v[i] = {});
+    const q = h("div", { class: "q" });
+    const tfo = h("div", { class: "opts tfo" });
+    const bT = h("button", { class: "opt", type: "button" }, "True");
+    const bF = h("button", { class: "opt", type: "button" }, "False");
+    tfo.append(bT, bF);
+    q.append(h("div", { class: "q-top" }, h("div", { class: "q-text" }, h("span", { class: "q-num" }, pad(i)), h("span", { html: it.q })), tfo));
+    const fixOpts = h("div", { class: "opts" });
+    const fixBtns = it.fix.map((f, j) => { const b = h("button", { class: "opt", type: "button", html: f }); b.addEventListener("click", () => { st.fix = j; persist(); paint(); fire(body); }); fixOpts.append(b); return b; });
+    const fixbox = h("div", { class: "fixbox", hidden: true }, h("div", { class: "fl" }, "Correct it:"), fixOpts);
+    const warn = h("div", { class: "warnline", hidden: true }, "Choose the correct sentence.");
+    q.append(fixbox, warn);
+    bT.addEventListener("click", () => { st.tf = true; delete st.fix; persist(); paint(); fire(body); });
+    bF.addEventListener("click", () => { st.tf = false; persist(); paint(); fire(body); });
+    function paint(){
+      [bT, bF, ...fixBtns].forEach(b => b.classList.remove("ok", "bad", "answer"));
+      bT.classList.toggle("sel", st.tf === true); bF.classList.toggle("sel", st.tf === false);
+      fixbox.hidden = st.tf !== false; warn.hidden = true;
+      fixBtns.forEach((b, j) => b.classList.toggle("sel", st.fix === j));
+    }
+    paint(); body.append(q);
+    qs.push({ it, st, bT, bF, fixBtns, fixbox, warn, paint });
+  });
+  return {
+    total: qs.length,
+    check(){ return qs.map(o => {
+      const { it, st } = o; o.paint();
+      if (st.tf === undefined) return null;
+      const tfOk = st.tf === it.answer;
+      (st.tf ? o.bT : o.bF).classList.add(tfOk ? "ok" : "bad");
+      if (st.tf === false && tfOk){
+        if (st.fix === undefined){ o.warn.hidden = false; return null; }
+        const fixOk = st.fix === it.fixAnswer; o.fixBtns[st.fix].classList.add(fixOk ? "ok" : "bad");
+        return fixOk;
+      }
+      return tfOk;
+    }); },
+    reveal(){ qs.forEach(o => { const { it, st } = o;
+      if (st.tf !== it.answer) (it.answer ? o.bT : o.bF).classList.add("answer");
+      if (!it.answer){ o.fixbox.hidden = false; o.fixBtns[it.fixAnswer].classList.add("answer"); }
+    }); },
+    reset(){ qs.forEach(o => { clear(o.st); o.paint(); }); }
+  };
+};
+
+RENDER.slotwrite = (sec, s, body) => {
+  const v = s.v || (s.v = {}); const rows = [];
+  sec.items.forEach((it, i) => {
+    const input = h("input", { class: "full", type: "text", autocomplete: "off", autocapitalize: "sentences", spellcheck: "true", placeholder: it.who.split(" / ")[0] + " …", "aria-label": "sentence about " + it.who });
+    input.value = v[i] || "";
+    const tags = h("div", { class: "sp-tags" },
+      h("span", { class: "c-who fill" }, "Who? " + it.who),
+      h("span", { class: "c-does" }, "Does what?"), h("span", { class: "c-what" }, "What?"),
+      h("span", { class: "c-where" }, "Where?"), h("span", { class: "c-when" }, "When?"));
+    const row = h("div", { class: "row" }, h("div", { class: "prompt" }, h("span", { class: "num" }, pad(i))), tags, input);
+    row.querySelector(".prompt").append(h("span", {}, ""));
+    input.addEventListener("input", () => { v[i] = input.value; persist(); input.classList.remove("ok", "bad"); const m = row.querySelector(".model"); if (m) m.remove(); });
+    body.append(row); rows.push({ it, input, row });
+  });
+  return {
+    total: rows.length, revealLabel: "👀 Show examples",
+    check(){ return rows.map(r => {
+      const old = r.row.querySelector(".model"); if (old) old.remove();
+      const txt = r.input.value.trim(); if (!txt){ r.input.classList.remove("ok", "bad"); return null; }
+      const words = txt.split(/\s+/).filter(Boolean);
+      const verbOk = /^\s*(\S+\s+){1,3}\w*(s)\b/i.test(txt);
+      const ok = words.length >= 5 && verbOk;
+      r.input.classList.toggle("ok", ok); r.input.classList.toggle("bad", !ok);
+      if (!ok) r.row.append(h("div", { class: "model warn" }, !verbOk ? "Check the verb: he / she / it → -s." : "Add more slots: what? where? when?"));
+      return ok;
+    }); },
+    reveal(){ rows.forEach(r => { const old = r.row.querySelector(".model"); if (old) old.remove(); r.row.append(h("div", { class: "model" }, "Example: " + r.it.sample)); }); },
+    reset(){ clear(v); rows.forEach(r => { r.input.value = ""; r.input.classList.remove("ok", "bad"); }); }
+  };
+};
+
+function similarity(a, b){
+  const A = norm(a).split(" ").filter(Boolean), B = norm(b).split(" ").filter(Boolean);
+  if (!A.length || !B.length) return 0;
+  const pool = B.slice(); let hit = 0;
+  for (const w of A){ const i = pool.indexOf(w); if (i > -1){ hit++; pool.splice(i, 1); } }
+  return hit / Math.max(A.length, B.length);
+}
+
+RENDER.mcq = (sec, s, body) => {
+  const v = s.v || (s.v = {}); const qs = [];
+  sec.items.forEach((it, i) => {
+    const q = h("div", { class: "q" });
+    const text = h("div", { class: "q-text" }, h("span", { class: "q-num" }, pad(i)));
+    it.q.split("___").forEach((part, k) => { if (k) text.append(h("span", { class: "blank" })); text.append(h("span", { html: part })); });
+    const opts = h("div", { class: "opts", role: "radiogroup" });
+    const btns = it.options.map((o, j) => {
+      const b = h("button", { class: "opt", type: "button", role: "radio", html: o });
+      b.addEventListener("click", () => { v[i] = j; persist(); paint(); fire(body); });
+      opts.append(b); return b;
+    });
+    function paint(){ btns.forEach((b, j) => { b.classList.toggle("sel", v[i] === j); b.classList.remove("ok", "bad", "answer"); b.setAttribute("aria-checked", v[i] === j); }); }
+    paint(); q.append(text, opts); body.append(q); qs.push({ it, btns, i, paint });
+  });
+  return {
+    total: qs.length,
+    check(){ return qs.map(({ it, btns, i, paint }) => { paint(); if (v[i] === undefined) return null; const ok = v[i] === it.answer; btns[v[i]].classList.add(ok ? "ok" : "bad"); return ok; }); },
+    reveal(){ qs.forEach(({ it, btns, i }) => { if (v[i] !== it.answer) btns[it.answer].classList.add("answer"); }); },
+    reset(){ clear(v); qs.forEach(({ paint }) => paint()); }
+  };
+};
+
+RENDER.match = (sec, s, body) => {
+  const v = s.v || (s.v = {}); const B = Board(body, v); const rows = [];
+  const grid = h("div", { class: "match" });
+  sec.pairs.forEach((p, i) => {
+    const slot = h("div", { class: "slot", role: "button", "aria-label": "drop zone" });
+    B.register(slot, slot, "m" + i, true);
+    grid.append(h("div", { class: "mrow" }, h("div", { class: "left", "data-n": pad(i), html: p[0] }), slot));
+    rows.push(slot);
+  });
+  shuffle(sec.pairs.map((p, i) => i), LESSON.id + sec.title).forEach(i => B.chip("r" + i, sec.pairs[i][1], String(i)));
+  body.append(B.bank, grid); B.restore();
+  return {
+    total: rows.length,
+    check(){ return rows.map((slot, i) => { const c = slot.querySelector(".chip");
+      if (!c){ slot.classList.remove("ok", "bad"); return null; }
+      const ok = c.dataset.value === String(i); slot.classList.toggle("ok", ok); slot.classList.toggle("bad", !ok); return ok; }); },
+    reveal(){ B.resetAll(); rows.forEach((slot, i) => B.place(B.chips["r" + i], "m" + i)); },
+    reset(){ B.resetAll(); persist(); }
+  };
+};
+
+RENDER.dragwords = (sec, s, body) => {
+  const v = s.v || (s.v = {}); const B = Board(body, v); const slots = []; const words = [];
+  const list = h("ol", { class: "lines" });
+  sec.items.forEach((it, i) => {
+    const line = h("li", { class: "line" });
+    parseGaps(it).forEach((p, j) => {
+      if (p.text != null){ line.append(h("span", { html: p.text })); return; }
+      const slot = h("span", { class: "slot", role: "button", "aria-label": "drop zone" });
+      B.register(slot, slot, "g" + i + "-" + j, true);
+      slots.push({ slot, answers: p.answers }); words.push(p.answers[0]); line.append(slot);
+    });
+    list.append(line);
+  });
+  (sec.extra || []).forEach(w => words.push(w));
+  shuffle(words.map((w, k) => ({ id: "c" + k, w })), LESSON.id + sec.title).forEach(o => B.chip(o.id, o.w, o.w));
+  if (sec.text) body.append(h("div", { class: "story", html: sec.text }));
+  body.append(B.bank, list); B.restore();
+  return {
+    total: slots.length,
+    check(){ return slots.map(o => {
+      const c = o.slot.querySelector(".chip"); if (!c){ o.slot.classList.remove("ok", "bad"); return null; }
+      const ok = matches(c.dataset.value, o.answers); o.slot.classList.toggle("ok", ok); o.slot.classList.toggle("bad", !ok); return ok;
+    }); },
+    reveal(){
+      B.resetAll(); const used = new Set();
+      slots.forEach(o => { const c = Object.values(B.chips).find(ch => !used.has(ch) && matches(ch.dataset.value, o.answers));
+        if (c){ used.add(c); B.place(c, o.slot.dataset.zone); } });
+    },
+    reset(){ B.resetAll(); persist(); }
+  };
+};
+
+RENDER.correct = (sec, s, body) => {
+  const v = s.v || (s.v = {}); const rows = [];
+  sec.items.forEach((it, i) => {
+    const input = h("input", { class: "full", type: "text", autocomplete: "off", autocapitalize: "sentences", spellcheck: "false", "aria-label": "corrected sentence " + (i + 1) });
+    input.value = v[i] != null ? v[i] : it.wrong;
+    input.addEventListener("input", () => { v[i] = input.value; persist(); input.classList.remove("ok", "bad"); });
+    const row = h("div", { class: "row" }, h("div", { class: "row-label" }, h("span", { class: "q-num" }, pad(i)), h("s", {}, it.wrong)), input);
+    body.append(row); rows.push({ it, input, row });
+  });
+  return {
+    total: rows.length,
+    check(){ return rows.map(r => {
+      if (norm(r.input.value) === norm(r.it.wrong) || !r.input.value.trim()){ r.input.classList.remove("ok", "bad"); return null; }
+      const ok = matches(r.input.value, r.it.answers); r.input.classList.toggle("ok", ok); r.input.classList.toggle("bad", !ok); return ok; }); },
+    reveal(){ rows.forEach(r => { if (!r.input.classList.contains("ok") && !r.row.querySelector(".model")) r.row.append(h("div", { class: "model" }, "✓ " + r.it.answers[0])); }); },
+    reset(){ clear(v); rows.forEach(r => { r.input.value = r.it.wrong; r.input.classList.remove("ok", "bad"); }); }
+  };
+};
+
+RENDER.rephrase = (sec, s, body) => {
+  const v = s.v || (s.v = {}); const rows = [];
+  sec.items.forEach((it, i) => {
+    const input = h("input", { class: "full", type: "text", autocomplete: "off", autocapitalize: "sentences", spellcheck: "false", placeholder: "Type the full sentence…", "aria-label": "answer " + (i + 1) });
+    input.value = v[i] || "";
+    const prompt = h("div", { class: "prompt" }, h("span", { class: "num" }, pad(i)), h("span", { html: it.prompt }));
+    if (it.key) prompt.append(h("span", { class: "key" }, it.key));
+    const row = h("div", { class: "row" }, prompt, input);
+    input.addEventListener("input", () => { v[i] = input.value; persist(); input.classList.remove("ok", "bad", "close"); const m = row.querySelector(".model"); if (m) m.remove(); });
+    body.append(row); rows.push({ it, input, row });
+  });
+  return {
+    total: rows.length,
+    check(){ return rows.map(r => {
+      const old = r.row.querySelector(".model"); if (old) old.remove();
+      r.input.classList.remove("ok", "bad", "close");
+      if (!r.input.value.trim()) return null;
+      if (matches(r.input.value, r.it.answers)){ r.input.classList.add("ok"); return true; }
+      const best = Math.max(...r.it.answers.map(a => similarity(r.input.value, a)));
+      if (best >= .7){ r.input.classList.add("close"); r.row.append(h("div", { class: "model close" }, "Almost! Check the form of the words.")); }
+      else r.input.classList.add("bad");
+      return false;
+    }); },
+    reveal(){ rows.forEach(r => { const old = r.row.querySelector(".model"); if (old) old.remove(); if (!r.input.classList.contains("ok")) r.row.append(h("div", { class: "model" }, "✓ " + r.it.answers[0])); }); },
+    reset(){ clear(v); rows.forEach(r => { r.input.value = ""; r.input.classList.remove("ok", "bad", "close"); }); }
+  };
+};
+
+RENDER.write = (sec, s, body) => {
+  const v = s.v || (s.v = {});
+  let box = null;
+  if (sec.words){ box = h("div", { class: "wordbox" }); sec.words.forEach(w => box.append(h("span", { "data-w": w }, w))); body.append(box); }
+  const ta = h("textarea", { class: "full", rows: 8, spellcheck: "true", placeholder: "Write here…", "aria-label": "your text" });
+  ta.value = v.text || "";
+  const ul = h("ul", { class: "checks" });
+  const lis = (sec.checks || []).map(c => { const li = h("li", {}, c.label); ul.append(li); return { c, li }; });
+  body.append(ta, ul);
+  function usedWords(t){ return (sec.words || []).filter(w => new RegExp("\\b" + w.replace(/\s+/g, "\\s+(?:\\w+\\s+)?"), "i").test(t)); }
+  function run(){ const tx = ta.value.replace(/[’‘]/g, "'");
+    const used = usedWords(tx);
+    if (box) box.querySelectorAll("span").forEach(sp => sp.classList.toggle("used", used.includes(sp.dataset.w)));
+    lis.forEach(({ c, li }) => {
+      let ok = false;
+      if (c.pattern){ const n = (tx.match(new RegExp(c.pattern, "gi")) || []).length; ok = n >= (c.min || 1); }
+      if (c.words) ok = used.length >= c.words;
+      if (c.sentences) ok = tx.split(/[.!?]+|\n+/).filter(x => x.trim().split(/\s+/).length >= 3).length >= c.sentences;
+      li.classList.toggle("done", ok);
+    });
+  }
+  ta.addEventListener("input", () => { v.text = ta.value; persist(); run(); });
+  run();
+  return {
+    total: 0, revealLabel: "👀 See an example", alwaysShow: true,
+    check(){ run(); return []; },
+    reveal(){ if (!body.querySelector(".model")) body.append(h("div", { class: "model" }, "Example: " + sec.sample)); },
+    reset(){ clear(v); ta.value = ""; run(); }
+  };
+};
+
+/* automaticity drill: every item must be typed correctly twice; mistakes come back */
+RENDER.drill = (sec, s, body) => {
+  const items = sec.items; const NEED = sec.need || 2;
+  const box = h("div", { class: "drill" }); body.append(box);
+  let q, hits, cur, t0, tick, mistakes;
+  function fmt(ms){ const t = Math.floor(ms / 1000); return Math.floor(t / 60) + ":" + String(t % 60).padStart(2, "0"); }
+  function intro(){
+    clearInterval(tick); box.innerHTML = "";
+    box.append(h("div", { class: "dtop" }, h("span", {}, items.length + " phrases × " + NEED), h("span", {}, s.best ? "best time " + fmt(s.best) : "no best time yet")));
+    box.append(h("div", { class: "dprompt" }, h("small", {}, "how it works"), "Type each answer fast. Mistakes come back until you get them right twice."));
+    const go = h("button", { class: "start", type: "button" }, "Start the dive ↓"); go.addEventListener("click", start); box.append(go);
+  }
+  function start(){
+    q = shuffle(items.map((_, i) => i), "d" + Date.now()); hits = items.map(() => 0); mistakes = 0; t0 = Date.now();
+    box.innerHTML = "";
+    const dots = h("div", { class: "dots" }, items.map(() => h("i")));
+    const timer = h("span", { class: "timer" }, "0:00");
+    const prompt = h("div", { class: "dprompt" });
+    const input = h("input", { type: "text", autocomplete: "off", autocapitalize: "sentences", spellcheck: "false", "aria-label": "your answer" });
+    const go = h("button", { class: "go", type: "button" }, "↵");
+    const fb = h("div", { class: "dfb" });
+    box.append(h("div", { class: "dtop" }, dots, timer), prompt, h("div", { class: "drow" }, input, go), fb);
+    tick = setInterval(() => { timer.textContent = fmt(Date.now() - t0); }, 250);
+    function paintDots(){ [...dots.children].forEach((d, i) => { d.className = hits[i] >= NEED ? "full" : hits[i] > 0 ? "half" : ""; }); }
+    function next(){
+      if (!q.length){ finish(); return; }
+      cur = q.shift(); const it = items[cur];
+      prompt.innerHTML = ""; prompt.append(h("small", {}, it.cue), h("span", { html: it.prompt }));
+      input.value = ""; input.focus({ preventScroll: true });
+    }
+    function submit(){
+      if (cur == null || !input.value.trim()) return;
+      const it = items[cur]; const ok = matches(input.value, it.answers);
+      box.classList.remove("flash-ok", "flash-bad"); void box.offsetWidth; box.classList.add(ok ? "flash-ok" : "flash-bad");
+      if (ok){ hits[cur]++; fb.className = "dfb ok"; fb.textContent = "✓ " + it.answers[0]; if (hits[cur] < NEED) q.splice(Math.min(q.length, 3 + Math.floor(Math.random() * 3)), 0, cur); }
+      else { mistakes++; hits[cur] = 0; fb.className = "dfb bad"; fb.textContent = "✗ " + it.answers[0]; q.splice(Math.min(q.length, 2), 0, cur); }
+      paintDots(); next();
+    }
+    go.addEventListener("click", submit);
+    input.addEventListener("keydown", e => { if (e.key === "Enter"){ e.preventDefault(); submit(); } });
+    paintDots(); next();
+  }
+  function finish(){
+    clearInterval(tick); const ms = Date.now() - t0; const best = !s.best || ms < s.best;
+    if (best){ s.best = ms; persist(); }
+    box.innerHTML = "";
+    const again = h("button", { class: "start", type: "button" }, "Dive again");
+    again.addEventListener("click", start);
+    box.append(h("div", { class: "done" }, h("small", {}, "your time"), h("b", {}, fmt(ms)),
+      h("div", {}, (best ? "New best time! " : "Best: " + fmt(s.best) + ". ") + (mistakes ? mistakes + " slip" + (mistakes > 1 ? "s" : "") + " on the way." : "No mistakes at all!"))), again);
+    burst(again);
+  }
+  intro();
+  return { noFoot: true, total: 0 };
+};
+
+RENDER.sort = (sec, s, body) => {
+  const v = s.v || (s.v = {}); const B = Board(body, v);
+  const wrap = h("div", { class: "buckets" }); const all = [];
+  sec.categories.forEach((cat, ci) => {
+    const zone = h("div", { class: "bucket-zone" }); B.register(zone, zone, "b" + ci, false);
+    wrap.append(h("div", { class: "bucket" }, h("h3", { html: cat.name }), zone));
+    cat.words.forEach((w, wi) => all.push({ id: "w" + ci + "-" + wi, w, ci }));
+  });
+  shuffle(all, LESSON.id + sec.title).forEach(o => B.chip(o.id, o.w, String(o.ci)));
+  body.append(B.bank, wrap); B.restore();
+  const order = all.map(o => o.id);
+  return {
+    total: all.length,
+    check(){ return order.map(id => { const c = B.chips[id]; const z = B.zoneOf(c);
+      c.classList.remove("ok", "bad"); if (z === "bank") return null;
+      const ok = z === "b" + c.dataset.value; c.classList.add(ok ? "ok" : "bad"); return ok; }); },
+    reveal(){ order.forEach(id => { const c = B.chips[id]; if (B.zoneOf(c) !== "b" + c.dataset.value) B.place(c, "b" + c.dataset.value); }); },
+    reset(){ B.resetAll(); persist(); }
+  };
+};
+LABEL.sort = "sort";
+
+/* ---------- birthday widgets: cake, wheel, gifts ---------- */
+RENDER.cake = (sec, s, body) => {
+  const N = sec.candles || 16; const list = [];
+  const stage = h("div", { class: "cake-stage" });
+  const candles = h("div", { class: "candles" });
+  for (let i = 0; i < N; i++){
+    const c = h("button", { class: "candle lit", type: "button", "aria-label": "candle " + (i + 1), style: "--i:" + i }, h("i", { class: "flame" }), h("i", { class: "smoke" }));
+    c.addEventListener("click", () => { if (c.classList.contains("lit")){ c.classList.remove("lit"); after(); } });
+    candles.append(c); list.push(c);
+  }
+  stage.append(candles, h("div", { class: "cake" }, h("div", { class: "tier t2" }, h("span", {}, sec.top || "")), h("div", { class: "tier t1" }), h("div", { class: "plate" })));
+  const left = h("span", { class: "cake-left" });
+  const btnMic = h("button", { class: "btn btn-check", type: "button" }, "🎤 Blow into the mic");
+  const btnRelight = h("button", { class: "btn", type: "button" }, "🕯️ Light them again");
+  const msg = h("div", { class: "cake-msg", html: sec.done || "" }); msg.hidden = true;
+  body.append(h("div", { class: "cake-banner", html: sec.banner || "" }), stage,
+    h("p", { class: "cake-hint", html: sec.hint || "" }), h("div", { class: "cake-ctr" }, btnMic, btnRelight, left), msg);
+  const lit = () => list.filter(c => c.classList.contains("lit"));
+  function after(){
+    const n = lit().length; left.textContent = n ? n + (n === 1 ? " candle left" : " candles left") : "";
+    if (!n && msg.hidden){ msg.hidden = false; stopMic(); [0, 260, 560, 900].forEach(t => setTimeout(() => burst(stage), t)); }
+  }
+  btnRelight.addEventListener("click", () => { list.forEach(c => c.classList.add("lit")); msg.hidden = true; after(); });
+  let stream = null, raf = 0, ctx = null;
+  function stopMic(){
+    cancelAnimationFrame(raf);
+    if (stream) stream.getTracks().forEach(t => t.stop()); stream = null;
+    if (ctx){ try { ctx.close(); } catch (e) {} ctx = null; }
+    btnMic.textContent = "🎤 Blow into the mic";
+  }
+  btnMic.addEventListener("click", async () => {
+    if (stream){ stopMic(); return; }
+    try { stream = await navigator.mediaDevices.getUserMedia({ audio: true }); }
+    catch (e){ btnMic.textContent = "🎤 No mic — tap the candles"; return; }
+    ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const an = ctx.createAnalyser(); an.fftSize = 512; ctx.createMediaStreamSource(stream).connect(an);
+    const buf = new Uint8Array(an.fftSize); let hot = 0, last = 0;
+    btnMic.textContent = "⏹ Stop the mic";
+    const loop = t => {
+      an.getByteTimeDomainData(buf); let sum = 0;
+      for (const x of buf){ const d = (x - 128) / 128; sum += d * d; }
+      hot = Math.sqrt(sum / buf.length) > 0.12 ? hot + 1 : 0;
+      if (hot > 3 && t - last > 110){ last = t; const L = lit(); if (L.length){ L[Math.floor(Math.random() * L.length)].classList.remove("lit"); after(); } }
+      raf = requestAnimationFrame(loop);
+    };
+    raf = requestAnimationFrame(loop);
+  });
+  after();
+  return { noFoot: true, total: 0, check(){ return []; }, reveal(){}, reset(){} };
+};
+
+RENDER.wheel = (sec, s, body) => {
+  const qs = sec.items, n = qs.length; const used = s.used || (s.used = []);
+  const colors = sec.colors || ["#FF7FA8", "#FFC857", "#B8A1FF", "#7ED6C3"];
+  const R = 146, C = 150; let svg = '<svg viewBox="0 0 300 300" class="wheel-svg" aria-hidden="true">';
+  for (let i = 0; i < n; i++){
+    const a0 = i / n * 2 * Math.PI - Math.PI / 2, a1 = (i + 1) / n * 2 * Math.PI - Math.PI / 2, am = (a0 + a1) / 2;
+    const p = a => (C + R * Math.cos(a)).toFixed(1) + "," + (C + R * Math.sin(a)).toFixed(1);
+    const tx = (C + R * .7 * Math.cos(am)).toFixed(1), ty = (C + R * .7 * Math.sin(am)).toFixed(1);
+    svg += `<path d="M${C},${C} L${p(a0)} A${R},${R} 0 0 1 ${p(a1)} Z" fill="${colors[i % colors.length]}" stroke="#fff" stroke-width="2.5"/>`;
+    svg += `<text x="${tx}" y="${ty}" text-anchor="middle" dominant-baseline="central" font-size="22" transform="rotate(${(am * 180 / Math.PI + 90).toFixed(1)} ${tx} ${ty})">${qs[i].icon || i + 1}</text>`;
+  }
+  svg += '<circle cx="150" cy="150" r="24" fill="#fff" stroke="#3B1F3A" stroke-width="3"/></svg>';
+  const rot = h("div", { class: "wheel-rot", html: svg });
+  const btn = h("button", { class: "btn btn-check", type: "button" }, "🎡 Spin the wheel");
+  const card = h("div", { class: "wheel-q" }, h("p", { class: "wq-tip" }, sec.start || "Spin the wheel!"));
+  const done = h("div", { class: "wheel-done" });
+  body.append(h("div", { class: "wheel-wrap" }, h("div", { class: "wheel" }, h("div", { class: "wheel-pin" }), rot), h("div", { class: "wheel-side" }, btn, card)), done);
+  let angle = s.angle || 0; rot.style.transform = `rotate(${angle}deg)`;
+  function paintDone(){ done.innerHTML = ""; used.forEach(i => done.append(h("span", { class: "wd" }, (qs[i].icon || "") + " " + qs[i].short))); }
+  function show(i){
+    card.innerHTML = "";
+    card.append(h("div", { class: "wq-n" }, "question " + (used.indexOf(i) + 1) + " of " + n), h("div", { class: "wq", html: qs[i].q }));
+    if (qs[i].tip) card.append(h("div", { class: "wq-tip", html: qs[i].tip }));
+  }
+  btn.addEventListener("click", () => {
+    let free = qs.map((q, i) => i).filter(i => !used.includes(i));
+    if (!free.length){ used.length = 0; free = qs.map((q, i) => i); }
+    const i = free[Math.floor(Math.random() * free.length)];
+    const center = (i + .5) / n * 360;
+    angle = Math.ceil(angle / 360) * 360 + 1440 + (360 - center);
+    rot.style.transition = "transform 3.2s cubic-bezier(.17,.67,.2,1)"; rot.style.transform = `rotate(${angle}deg)`;
+    btn.disabled = true;
+    setTimeout(() => { used.push(i); s.angle = angle; persist(); show(i); paintDone(); btn.disabled = false; burst(card); }, 3300);
+  });
+  paintDone(); if (used.length) show(used[used.length - 1]);
+  return { noFoot: true, total: 0, check(){ return []; }, reveal(){}, reset(){} };
+};
+
+RENDER.gifts = (sec, s, body) => {
+  const v = s.v || (s.v = {}); const o = s.o || (s.o = {}); const items = [];
+  const grid = h("div", { class: "gifts" });
+  sec.items.forEach((it, i) => {
+    const box = h("div", { class: "gift" + (o[i] ? " open" : ""), style: "--g:" + i });
+    const lid = h("button", { class: "gift-closed", type: "button", "aria-label": "open present " + (i + 1) }, emo(sec.icon || "gift"), h("span", { class: "gift-n" }, pad(i)));
+    const text = h("div", { class: "q-text" }, h("span", { class: "q-num" }, pad(i)));
+    it.q.split("___").forEach((part, k) => { if (k) text.append(h("span", { class: "blank" })); text.append(h("span", { html: part })); });
+    const opts = h("div", { class: "opts" });
+    const btns = it.options.map((op, j) => { const b = h("button", { class: "opt", type: "button", html: op }); b.addEventListener("click", () => { v[i] = j; persist(); paint(); fire(body); }); opts.append(b); return b; });
+    function paint(){ btns.forEach((b, j) => { b.classList.toggle("sel", v[i] === j); b.classList.remove("ok", "bad", "answer"); }); }
+    lid.addEventListener("click", () => { o[i] = 1; persist(); box.classList.add("open"); burst(box); });
+    box.append(lid, h("div", { class: "gift-in" }, text, opts)); grid.append(box); paint();
+    items.push({ it, btns, i, paint, box });
+  });
+  body.append(grid);
+  return {
+    total: items.length,
+    check(){ return items.map(({ it, btns, i, paint }) => { paint(); if (v[i] === undefined) return null; const ok = v[i] === it.answer; btns[v[i]].classList.add(ok ? "ok" : "bad"); return ok; }); },
+    reveal(){ items.forEach(({ it, btns, i, box }) => { box.classList.add("open"); o[i] = 1; if (v[i] !== it.answer) btns[it.answer].classList.add("answer"); }); persist(); },
+    reset(){ clear(v); clear(o); items.forEach(({ paint, box }) => { paint(); box.classList.remove("open"); }); }
+  };
+};
+
+RENDER.balloons = (sec, s, body) => {
+  const items = sec.items; const popped = s.p || (s.p = {});
+  const colors = ["#FF4F8B", "#7B5CFF", "#FFC857", "#2EC4B6"];
+  const grid = h("div", { class: "balloons" }); const els = [];
+  const left = h("span", { class: "cake-left" });
+  items.forEach((q, i) => {
+    const b = h("button", { class: "bln" + (popped[i] ? " popped" : ""), type: "button", style: `--c:${colors[i % 4]};--d:${(i % 5) * .35}s`, "aria-label": "balloon " + (i + 1) },
+      h("span", { class: "bln-body" }, h("b", {}, String(i + 1))), h("span", { class: "bln-q", html: q }));
+    b.addEventListener("click", () => { if (popped[i]) return; popped[i] = 1; persist(); b.classList.add("popped"); burst(b); count(); });
+    grid.append(b); els.push(b);
+  });
+  const again = h("button", { class: "btn", type: "button" }, "🎈 Blow them up again");
+  again.addEventListener("click", () => { clear(popped); persist(); els.forEach(b => b.classList.remove("popped")); count(); });
+  function count(){ const n = items.length - Object.keys(popped).length; left.textContent = n ? n + " balloons left" : "🎉 All popped!"; }
+  body.append(h("div", { class: "cake-banner", html: sec.banner || "" }), grid, h("div", { class: "cake-ctr" }, again, left));
+  count();
+  return { noFoot: true, total: 0, check(){ return []; }, reveal(){}, reset(){} };
+};
+
+RENDER.letter = (sec, s, body) => {
+  const env = h("button", { class: "env", type: "button", "aria-label": "open the envelope" },
+    h("span", { class: "env-back" }), h("span", { class: "env-letter" }), h("span", { class: "env-front" }), h("span", { class: "env-flap" }),
+    h("span", { class: "env-seal" }, emo(sec.seal || "loveletter")), h("span", { class: "env-to", html: sec.to || "" }));
+  const letter = h("div", { class: "letter", html: sec.html }); letter.hidden = true;
+  const hint = h("p", { class: "cake-hint" }, sec.hint || "Tap the envelope to open it.");
+  env.addEventListener("click", () => {
+    if (env.classList.contains("open")) return;
+    env.classList.add("open"); hint.hidden = true;
+    setTimeout(() => { letter.hidden = false; letter.classList.add("in"); [0, 300, 650].forEach(t => setTimeout(() => burst(env), t)); }, 700);
+  });
+  body.append(h("div", { class: "env-wrap" }, env), hint, letter);
+  return { noFoot: true, total: 0, check(){ return []; }, reveal(){}, reset(){} };
+};
+
+/* ---------- block timer (visible countdown, 5/7/8 min) ---------- */
+(function blockTimer(){
+  let left = 0, total = 0, iv = 0;
+  const face = h("button", { type: "button", class: "bt-face", title: "Block timer: 5, 7 or 8 minutes" }, "⏱ Timer");
+  const presets = h("div", { class: "bt-presets" });
+  const box = h("div", { class: "bt" }, face, presets);
+  [5, 7, 8].forEach(m => { const b = h("button", { type: "button" }, m + " min"); b.addEventListener("click", () => start(m)); presets.append(b); });
+  face.addEventListener("click", () => { box.classList.toggle("open"); paint(); });
+  const stop = h("button", { type: "button", class: "bt-stop" }, "■ stop"); stop.addEventListener("click", reset); presets.append(stop);
+  function fmt(){ const m = Math.floor(left / 60), s = left % 60; return m + ":" + String(s).padStart(2, "0"); }
+  function paint(){ face.textContent = left ? "⏱ " + fmt() : (box.classList.contains("open") ? "⏱ Timer ▸" : "⏱ Timer"); box.style.setProperty("--p", total ? (1 - left / total) : 0); box.classList.toggle("run", !!left); box.classList.toggle("low", left > 0 && left <= 60); }
+  function start(m){ box.classList.remove("open"); clearInterval(iv); total = left = m * 60; paint(); iv = setInterval(() => { left--; if (left <= 0){ left = 0; clearInterval(iv); box.classList.add("ring"); setTimeout(() => box.classList.remove("ring"), 2600); burst(box); } paint(); }, 1000); }
+  function reset(){ clearInterval(iv); left = total = 0; paint(); }
+  document.body.append(box); paint();
+})();
+
+/* ---------- open T/F (checked together, no auto score) ---------- */
+RENDER.tfopen = (sec, s, body) => {
+  const v = s.v || (s.v = {});
+  const list = h("ol", { class: "tfo" });
+  sec.items.forEach((q, i) => {
+    const btns = ["T", "F"].map(L => {
+      const b = h("button", { type: "button", class: "opt" + (v[i] === L ? " sel" : "") }, L);
+      b.addEventListener("click", () => { v[i] = L; persist(); btns.forEach(x => x.classList.toggle("sel", x === b)); });
+      return b;
+    });
+    list.append(h("li", {}, h("span", { html: q }), h("span", { class: "tfo-b" }, btns[0], btns[1])));
+  });
+  body.append(list);
+  if (sec.note) body.append(h("p", { class: "wq-tip", html: sec.note }));
+  return { noFoot: true, total: 0, check(){ return []; }, reveal(){}, reset(){} };
+};
+
+/* ---------- build page ---------- */
+const main = document.getElementById("lesson");
+const graded = []; let reviewBox = null; let n = 0;
+
+LESSON.sections.forEach((sec, idx) => {
+  if (sec.type === "part"){
+    main.append(h("div", { class: "part", style: sec.color ? "--pc:" + sec.color : "" },
+      h("div", { class: "pi" }, emo(sec.icon)),
+      h("div", {}, h("div", { class: "pn" }, "PART " + sec.n), h("h2", {}, sec.title), sec.text ? h("p", {}, sec.text) : null)));
+    return;
+  }
+  const sid = "s" + idx; const s = SAVE[sid] || (SAVE[sid] = {});
+  const exercise = sec.type !== "rule" && sec.type !== "review";
+  const card = h("section", { class: "card", id: sid });
+  card.append(h("div", { class: "winbar", "aria-hidden": "true" }, h("i"), h("i"), h("i"), h("span", {}, sec.label || LABEL[sec.type] || "")));
+  if (sec.sticker) card.append(h("div", { class: "deco", "aria-hidden": "true" }, emo(sec.sticker)));
+  const inner = h("div", { class: "card-in" }); card.append(inner);
+  const num = exercise ? pad(n++) : (sec.type === "review" ? "★" : "i");
+  inner.append(h("div", { class: "card-head" }, h("div", { class: "ticket" + (exercise ? "" : " alt") }, num), h("div", {}, h("h2", { class: "t", html: sec.title || "" }))));
+  if (sec.instructions) inner.append(h("p", { class: "instr", html: sec.instructions }));
+  else inner.append(h("div", { style: "height:14px" }));
+  const body = h("div", { class: "card-body" }); inner.append(body);
+  main.append(card);
+
+  if (sec.type === "review"){ reviewBox = body; return; }
+  const api = RENDER[sec.type] ? RENDER[sec.type](sec, s, body) : null;
+  if (!api || api.noFoot) return;
+
+  const score = h("span", { class: "score" });
+  const btnCheck = h("button", { class: "btn btn-check", type: "button" }, "Check");
+  const btnShow = h("button", { class: "btn btn-soft", type: "button", hidden: !api.alwaysShow }, api.revealLabel || "👀 Show answers");
+  const btnReset = h("button", { class: "btn", type: "button" }, "Reset");
+  inner.append(h("div", { class: "card-foot" }, btnCheck, btnShow, btnReset, score));
+  const g = { sec, s, api, card, num, title: sec.title };
+  graded.push(g);
+
+  function showScore(){
+    if (s.score == null || !api.total){ score.textContent = ""; score.classList.remove("perfect"); return; }
+    score.textContent = s.score + "/" + api.total + (s.score === api.total ? " ✓" : "");
+    score.classList.toggle("perfect", s.score === api.total);
+  }
+  function doCheck(silent){
+    const res = api.check(); const sc = res.filter(x => x === true).length;
+    s.score = sc; s.checked = true;
+    if (!silent){
+      s.tries = (s.tries || 0) + 1;
+      s.first = s.first || [];
+      s.fixed = s.fixed || [];
+      res.forEach((r, i) => {
+        if (s.first[i] == null){ if (r !== null) s.first[i] = r; }
+        else if (s.first[i] === false && r === true && !s.revealed) s.fixed[i] = true;
+      });
+    }
+    btnShow.hidden = !api.alwaysShow && !((s.tries || 0) >= 2 && sc < api.total);
+    persist(); showScore(); updateAll();
+    if (!silent && api.total && sc === api.total){ burst(btnCheck); btnCheck.classList.remove("wiggle"); void btnCheck.offsetWidth; btnCheck.classList.add("wiggle"); }
+  }
+  g.doCheck = doCheck;
+  btnCheck.addEventListener("click", () => doCheck(false));
+  btnShow.addEventListener("click", () => { s.revealed = true; persist(); api.reveal(); updateAll(); });
+  btnReset.addEventListener("click", () => {
+    api.reset(); body.querySelectorAll(".reveal,.model,.why").forEach(x => x.remove());
+    delete s.score; delete s.checked; persist(); btnShow.hidden = !api.alwaysShow; showScore(); updateAll();
+  });
+  body.addEventListener("input", () => { if (s.score != null){ delete s.score; delete s.checked; persist(); showScore(); updateAll(); } });
+  if (s.checked) doCheck(true);
+});
+
+/* ---------- progress + self-check ---------- */
+function updateAll(){
+  let sc = 0, tot = 0, fixed = 0;
+  graded.forEach(({ s, api }) => { tot += api.total; if (s.score != null) sc += s.score; (s.fixed || []).forEach(f => { if (f) fixed++; }); });
+  document.getElementById("pScore").textContent = sc;
+  document.getElementById("pTotal").textContent = tot;
+  document.getElementById("pBar").style.width = tot ? (sc / tot * 100) + "%" : "0";
+  document.getElementById("pFix").textContent = fixed;
+  if (!reviewBox) return;
+  reviewBox.innerHTML = "";
+  reviewBox.append(h("div", { class: "fixcount" }, emo("star"),
+    h("div", {}, h("div", { class: "big" }, "+" + fixed), h("div", { class: "lbl" }, "mistakes you fixed yourself"))));
+  const list = h("div", { class: "rv-list" }); let any = false, checkedAny = false;
+  graded.forEach(g => {
+    const first = g.s.first || []; if (first.length) checkedAny = true;
+    const wrong = [], done = [];
+    first.forEach((f, i) => { if (f === false){ (g.s.fixed && g.s.fixed[i] ? done : wrong).push(i + 1); } });
+    if (!wrong.length && !done.length) return;
+    any = true;
+    const btn = h("button", { class: "btn", type: "button" }, wrong.length ? "Fix →" : "See →");
+    btn.addEventListener("click", () => { g.card.scrollIntoView({ behavior: "smooth", block: "start" }); g.card.classList.remove("flash"); void g.card.offsetWidth; g.card.classList.add("flash"); });
+    list.append(h("div", { class: "rv-item" + (wrong.length ? "" : " done") },
+      h("div", {}, h("div", { class: "rv-t" }, g.num + " · " + g.title.replace(/<[^>]+>/g, "")),
+        h("div", { class: "rv-n" }, wrong.length ? "to fix: " + wrong.join(", ") + (g.s.revealed ? " (answers shown)" : "") : "all fixed ✓")),
+      btn));
+  });
+  if (!any) list.append(h("div", { class: "rv-empty" }, checkedAny ? "No mistakes — wow! 🎉" : "Check some exercises first. Your mistakes will appear here."));
+  reviewBox.append(list);
+}
+updateAll();
+
+document.getElementById("resetAll").addEventListener("click", () => {
+  if (!confirm("Clear all your answers in this lesson?")) return;
+  SAVE = {}; try { localStorage.removeItem(KEY); } catch (e) {}
+  location.reload();
+});
+})();
+</script>
+</body>
+</html>
