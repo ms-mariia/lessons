@@ -880,7 +880,7 @@ RENDER.build = (sec, s, body) => {
       B.register(box, zone, "z-" + role, true);
       row.append(box); slots.push({ role, box, zone });
     });
-    row.append(h("span", { class: "bdot" }, "."));
+    row.append(h("span", { class: "bdot" }, it.end || "."));
     const chipsData = ROLES.filter(([r]) => it[r] != null).map(([r]) => ({ id: r, label: it[r], value: r }));
     if (it.wrong) chipsData.push({ id: "x", label: it.wrong, value: "x" });
     shuffle(chipsData, LESSON.id + sec.title + i).forEach(c => B.chip(c.id, c.label, c.value));
