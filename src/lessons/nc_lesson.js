@@ -41,14 +41,14 @@ const LESSON = {
           <div>have <b>breakfast</b> · <b>lunch</b> · <b>dinner</b> · <b>a meal</b></div>
           <div>have <b>a cup of tea / coffee</b> · <b>a drink</b> · <b>an ice cream</b></div>
           <div>have <b>a lesson</b> · <b>an exam</b> · <b>homework</b></div>
-          <div>have <b>a party</b> · <b>a meeting</b> · <b>a game</b> (of football)</div>
+          <div>have <b>a party</b> · <b>a meeting</b> · <b>a game</b> (of soccer)</div>
           <div>have <b>a shower</b> · <b>a bath</b> · <b>a swim</b></div>
         </div>
         <h3>Expressions with have</h3>
         <div class="colloc">
           <div>Can I <b>have a look</b>? = look at it</div>
           <div>Can I <b>have a go</b>? = try / ride it</div>
-          <div><b>Have a good journey!</b> — to someone going away</div>
+          <div><b>Have a good trip!</b> — to someone going away</div>
           <div>Do you <b>have a moment</b>? = some time</div>
           <div>Can I <b>have a word with</b> you? = speak to you</div>
           <div>We <b>had a good time</b>. = fun, we enjoyed it</div>
@@ -69,7 +69,7 @@ const LESSON = {
       categories: [
         { name: "eat & drink", words: ["breakfast", "a cup of tea", "an ice cream"] },
         { name: "school", words: ["a lesson", "an exam", "homework"] },
-        { name: "free time", words: ["a party", "a game of football"] },
+        { name: "free time", words: ["a party", "a game of soccer"] },
         { name: "wash & swim", words: ["a shower", "a swim"] }
       ]
     },
@@ -79,7 +79,7 @@ const LESSON = {
       title: "What do you say?",
       instructions: "Choose the best answer for each situation.",
       items: [
-        { q: "Your friend is going to Lviv by train. You say: “Bye! Have ___!”", options: ["a good journey", "a good travel", "a nice go"], answer: 0 },
+        { q: "Your friend is going to Lviv by train. You say: “Bye! Have ___!”", options: ["a good trip", "a good travel", "a nice go"], answer: 0 },
         { q: "Your classmate has a new phone. You say: “Wow! Can I have ___?”", options: ["a looking", "a look", "the look"], answer: 1 },
         { q: "Your brother has a new skateboard. You want to try it: “Can I have ___?”", options: ["a go", "a going", "a try on"], answer: 0 },
         { q: "You need to speak to your teacher: “Can I have ___ you?”", options: ["some words with", "a word with", "a talk to"], answer: 1 },
@@ -130,7 +130,7 @@ const LESSON = {
         { text: "What [[were you doing]] <span class=hint>(you / do)</span> at 11 o’clock last night?", why: "Question: What + were + you + -ing." },
         { text: "My sister [[was swimming]] <span class=hint>(swim)</span> in the pool when I arrived.", why: "swim → swimming (double m)." },
         { text: "[[Was it raining]] <span class=hint>(it / rain)</span> when you left the house?", why: "Question: Was + it + -ing." },
-        { text: "We [[were sitting]] <span class=hint>(sit)</span> at the back of the cinema, so we couldn’t see well.", why: "sit → sitting (double t)." },
+        { text: "We [[were sitting]] <span class=hint>(sit)</span> at the back of the movie theater, so we couldn’t see well.", why: "sit → sitting (double t)." },
         { text: "Why [[was Tom running]] <span class=hint>(Tom / run)</span>? Was he late for the train?", why: "Why + was + Tom + running." },
         { text: "They [[weren't looking|were not looking]] <span class=hint>(not / look)</span> at the camera, so the photo is terrible.", why: "they → weren’t + -ing." },
         { text: "This time last year I [[was living]] <span class=hint>(live)</span> in a different city.", why: "live → living (drop the e)." },
@@ -148,8 +148,8 @@ const LESSON = {
         { q: "We ___ a party last Saturday. Everybody came!", options: ["had", "were having"], answer: 0 },
         { q: "“What were you doing at 8 p.m.?” “I ___ my homework.”", options: ["did", "was doing"], answer: 1 },
         { q: "When I ___ up this morning, the sun was shining.", options: ["woke", "was waking"], answer: 0 },
-        { q: "She ___ her leg while she was playing football.", options: ["was breaking", "broke"], answer: 1 },
-        { q: "We ___ to the beach every day when we were on holiday.", options: ["went", "were going"], answer: 0 },
+        { q: "She ___ her leg while she was playing soccer.", options: ["was breaking", "broke"], answer: 1 },
+        { q: "We ___ to the beach every day when we were on vacation.", options: ["went", "were going"], answer: 0 },
         { q: "I saw Max in the café. He ___ a cup of coffee with a friend.", options: ["had", "was having"], answer: 1 },
         { q: "___ TV when I called you last night?", options: ["Did you watch", "Were you watching"], answer: 1 },
         { q: "When the teacher came in, we ___ our books and started the lesson. (= she came in, and then we did it)", options: ["opened", "were opening"], answer: 0 }
@@ -183,7 +183,7 @@ const LESSON = {
         { prompt: "We were having lunch. It started to rain.", key: "WHEN", answers: ["We were having lunch when it started to rain.", "When it started to rain, we were having lunch."] },
         { prompt: "She was swimming in the pool. She lost her ring.", key: "WHILE", answers: ["She lost her ring while she was swimming in the pool.", "While she was swimming in the pool, she lost her ring."] },
         { prompt: "I was walking to the station. I met my teacher.", key: "WHEN", answers: ["I was walking to the station when I met my teacher.", "When I met my teacher, I was walking to the station."] },
-        { prompt: "They were watching a film. The lights went out.", key: "WHILE", answers: ["The lights went out while they were watching a film.", "While they were watching a film, the lights went out."] },
+        { prompt: "They were watching a movie. The lights went out.", key: "WHILE", answers: ["The lights went out while they were watching a movie.", "While they were watching a movie, the lights went out."] },
         { prompt: "My dad was cooking dinner. He burned his hand.", key: "WHILE", answers: ["My dad burned his hand while he was cooking dinner.", "While my dad was cooking dinner, he burned his hand.", "My dad burned his hand while cooking dinner."] }
       ]
     },
@@ -196,7 +196,7 @@ const LESSON = {
         { wrong: "I was have breakfast when you called.", answers: ["I was having breakfast when you called."] },
         { wrong: "What did you doing at 7 o'clock yesterday?", answers: ["What were you doing at 7 o'clock yesterday?"] },
         { wrong: "We was sitting in the café when it started to snow.", answers: ["We were sitting in the café when it started to snow."] },
-        { wrong: "I was reading when my mum was coming home.", answers: ["I was reading when my mum came home."] },
+        { wrong: "I was reading when my mom was coming home.", answers: ["I was reading when my mom came home."] },
         { wrong: "That phone looks great. Can I have a looking?", answers: ["That phone looks great. Can I have a look?"] },
         { wrong: "Yesterday I had got to stay at school until five.", answers: ["Yesterday I had to stay at school until five."] },
         { wrong: "We had a good fun at the party.", answers: ["We had a good time at the party."] }
@@ -218,7 +218,7 @@ const LESSON = {
         { cue: "negative", prompt: "I / not / listen", answers: ["I wasn't listening."] },
         { cue: "past simple", prompt: "we / have / a good time / at the party", answers: ["We had a good time at the party."] },
         { cue: "have", prompt: "can I / have / a look?", answers: ["Can I have a look?"] },
-        { cue: "have", prompt: "have / a good journey!", answers: ["Have a good journey!"] },
+        { cue: "have", prompt: "have / a good trip!", answers: ["Have a good trip!"] },
         { cue: "have", prompt: "can I / have / a word with / you?", answers: ["Can I have a word with you?"] },
         { cue: "past simple", prompt: "I / have / my hair / cut / yesterday", answers: ["I had my hair cut yesterday.", "Yesterday I had my hair cut."] },
         { cue: "had to", prompt: "I / have to / study / last night", answers: ["I had to study last night.", "Last night I had to study."] },
@@ -241,7 +241,7 @@ const LESSON = {
         { label: "3+ have-phrases from today (they light up above)", words: 3 },
         { label: "at least 5 sentences", sentences: 5 }
       ],
-      sample: "Yesterday at 7 p.m. I was at home. My mum was cooking dinner and my dad was watching the news. I was doing my homework in my room. While I was writing an essay, my friend called me. We had a short chat, and then I had to finish my homework. After that we had dinner together, and I had a hot shower before bed."
+      sample: "Yesterday at 7 p.m. I was at home. My mom was cooking dinner and my dad was watching the news. I was doing my homework in my room. While I was writing an essay, my friend called me. We had a short chat, and then I had to finish my homework. After that we had dinner together, and I had a hot shower before bed."
     },
 
     /* ================= 6 · SELF-CHECK ================= */
