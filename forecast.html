@@ -336,6 +336,10 @@
   .wxgrid b{display:block}
   .wxgrid small{color:var(--muted)}
   @media (max-width:560px){.wxgrid{grid-template-columns:repeat(2,1fr)}.tscale .tl6{font-size:12px}.tscale .tl6 i{font-size:10.5px}}
+  /* timeline labels: two rows so they never overlap */
+  .tl{height:132px;margin:34px 4px 10px}
+  .tl .pt b{bottom:56px}
+  .tl .pt i{top:54px}
 </style>
 </head>
 <body>
