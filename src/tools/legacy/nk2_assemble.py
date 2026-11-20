@@ -1,4 +1,4 @@
-S = "/tmp/claude-0/-home-claude/8ad7431f-8534-5bff-9d6c-2db718dd4e9c/scratchpad"
+S = "/home/claude/work"
 e = open(S + "/engine.js").read()
 e = e.replace('const ROLES = [\n  ["who", "Who?"]', 'const ROLES = [\n  ["qw", "Question word"], ["aux", "Helper"], ["who", "Who?"]', 1)
 e = e.replace('row.append(h("span", { class: "bdot" }, "."));', 'row.append(h("span", { class: "bdot" }, it.end || "."));', 1)

@@ -1,4 +1,4 @@
-S = "/tmp/claude-0/-home-claude/8ad7431f-8534-5bff-9d6c-2db718dd4e9c/scratchpad"
+S = "/home/claude/work"
 e = open(S + "/engine.js").read()
 def rep(old, new):
     global e
@@ -28,7 +28,7 @@ head = '''<!doctype html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Sweet 16 Is Coming</title>
+<title>Turning 17</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Gloock&family=Figtree:wght@400;500;600;700&family=Fragment+Mono&display=swap" rel="stylesheet">

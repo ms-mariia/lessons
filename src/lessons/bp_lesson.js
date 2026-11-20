@@ -3,8 +3,8 @@ const H = v => ` <span class=hint>(${v})</span>`;
 const LESSON = {
   id: "birthday-plans-egu19-23-confusables",
   kicker: "birthday plans · future forms",
-  titleHTML: 'Sweet <em>16</em> plans',
-  title: "Sweet 16 plans",
+  titleHTML: 'Turning <em>17</em>',
+  title: "Turning 17",
   subtitle: "A big birthday is coming. Plans, arrangements, quick decisions — and the tricky words you already know.",
   stickers: ["balloon", "bdcake"],
   confetti: ["balloon", "party", "gift", "sparkles", "confettiball", "star"],
@@ -12,18 +12,18 @@ const LESSON = {
   sections: [
 
     /* ================= 1 · WARM-UP ================= */
-    { type: "part", n: "01", icon: "balloon", title: "This or that?", text: "Sixteen balloons. Pop one — choose fast — say why." },
+    { type: "part", n: "01", icon: "balloon", title: "This or that?", text: "Seventeen balloons. Pop one — choose fast — say why." },
 
     {
       type: "balloons", label: "speaking · quick choices", sticker: "balloon",
-      title: "Sixteen balloons, sixteen choices",
+      title: "Seventeen balloons, seventeen choices",
       instructions: "Pop a balloon, choose, and give <b>one reason</b>: <i>I’d go for… because…</i>",
       banner: "🎈 YOUR PERFECT BIRTHDAY 🎈",
       items: [
         "Cake or ice cream?", "A party at home or at a café?", "A big party or a small one?", "A surprise party — yes or no?",
         "Pizza or sushi?", "Balloons or flowers?", "A present you can wear, use or eat?", "A morning or an evening party?",
-        "A dress or jeans?", "Photos on a phone or a real camera?", "Friends or family first?", "16 candles or just one?",
-        "Party games — yes or no?", "A movie or a concert?", "Dancing or karaoke?", "Your perfect birthday in one emoji?"
+        "A dress or jeans?", "Photos on a phone or a real camera?", "Friends or family first?", "17 candles or just one?",
+        "Party games — yes or no?", "A movie or a concert?", "Dancing or karaoke?", "A playlist or a live band?", "Your perfect birthday in one emoji?"
       ]
     },
 
@@ -220,7 +220,7 @@ const LESSON = {
         { icon: "🎁", short: "presents", q: "What’s your dream present — and what do you think you’<b>ll</b> really get?" },
         { icon: "📅", short: "arranged", q: "Is anything already arranged? Who <b>are you seeing</b>, where <b>are you going</b>?" },
         { icon: "❄️", short: "plan B", q: "If it snows or rains, what <b>will</b> you <b>do</b> instead?" },
-        { icon: "🔑", short: "16", q: "What do you think you’<b>ll</b> feel when you wake up at 16? What <b>are you going to do</b> differently?" }
+        { icon: "🔑", short: "17", q: "What do you think you’<b>ll</b> feel when you wake up at 17? What <b>are you going to do</b> differently?" }
       ]
     },
 

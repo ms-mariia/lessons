@@ -497,7 +497,7 @@ const LESSON = {
         { q: "People love to sunbathe when it’s freezing.", answer: false, fix: ["People love to sunbathe when it’s hot.", "People love to sunbathe when it’s icy.", "People love to sunbathe in a storm."], fixAnswer: 0 },
         { q: "When it’s boiling, a cold drink is a great idea.", answer: true, fix: [], fixAnswer: 0 },
         { q: "A shower is a long period of very heavy rain.", answer: false, fix: ["A shower is a type of strong wind.", "A shower is thick fog in the morning.", "A shower is a short period of rain."], fixAnswer: 2 },
-        { q: "When it’s chilly, a warm jumper is a good idea.", answer: true, fix: [], fixAnswer: 0 },
+        { q: "When it’s chilly, a warm sweater is a good idea.", answer: true, fix: [], fixAnswer: 0 },
         { q: "When it’s humid, the air feels warm and dry.", answer: false, fix: ["When it’s humid, the air feels warm and wet.", "When it’s humid, the air feels cold and dry.", "When it’s humid, there is no air."], fixAnswer: 0 },
         { q: "A mild winter is colder than usual.", answer: false, fix: ["A mild winter has no snow at all.", "A mild winter is not as cold as usual.", "A mild winter is extremely cold."], fixAnswer: 1 },
         { q: "After heavy rain, the roads are wet.", answer: true, fix: [], fixAnswer: 0 },
@@ -542,7 +542,7 @@ const LESSON = {
         { text: "What [[were you doing]] <span class=hint>(you / do)</span> at 8 o’clock last night?", why: "Question: What + were + you + -ing." },
         { text: "It [[wasn't raining|was not raining]] <span class=hint>(not / rain)</span> when we got up, but it was very cloudy.", why: "Negative: wasn’t + -ing." },
         { text: "[[Was it snowing]] <span class=hint>(it / snow)</span> when you left school?", why: "Question: Was + it + -ing." },
-        { text: "I [[was sitting]] <span class=hint>(sit)</span> in the garden when the sun came out.", why: "sit → sitting (double t)." },
+        { text: "I [[was sitting]] <span class=hint>(sit)</span> in the yard when the sun came out.", why: "sit → sitting (double t)." },
         { text: "The wind [[was blowing]] <span class=hint>(blow)</span> so hard that I couldn’t open my umbrella.", why: "the wind = it → was blowing." },
         { text: "My parents [[were driving]] <span class=hint>(drive)</span> home in thick fog.", why: "they → were; drive → driving (no e)." },
         { text: "Why [[were you running]] <span class=hint>(you / run)</span>? — Because it was pouring with rain!", why: "run → running (double n)." },
@@ -564,7 +564,7 @@ const LESSON = {
         { q: "We ___ tennis yesterday from 10 to 11.30.", options: ["played", "were playing"], answer: 0 },
         { q: "“What ___ at 2 o’clock this morning?” “I was asleep.”", options: ["did you do", "were you doing"], answer: 1 },
         { q: "I lost my key last night, so I ___ in through a window.", options: ["was climbing", "climbed"], answer: 1 },
-        { q: "It ___ at all while we were on holiday — not one drop!", options: ["didn’t rain", "wasn’t raining"], answer: 0 },
+        { q: "It ___ at all while we were on vacation — not one drop!", options: ["didn’t rain", "wasn’t raining"], answer: 0 },
         { q: "I ___ Lucy this morning. She was waiting at the bus stop.", options: ["was seeing", "saw"], answer: 1 },
         { q: "___ TV when I phoned you?", options: ["Were you watching", "Did you watch"], answer: 0 }
       ]
@@ -599,7 +599,7 @@ const LESSON = {
         { wrong: "I was having a shower when the phone was ringing.", answers: ["I was having a shower when the phone rang."] },
         { wrong: "It's very fog today.", answers: ["It's very foggy today."] },
         { wrong: "There was a heavy wind when we were on the boat.", answers: ["There was a strong wind when we were on the boat."] },
-        { wrong: "We had some strong rain at the weekend.", answers: ["We had some heavy rain at the weekend."] }
+        { wrong: "We had some strong rain on the weekend.", answers: ["We had some heavy rain on the weekend."] }
       ]
     },
 
@@ -641,7 +641,7 @@ const LESSON = {
         { cue: "word partner", prompt: "the sun / come out / after lunch", answers: ["The sun came out after lunch."] },
         { cue: "word partner", prompt: "it / pour with rain / all afternoon", answers: ["It poured with rain all afternoon."] },
         { cue: "word partner", prompt: "there / be / a strong wind / yesterday", answers: ["There was a strong wind yesterday."] },
-        { cue: "word partner", prompt: "we / have / heavy rain / at the weekend", answers: ["We had heavy rain at the weekend.", "We had some heavy rain at the weekend."] },
+        { cue: "word partner", prompt: "we / have / heavy rain / on the weekend", answers: ["We had heavy rain on the weekend.", "We had some heavy rain on the weekend."] },
         { cue: "word partner", prompt: "the sky / be / clear / by lunchtime", answers: ["The sky was clear by lunchtime."] },
         { cue: "question", prompt: "it / rain / when / you / get up?", answers: ["Was it raining when you got up?"] }
       ]
@@ -868,7 +868,7 @@ RENDER.build = (sec, s, body) => {
       B.register(box, zone, "z-" + role, true);
       row.append(box); slots.push({ role, box, zone });
     });
-    row.append(h("span", { class: "bdot" }, "."));
+    row.append(h("span", { class: "bdot" }, it.end || "."));
     const chipsData = ROLES.filter(([r]) => it[r] != null).map(([r]) => ({ id: r, label: it[r], value: r }));
     if (it.wrong) chipsData.push({ id: "x", label: it.wrong, value: "x" });
     shuffle(chipsData, LESSON.id + sec.title + i).forEach(c => B.chip(c.id, c.label, c.value));
