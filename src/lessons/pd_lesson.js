@@ -30,6 +30,29 @@ const LESSON = {
         </ol>`
     },
 
+    /* ================= 00 · REVIEW ================= */
+    { type: "part", n: "00", icon: "repeat", title: "Last time…", text: "Quick review before we start: Match Report · Turning 17 · Confusables." },
+
+    {
+      type: "mcq", label: "review · last lessons", sticker: "repeat",
+      title: "Remember?",
+      instructions: "Twelve quick questions from the last lessons. Don’t think too long — then we check together.",
+      items: [
+        { q: "I ___ basketball twice a week.", options: ["play", "do", "go"], answer: 0 },
+        { q: "My sister ___ yoga every morning.", options: ["plays", "goes", "does"], answer: 2 },
+        { q: "We often ___ swimming in summer.", options: ["do", "go", "play"], answer: 1 },
+        { q: "Look! Max ___ a new bike.", options: ["rides", "is riding", "ride"], answer: 1 },
+        { q: "Can you ___ me the time, please?", options: ["say", "speak", "tell"], answer: 2 },
+        { q: "She ___ three languages.", options: ["speaks", "talks", "tells"], answer: 0 },
+        { q: "The party ___ at 7 tonight.", options: ["will starting", "is start", "starts"], answer: 2 },
+        { q: "I think it ___ rain tomorrow.", options: ["is raining", "will", "is going"], answer: 1 },
+        { q: "We ___ dinner with Grandma on Sunday. It’s all planned.", options: ["have", "are having", "had"], answer: 1 },
+        { q: "Let’s stay at ___ tonight and watch a movie.", options: ["house", "home", "the home"], answer: 1 },
+        { q: "There’s a ___ mistake in your test — just one letter.", options: ["tiny", "large", "great"], answer: 0 },
+        { q: "The plane landed safely on the ___.", options: ["land", "earth", "ground"], answer: 2 }
+      ]
+    },
+
     /* ================= 2 · VOCABULARY ================= */
     { type: "part", n: "02", icon: "ball", title: "Competitive sport", text: "Vocabulary in Use Pre-int & Int · Unit 42" },
 

@@ -30,6 +30,29 @@ const LESSON = {
         </ol>`
     },
 
+    /* ================= 00 · REVIEW ================= */
+    { type: "part", n: "00", icon: "repeat", title: "Last time…", text: "Quick review before we start: Podium · Match Report · Turning 17." },
+
+    {
+      type: "mcq", label: "review · last lessons", sticker: "repeat",
+      title: "Remember?",
+      instructions: "Twelve quick questions from the last lessons. Don’t think too long — then we check together.",
+      items: [
+        { q: "Our team ___ the cup three times.", options: ["has won", "won", "have win"], answer: 0 },
+        { q: "We ___ the final last year.", options: ["have lost", "lost", "were losing"], answer: 1 },
+        { q: "Spain ___ Germany 2–1.", options: ["beat", "won", "scored"], answer: 0 },
+        { q: "“Have you ever been to a big stadium?” “Yes, I ___ there last May.”", options: ["have gone", "was going", "went"], answer: 2 },
+        { q: "While we ___ the game, it started to rain.", options: ["watched", "were watching", "have watched"], answer: 1 },
+        { q: "Who ___ the goal?", options: ["scored", "won", "beat"], answer: 0 },
+        { q: "I ___ my homework yet.", options: ["haven’t finished", "didn’t finish", "don’t finish"], answer: 0 },
+        { q: "I’ve played tennis ___ I was seven.", options: ["ago", "for", "since"], answer: 2 },
+        { q: "She moved to Lviv two years ___.", options: ["ago", "since", "for"], answer: 0 },
+        { q: "How long ___ you known your best friend?", options: ["do", "did", "have"], answer: 2 },
+        { q: "I’m sure you ___ the test tomorrow.", options: ["pass", "will pass", "are passing"], answer: 1 },
+        { q: "What ___ when the lights went out?", options: ["did you do", "have you done", "were you doing"], answer: 2 }
+      ]
+    },
+
     /* ================= 2 · BOOKS & MOVIES ================= */
     { type: "part", n: "02", icon: "openbook", title: "Books and movies", text: "Vocabulary in Use Pre-int & Int · Unit 43" },
 
